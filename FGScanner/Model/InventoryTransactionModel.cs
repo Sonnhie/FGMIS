@@ -146,4 +146,18 @@ namespace FGScanner.Model
         public string Pcs { get; set; }
         public string Remarks { get; set; }
     }
+
+    public class DPIList
+    {
+        public string Partnumber { get; set; }
+        public int Quantity { get; set; }
+        public int PPS { get; set; }
+        public int Box { get; set; }
+    }
+
+    public class DPIInfo
+    {
+        public DPIList Item { get; set; }
+        public int TotalBox { get; set; }
+    }
 }

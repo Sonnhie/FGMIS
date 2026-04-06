@@ -43,7 +43,7 @@ namespace FGScanner
             TxtRackno.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             TxtRackno.AutoCompleteSource = AutoCompleteSource.CustomSource;
             TxtRackno.AutoCompleteCustomSource = auto;
-            TxtRackno.DataSource = auto;
+            //TxtRackno.DataSource = auto;
         }
         private bool OnScanProcess(string QRCode)
         {
@@ -559,7 +559,6 @@ namespace FGScanner
                 Shift = "1",
                 IssueDate = DateTime.Now.ToString("dd-MMM-yyyy"),
                 PreparedBy = "JEM",
-                // ... fill other fields
             };
 
             // Call the Landscape drawing method!
@@ -580,6 +579,11 @@ namespace FGScanner
                     middleOfPage,
                     myData
                 );
+        }
+
+        private void TxtScanData_KeyDown(object sender, KeyEventArgs e)
+        {
+
         }
     }
 }

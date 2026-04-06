@@ -1107,73 +1107,93 @@ namespace FGScanner.Util
             // We are returning a LIST of cards, one for each Part Number
             List<InventoryCardData> allCards = new List<InventoryCardData>();
 
-            using (SqlConnection conn = _Connection.Getconnection())
+            try
             {
-                conn.Open();
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
 
-                // 1. ONE efficient query to get all parts and their rows for this rack
-                string sql = @"
+                    // 1. ONE efficient query to get all parts and their rows for this rack
+                    string sql = @"
                         SELECT storage_location, partnumber, prod_date, total_box, quantity 
                         FROM actual_inventory 
                         WHERE location = @location AND WhId = @whid
                         ORDER BY partnumber, prod_date";
 
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
-                {
-                    cmd.Parameters.Add("@location", SqlDbType.NVarChar).Value = location;
-                    cmd.Parameters.Add("@whid", SqlDbType.NVarChar).Value = whid;
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
-                        Dictionary<string, InventoryCardData> cardsByPart = new Dictionary<string, InventoryCardData>();
+                        cmd.Parameters.Add("@location", SqlDbType.NVarChar).Value = location;
+                        cmd.Parameters.Add("@whid", SqlDbType.NVarChar).Value = whid;
 
-                        while (reader.Read())
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            string currentPartNo = reader["partnumber"].ToString() ?? string.Empty;
+                            Dictionary<string, InventoryCardData> cardsByPart = new Dictionary<string, InventoryCardData>();
 
-                            // 2. If we haven't seen this Part Number yet, create a new Card for it!
-                            if (!cardsByPart.ContainsKey(currentPartNo))
+                            while (reader.Read())
                             {
-                                cardsByPart[currentPartNo] = new InventoryCardData
+                                string currentPartNo = reader["partnumber"].ToString() ?? string.Empty;
+
+                                // 2. If we haven't seen this Part Number yet, create a new Card for it!
+                                if (!cardsByPart.ContainsKey(currentPartNo))
                                 {
-                                    PartNo = currentPartNo,
-                                    ErpLocation = reader["storage_location"].ToString() ?? string.Empty,
-                                    MonthYear = DateTime.Now.ToString("yyyy MMMM").ToUpper(),
-                                    GrandTotalBoxes = 0,
-                                    GrandTotalQuantity = 0,
-                                    Rows = new List<InventoryRow>() // Make sure the list is initialized
+                                    cardsByPart[currentPartNo] = new InventoryCardData
+                                    {
+                                        PartNo = currentPartNo,
+                                        ErpLocation = reader["storage_location"].ToString() ?? string.Empty,
+                                        MonthYear = DateTime.Now.ToString("yyyy MMMM").ToUpper(),
+                                        GrandTotalBoxes = 0,
+                                        GrandTotalQuantity = 0,
+                                        Rows = new List<InventoryRow>() // Make sure the list is initialized
+                                    };
+                                }
+
+                                // 3. Grab the card we are currently building
+                                InventoryCardData card = cardsByPart[currentPartNo];
+
+                                // 4. Safely parse the row data
+                                DateTime prodDate = reader["prod_date"] != DBNull.Value ? Convert.ToDateTime(reader["prod_date"]) : DateTime.MinValue;
+                                int boxes = reader["total_box"] != DBNull.Value ? Convert.ToInt32(reader["total_box"]) : 0;
+                                int qty = reader["quantity"] != DBNull.Value ? Convert.ToInt32(reader["quantity"]) : 0;
+
+                                InventoryRow row = new InventoryRow
+                                {
+                                    LotNo = prodDate.ToString("MM-dd-yy"),
+                                    Boxes = boxes,
+                                    Quantity = qty / boxes
                                 };
+
+                                card.Rows.Add(row);
+
+                                card.GrandTotalBoxes += row.Boxes;
+                                card.GrandTotalQuantity += row.TotalQty;
+                                int PPS = qty / boxes;
+                                card.PPS = PPS;
                             }
 
-                            // 3. Grab the card we are currently building
-                            InventoryCardData card = cardsByPart[currentPartNo];
-
-                            // 4. Safely parse the row data
-                            DateTime prodDate = reader["prod_date"] != DBNull.Value ? Convert.ToDateTime(reader["prod_date"]) : DateTime.MinValue;
-                            int boxes = reader["total_box"] != DBNull.Value ? Convert.ToInt32(reader["total_box"]) : 0;
-                            int qty = reader["quantity"] != DBNull.Value ? Convert.ToInt32(reader["quantity"]) : 0;
-
-                            InventoryRow row = new InventoryRow
-                            {
-                                LotNo = prodDate.ToString("MM-dd-yy"),
-                                Boxes = boxes,
-                                Quantity = qty / boxes
-                            };
-
-                            card.Rows.Add(row);
-
-                            card.GrandTotalBoxes += row.Boxes;
-                            card.GrandTotalQuantity += row.TotalQty;
-                            int PPS = qty / boxes;
-                            card.PPS = PPS;
+                            allCards = cardsByPart.Values.ToList();
                         }
-
-                        allCards = cardsByPart.Values.ToList();
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
 
             return allCards;
         }
+
+        //public List<TransferSlipData> GetWHReturnData(string controlnumber)
+        //{
+        //    List<TransferSlipData> WHReturn = new List<TransferSlipData>();
+
+        //    try
+        //    {
+
+        //    }catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Error: " + ex.Message, "SQL Error");
+        //    }
+        //}
     }
 }

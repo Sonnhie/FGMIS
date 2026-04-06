@@ -1,6 +1,7 @@
 ﻿using FGScanner.Model;
 using FGScanner.Util;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,6 +11,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Util;
@@ -22,6 +24,8 @@ namespace FGScanner
         private readonly string _TransactionType = string.Empty;
         private readonly db_connection _Connection;
         private readonly BindingList<ScannedModel> ShippingItems = new BindingList<ScannedModel>();
+        private readonly BindingList<DPIList> DPIItems = new BindingList<DPIList>();
+        private Dictionary<string, DPIList> DPIDict = new Dictionary<string, DPIList>();
 
         public WH_OUT(string TransactionType)
         {
@@ -31,12 +35,31 @@ namespace FGScanner
             _Connection = new db_connection();
             progressBar.Visible = false;
             toolStripStatusLabel1.Text = "";
+            Loadreference();
+            btnSave.Enabled = false;
         }
+
+        private void Loadreference()
+        {
+            DPIDict = DPIItems
+                 .GroupBy(x => x.Partnumber)
+                 .ToDictionary(
+                    g => g.Key,
+                    g => new DPIList
+                    {
+                        Partnumber = g.Key,
+                        Quantity = g.Sum(x => x.Quantity),
+                        PPS = g.First().PPS,
+                        Box = g.Sum(x => x.Box)
+                    }
+                );
+        }
+
         private bool OnScanProcess(string QRCode)
         {
             var Process = new ScannerUtility();
             var Insert = new TransactionRepo();
-
+           
             if (string.IsNullOrEmpty(QRCode))
             {
                 MessageBox.Show("QR Code Error or empty!");
@@ -49,16 +72,46 @@ namespace FGScanner
                 return false;
             }
 
+            if (DPIDict == null)
+            {
+                MessageBox.Show("Upload reference DPI excel first before scanning.", "Missing Reference", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (!DPIDict.TryGetValue(itemModel.PartNumber, out var reference))
+            {
+                MessageBox.Show($"Part number {itemModel.PartNumber} not found in DPI list. Please upload the correct DPI file.", "DPI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            var ShippingSum = ShippingItems.Where(x => x.PartNumber == itemModel.PartNumber).Sum(x => x.Quantity);
+            var updatedScannedQty = ShippingItems
+                                    .Where(x => x.PartNumber == itemModel.PartNumber)
+                                    .Sum(x => x.Quantity);
+            var remaining = reference.Quantity - updatedScannedQty;
+            var newTotal = ShippingSum + itemModel.Quantity;
+            if (newTotal > reference.Quantity)
+            {
+                MessageBox.Show(
+                   $"Total scanned quantity for part number {itemModel.PartNumber} exceeds the DPI reference.\n" +
+                   $"Current: {ShippingSum}, Incoming: {itemModel.Quantity}, DPI: {reference.Quantity}",
+                   "DPI Quantity Warning",
+                   MessageBoxButtons.OK,
+                   MessageBoxIcon.Warning);
+                return false;
+            }
+
             int partcount = ShippingItems.Count(x => x.PartNumber == itemModel.PartNumber);
             int StockCount = Insert.CheckStock(itemModel.PartNumber, TxtRackno.Text);
             var lastIndex = ShippingItems.Count - 1;
-            
+            var customer = Insert.GetCustomer(itemModel.PartNumber);
+
             if (StockCount > partcount)
             {
                 ShippingItems.Add(new ScannedModel
                 {
                     TransactionDate = DateTime.Now,
-                    Customer = Insert.GetCustomer(itemModel.PartNumber),
+                    Customer = customer,
                     PartNumber = itemModel.PartNumber,
                     ProductionDate = itemModel.ProductionDate,
                     ProductionVersion = itemModel.ProductionVer,
@@ -76,11 +129,16 @@ namespace FGScanner
                 return false;
             }
 
+            int DPIQty = DPIItems.Sum(x => x.Quantity);
+            int ShippingQty = ShippingItems.Sum(x => x.Quantity);
+
+            if(ShippingQty == DPIQty)
+            {
+                btnSave.Enabled = true;
+            }
 
 
-            UpdateShiplogs();
-
-            var customer = Insert.GetCustomer(itemModel.PartNumber);
+            UpdateShiplogs(); 
 
             LblPartNumber.Text = itemModel.PartNumber;
             LblProDate.Text = itemModel.ProductionDate.ToString("dd-MM-yy");
@@ -90,8 +148,8 @@ namespace FGScanner
             LblCustomer.Text = customer;
 
 
-                LblTotalQuantity.Text = ShippingItems.Sum(item => item.Quantity).ToString();
-                LblTotalbox.Text = ShippingItems.Count.ToString();
+            LblTotalQuantity.Text = ShippingItems.Sum(item => item.Quantity).ToString();
+            LblTotalbox.Text = ShippingItems.Count.ToString();
        
 
             return true;
@@ -125,6 +183,7 @@ namespace FGScanner
             timer1.Start();
             TxtScanData.Focus();
             TxtcontrolNumber.Text = GenerateTransactionNumber();
+            Loadreference();
         }
 
         private string GenerateTransactionNumber()
@@ -141,12 +200,12 @@ namespace FGScanner
 
         private async Task<bool> UploadData()
         {
+
             if (ShippingItems.Count == 0)
             {
                 MessageBox.Show("No items to upload!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
-
 
             var Repo = new TransactionRepo();
 
@@ -190,6 +249,7 @@ namespace FGScanner
                         //Repo.RunMovementClassification();
                         tx.Commit();                        
                         MessageBox.Show("Data uploaded successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        btnSave.Enabled = false;
                         return true;
                     }
                     catch (Exception ex)
@@ -275,6 +335,7 @@ namespace FGScanner
                     TxtScanData.Clear();
                     e.SuppressKeyPress = true;
                     TxtScanData.Focus();
+                    DPILogsTable.Refresh();
                 }
                 else
                 {
@@ -366,6 +427,149 @@ namespace FGScanner
         private void CmbWHid_SelectedIndexChanged_1(object sender, EventArgs e)
         {
             LoadAutosuggest();
+        }
+
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Excel Files|*.xlsx;*.xls";
+                openFileDialog.Title = "Select an Excel File";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string filepath = openFileDialog.FileName;
+
+                    FileInfo fileInfo = new FileInfo(filepath);
+
+                    var progress = new Progress<int>(value =>
+                    {
+                        progressBar.Value = value;
+                        toolStripStatusLabel1.Text = $"Processing... {value}%";
+                    });
+
+                    try
+                    {
+                        progressBar.Visible = true;
+                        toolStripStatusLabel1.Text = "Processing...";
+                        await ProcessUpload(fileInfo, progress);
+                    }
+                    catch (Exception ex)
+                    {
+                        toolStripStatusLabel1.Text = "Processing failed!";
+                        toolStripStatusLabel1.ForeColor = Color.Red;
+                        MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        Loadreference();
+                        DPILogs();
+                        progressBar.Visible = false;
+                        toolStripStatusLabel1.Text = "Processing completed!";
+                    }
+                }
+            }
+        }
+
+        private async Task ProcessUpload(FileInfo fileInfo, IProgress<int> progress)
+        {
+            DPIItems.Clear();
+            ExcelPackage.License.SetNonCommercialPersonal("NIDEC");
+
+            using (ExcelPackage package = new ExcelPackage(fileInfo))
+            {
+                ExcelWorksheet ws = package.Workbook.Worksheets[0];
+
+                int startRow = 3;
+                int rowCount = ws.Dimension.Rows;
+                int totalRows = rowCount - startRow + 1;
+
+                int current = 0;
+
+                for (int row = startRow; row <= rowCount; row++)
+                {
+                    current++;
+                    DPIItems.Add(new DPIList
+                    {
+                        Partnumber = ws.Cells[row, 2].Value.ToString(),
+                        Quantity = Convert.ToInt32(ws.Cells[row, 5].Value),
+                        PPS = Convert.ToInt32(ws.Cells[row, 4].Value),
+                        Box = Convert.ToInt32(ws.Cells[row, 6].Value)
+                    });
+
+                    int percent = (int)((double)current / totalRows * 100);
+                    percent = Math.Min(percent, 100);
+                    if (current % 10 == 0)
+                        progress?.Report(percent);
+                    progress?.Report(percent);
+                }
+                await Task.Delay(100);
+            }
+
+            progress?.Report(100);
+        }
+
+        private void DPILogs()
+        {
+            if (DPIDict == null)
+            {
+                return;
+            }
+
+            BindingSource bs = new BindingSource
+            {
+                DataSource = DPIDict.Values.ToList()
+            };
+            DPILogsTable.DataSource = bs;
+            DPILogsTable.Columns["Partnumber"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            DPILogsTable.Columns["Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            DPILogsTable.Columns["PPS"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            DPILogsTable.Columns["Box"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        }
+
+        private void DPILogsTable_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
+        {
+            var row = DPILogsTable.Rows[e.RowIndex];
+            if (row.IsNewRow) return;
+            var cellValue  = row.Cells["Partnumber"].Value.ToString();
+            if (cellValue == null) return;
+            var partnumber = cellValue.ToString();
+
+            if (string.IsNullOrEmpty(partnumber))
+            {
+                return;
+            }
+
+            if (!DPIDict.TryGetValue(partnumber, out var reference))
+            {
+                return;
+            }
+
+            var ShippingSum = ShippingItems.Where(x => x.PartNumber == partnumber).Sum(x => x.Quantity);
+
+            if (ShippingSum > reference.Quantity)
+            {
+                row.DefaultCellStyle.BackColor = Color.LightCoral;
+                
+            }
+             else if (ShippingSum == reference.Quantity)
+            {
+                row.DefaultCellStyle.BackColor = Color.LimeGreen;
+               
+            }
+             else
+            {
+                row.DefaultCellStyle.BackColor = Color.LightYellow;
+              
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            DPIItems.Clear();
+            DPIDict?.Clear();
+            DPILogsTable.DataSource = null;
+            DPILogsTable.Refresh();
         }
     }
 }
