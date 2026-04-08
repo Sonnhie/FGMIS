@@ -158,7 +158,8 @@ namespace FGScanner
 
         private void warehouseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            WHRForm wr = new WHRForm();
+            DisplayForm(wr);
         }
 
         private void packingListToolStripMenuItem_Click(object sender, EventArgs e)

@@ -141,10 +141,24 @@ namespace FGScanner
                         toolStripProgressBar1.Value = value;
                         toolStripStatusLabel1.Text = $"Exporting... {value}%";
                     });
+                   
+                    var columnMap = new Dictionary<string, string>
+                    {
+                        { "partnumber", "Part Number" },
+                        { "customer", "Customer" },
+                        { "prod_date", "Lot date" },
+                        { "prod_ver", "Prod Ver" },
+                        { "location", "Location" },
+                        { "quantity", "Quantity" },
+                        { "total_box", "Total Box" },
+                        { "storage_location", "Storage Location" },
+                        { "last_out_date", "Last Movement date" },
+                        { "movement_classification", "Movement Classification" }
+                    };
 
                     try
                     {
-                        await ExportService.ExportCSV(Data, filepath, progress, "Slow moving");
+                        await ExportService.ExportCSV(Data, columnMap, filepath, progress, "Slow moving");
                         toolStripProgressBar1.Value = 100;
                         toolStripStatusLabel1.Text = "Export completed successfully";
                         MessageBox.Show("Export completed successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);

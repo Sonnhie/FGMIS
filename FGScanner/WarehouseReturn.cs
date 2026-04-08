@@ -22,6 +22,8 @@ namespace FGScanner
     {
         private readonly db_connection _Connection;
         private readonly string user_id;
+        private List<TransferSlipData> data = new List<TransferSlipData>();
+
         public WarehouseReturn(string user)
         {
             InitializeComponent();
@@ -31,6 +33,7 @@ namespace FGScanner
         }
 
         private readonly BindingList<ScannedModel> ShippingItems = new BindingList<ScannedModel>();
+        
         private void LoadAutosuggest()
         {
             string whid = CmbWHid.Text;
@@ -45,6 +48,7 @@ namespace FGScanner
             TxtRackno.AutoCompleteCustomSource = auto;
             //TxtRackno.DataSource = auto;
         }
+       
         private bool OnScanProcess(string QRCode)
         {
             var Process = new ScannerUtility();
@@ -101,8 +105,6 @@ namespace FGScanner
             return true;
         }
 
-
-
         private void UpdateReturnlogs()
         {
             BindingSource source = new BindingSource
@@ -111,36 +113,6 @@ namespace FGScanner
             };
 
             returnlogs.DataSource = source;
-        }
-
-        private void textBox1_KeyDown(object sender, KeyEventArgs e)
-        {
-            var List = new TransactionRepo();
-            string whid = CmbWHid.Text;
-            var data = List.GetRackLocations(whid);
-
-            if (!data.Contains(TxtRackno.Text))
-            {
-                MessageBox.Show("Rack no. is invalid!", "Error location");
-                TxtRackno.Focus();
-                return;
-            }
-
-            if (e.KeyCode == Keys.Enter)
-            {
-                var ParsedData = TxtScanData.Text;
-                var IsProcessed = OnScanProcess(ParsedData);
-                if (IsProcessed)
-                {
-                    TxtScanData.Clear();
-                    e.SuppressKeyPress = true;
-                    TxtScanData.Focus();
-                }
-                else
-                {
-                    TxtScanData.Clear();
-                }
-            }
         }
 
         private async Task<bool> UploadData()
@@ -207,18 +179,6 @@ namespace FGScanner
                         return false;
                     }
                 }
-            }
-        }
-
-        private async void button2_Click(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrWhiteSpace(remarktext.Text))
-            {
-                await UploadData();
-            }
-            else
-            {
-                MessageBox.Show($"Error uploading data: Remarks is required", "Upload Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -299,79 +259,6 @@ namespace FGScanner
             }
         }
 
-        private async void button3_Click(object sender, EventArgs e)
-        {
-            string TransactionID = controlnumberLabel.Text;
-            string Filename = $@"TransferSlip_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
-            var method = new TransactionRepo();
-            List<OrdersSummaryExtend> order = method.GetWarehouseReturn(TransactionID);
-
-            if (order.Count == 0)
-            {
-                MessageBox.Show("No items to generate!", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            using (SaveFileDialog sf = new SaveFileDialog())
-            {
-                sf.Filter = "Excel Files|*.xlsx";
-                sf.Title = "Save Transfer Slip";
-                sf.DefaultExt = "xlsx";
-                sf.FileName = Filename;
-
-                if (sf.ShowDialog() == DialogResult.OK)
-                {
-                    string filepath = sf.FileName;
-
-                    if (order.Count == 0)
-                    {
-                        MessageBox.Show("No Data Found.");
-                        return;
-                    }
-
-                    progressBar.Value = 0;
-                    progressBar.Visible = true;
-                    toolStripStatusLabel1.Text = "Generating Transfer Slip...";
-
-                    var progress = new Progress<int>(value =>
-                    {
-                        progressBar.Value = value;
-                        toolStripStatusLabel1.Text = $"Generating Transfer Slip... {value}%";
-                    });
-
-                    try
-                    {
-                        await AutoFillTemplate(order, filepath, progress);
-                        progressBar.Value = 100;
-                        toolStripStatusLabel1.Text = "Generating completed successfully!";
-                        MessageBox.Show("Export completed successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        toolStripStatusLabel1.Text = "Export failed!";
-                        toolStripStatusLabel1.ForeColor = Color.Red;
-                        MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    finally
-                    {
-                        progressBar.Value = 0;
-                        progressBar.Visible = false;
-                        toolStripStatusLabel1.Text = "";
-                        controlnumberLabel.Text = GenerateTransactionNumber();
-                        ShippingItems.Clear();
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Generation canceled.");
-                }
-            }
-        }
-
-        private void CmbWHid_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            LoadAutosuggest();
-        }
         private int DrawTransferSlip(Graphics g, int width, int height, int startX, int startY, TransferSlipData data)
         {
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -507,8 +394,8 @@ namespace FGScanner
                             case 2: cellData = dRow.RevNo; break;
                             case 3: cellData = dRow.InspectionDate; break;
                             case 4: cellData = dRow.ProductionDate; break;
-                            case 5: cellData = dRow.NoBox; break;
-                            case 6: cellData = dRow.PPS; break;
+                            case 5: cellData = dRow.NoBox.ToString(); break;
+                            case 6: cellData = dRow.PPS.ToString(); break;
                             case 7: cellData = dRow.Pcs; break;
                             case 8: cellData = dRow.Remarks; break;
                         }
@@ -532,36 +419,17 @@ namespace FGScanner
             // ADD THIS LINE: Return the final Y position + 20 pixels of spacing
             return y + 20;
         }
-        private void GBtn_Click(object sender, EventArgs e)
-        {
-            printDocument1.DefaultPageSettings.PaperSize = new PaperSize("A4", 827, 1169);
-
-            printDocument1.PrintPage -= new PrintPageEventHandler(printDocument1_PrintPage);
-            printDocument1.PrintPage += new PrintPageEventHandler(printDocument1_PrintPage);
-
-            //printDocument1.BeginPrint -= new PrintEventHandler(printDocument1_BeginPrint);
-            //printDocument1.BeginPrint += new PrintEventHandler(printDocument1_BeginPrint);
-
-            PrintPreviewDialog printPreviewDialog = new PrintPreviewDialog();
-            printPreviewDialog.Document = printDocument1;
-            printPreviewDialog.Width = 800;
-            printPreviewDialog.Height = 800;
-            printPreviewDialog.PrintPreviewControl.Columns =  1;
-            printPreviewDialog.ShowDialog();
-        }
-
+        
         private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
         {
-            // Fetch your data from your database (or mock it)
-            TransferSlipData myData = new TransferSlipData
-            {
-                DocumentNo = "DOC-9921",
-                Shift = "1",
-                IssueDate = DateTime.Now.ToString("dd-MMM-yyyy"),
-                PreparedBy = "JEM",
-            };
+            TransferSlipData myData = data.FirstOrDefault();
 
-            // Call the Landscape drawing method!
+            if (myData == null)
+            {
+                e.Graphics.DrawString("No data available to print.", new Font("Arial", 12), Brushes.Black, new PointF(100, 100));
+                return;
+            }
+
             int middleOfPage =  DrawTransferSlip(
                 e.Graphics,
                 e.MarginBounds.Width,
@@ -580,10 +448,147 @@ namespace FGScanner
                     myData
                 );
         }
-
+        
         private void TxtScanData_KeyDown(object sender, KeyEventArgs e)
         {
+            var List = new TransactionRepo();
+            string whid = CmbWHid.Text;
+            var data = List.GetRackLocations(whid);
 
+            if (!data.Contains(TxtRackno.Text))
+            {
+                MessageBox.Show("Rack no. is invalid!", "Error location");
+                TxtRackno.Focus();
+                return;
+            }
+
+            if (e.KeyCode == Keys.Enter)
+            {
+                var ParsedData = TxtScanData.Text;
+                var IsProcessed = OnScanProcess(ParsedData);
+                if (IsProcessed)
+                {
+                    TxtScanData.Clear();
+                    e.SuppressKeyPress = true;
+                    TxtScanData.Focus();
+                }
+                else
+                {
+                    TxtScanData.Clear();
+                }
+            }
+        }
+        
+        private void CmbWHid_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            LoadAutosuggest();
+        }
+        
+        private async void button2_Click_1(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(remarktext.Text))
+            {
+                await UploadData();
+            }
+            else
+            {
+                MessageBox.Show($"Error uploading data: Remarks is required", "Upload Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        
+        private void GBtn_Click_1(object sender, EventArgs e)
+        {
+            string docNo = controlnumberLabel.Text;
+
+            if (string.IsNullOrWhiteSpace(docNo))
+            {
+                MessageBox.Show("Invalid control Number");
+                return;
+            }
+
+            var Repo = new TransactionRepo();
+            data = Repo.GetTransferSlipData(docNo);
+
+            printDocument1.DefaultPageSettings.PaperSize = new PaperSize("A4", 827, 1169);
+
+            printDocument1.PrintPage -= new PrintPageEventHandler(printDocument1_PrintPage);
+            printDocument1.PrintPage += new PrintPageEventHandler(printDocument1_PrintPage);
+
+            PrintPreviewDialog printPreviewDialog = new PrintPreviewDialog();
+            printPreviewDialog.Document = printDocument1;
+            printPreviewDialog.Width = 800;
+            printPreviewDialog.Height = 800;
+            printPreviewDialog.PrintPreviewControl.Columns = 1;
+            printPreviewDialog.ShowDialog();
+        }
+
+        private async void button3_Click_1(object sender, EventArgs e)
+        {
+            string TransactionID = controlnumberLabel.Text;
+            string Filename = $@"TransferSlip_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            var method = new TransactionRepo();
+            List<OrdersSummaryExtend> order = method.GetWarehouseReturn(TransactionID);
+
+            if (order.Count == 0)
+            {
+                MessageBox.Show("No items to generate!", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            using (SaveFileDialog sf = new SaveFileDialog())
+            {
+                sf.Filter = "Excel Files|*.xlsx";
+                sf.Title = "Save Transfer Slip";
+                sf.DefaultExt = "xlsx";
+                sf.FileName = Filename;
+
+                if (sf.ShowDialog() == DialogResult.OK)
+                {
+                    string filepath = sf.FileName;
+
+                    if (order.Count == 0)
+                    {
+                        MessageBox.Show("No Data Found.");
+                        return;
+                    }
+
+                    progressBar.Value = 0;
+                    progressBar.Visible = true;
+                    toolStripStatusLabel1.Text = "Generating Transfer Slip...";
+
+                    var progress = new Progress<int>(value =>
+                    {
+                        progressBar.Value = value;
+                        toolStripStatusLabel1.Text = $"Generating Transfer Slip... {value}%";
+                    });
+
+                    try
+                    {
+                        await AutoFillTemplate(order, filepath, progress);
+                        progressBar.Value = 100;
+                        toolStripStatusLabel1.Text = "Generating completed successfully!";
+                        MessageBox.Show("Export completed successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        toolStripStatusLabel1.Text = "Export failed!";
+                        toolStripStatusLabel1.ForeColor = Color.Red;
+                        MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        progressBar.Value = 0;
+                        progressBar.Visible = false;
+                        toolStripStatusLabel1.Text = "";
+                        controlnumberLabel.Text = GenerateTransactionNumber();
+                        ShippingItems.Clear();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Generation canceled.");
+                }
+            }
         }
     }
 }

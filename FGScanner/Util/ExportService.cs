@@ -14,7 +14,7 @@ namespace FGScanner.Util
 {
     public class ExportService
     {
-        public static async Task ExportCSV(DataTable data, string filepath, IProgress<int> progress, string worksheetName)
+        public static async Task ExportCSV(DataTable data, Dictionary<string,string> map, string filepath, IProgress<int> progress, string worksheetName)
         {
             ExcelPackage.License.SetNonCommercialPersonal("NIDEC");
 
@@ -30,9 +30,15 @@ namespace FGScanner.Util
                     var worksheet = package.Workbook.Worksheets.Add(worksheetName);
                     int ColIndex = 0;
 
+
+
                     for (int col = 0;col < data.Columns.Count; col++)
                     {
-                        string Column_Name = data.Columns[col].ColumnName;
+                        string dbName = data.Columns[col].ColumnName;
+
+                        string Column_Name = map.ContainsKey(dbName)
+                            ? map[dbName]
+                            : dbName;
 
                         ColIndex++;
                         worksheet.Cells[1, ColIndex].Value = Column_Name;

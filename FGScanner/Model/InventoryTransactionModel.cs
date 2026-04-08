@@ -77,6 +77,7 @@ namespace FGScanner.Model
         public DateTime FilterByFromDate { get; set; }
         public DateTime FilterByToDate { get; set; }
         public string SortedBy { get; set; }
+        public string TransactionNumber { get; set; }
     }
 
     public class SlowMovingSummary
@@ -131,6 +132,8 @@ namespace FGScanner.Model
         public string CheckedBy { get; set; }
         public string ReceivedBy { get; set; }
         public string EncodedBy { get; set; }
+        public int TotalBoxes { get; set; }
+        public int TotalQuantity { get; set; }
         public List<TransferRow> Rows { get; set; } = new List<TransferRow>();
     }
 
@@ -141,8 +144,8 @@ namespace FGScanner.Model
         public string RevNo { get; set; }
         public string InspectionDate { get; set; }
         public string ProductionDate { get; set; }
-        public string NoBox { get; set; }
-        public string PPS { get; set; }
+        public int NoBox { get; set; }
+        public int PPS { get; set; }
         public string Pcs { get; set; }
         public string Remarks { get; set; }
     }

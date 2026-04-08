@@ -6,11 +6,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Security;
 using System.Web.UI.WebControls.WebParts;
 using System.Windows.Forms;
+using static Microsoft.IO.RecyclableMemoryStreamManager;
 
 namespace FGScanner.Util
 {
@@ -674,6 +677,7 @@ namespace FGScanner.Util
             }
             return count;
         }
+       
         public List<chartmodel> GetCustomerOrder(int Month, int year)
         {
             List<chartmodel> data = new List<chartmodel>();
@@ -712,6 +716,7 @@ namespace FGScanner.Util
             }
             return data;
         }
+        
         public List<int> GetYear()
         {
             List<int> year = new List<int>();
@@ -740,6 +745,7 @@ namespace FGScanner.Util
             }
             return year;
         }
+        
         public List<MonthlyInventorySummary> GetMonthlyInventory(int year)
         {
             List<MonthlyInventorySummary> list = new List<MonthlyInventorySummary>();
@@ -786,6 +792,7 @@ namespace FGScanner.Util
             }
             return list;
         }
+        
         public List<CustomerStock> GetCurrentCustomerStock()
         {
             List<CustomerStock> customer = new List<CustomerStock>();
@@ -821,6 +828,7 @@ namespace FGScanner.Util
             }
             return customer;
         }
+       
         public List<MonthlyShipment> GetShipment(int year)
         {
             List<MonthlyShipment> Shipment = new List<MonthlyShipment>();
@@ -893,6 +901,7 @@ namespace FGScanner.Util
             }
             return id;
         }
+        
         public Dictionary<string, int> GetLatestId()
         {
             Dictionary<string, int> RackIDs = new Dictionary<string, int>();
@@ -977,6 +986,7 @@ namespace FGScanner.Util
             }
             return items;
         }
+       
         public void RunMovementClassification()
         {
             try
@@ -994,6 +1004,7 @@ namespace FGScanner.Util
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
         }
+       
         public DataTable GetInventoryData()
         {
             DataTable items = new DataTable();
@@ -1104,7 +1115,6 @@ namespace FGScanner.Util
 
         public List<InventoryCardData> GetInventoryCardData(string location, string whid)
         {
-            // We are returning a LIST of cards, one for each Part Number
             List<InventoryCardData> allCards = new List<InventoryCardData>();
 
             try
@@ -1181,19 +1191,318 @@ namespace FGScanner.Util
             }
 
             return allCards;
+
         }
 
-        //public List<TransferSlipData> GetWHReturnData(string controlnumber)
-        //{
-        //    List<TransferSlipData> WHReturn = new List<TransferSlipData>();
+        public List<TransferSlipData> GetWHReturnData(string docnum, string location, DateTime from, DateTime to, int page, int size)
+        {
+            List<TransferSlipData> WHReturn = new List<TransferSlipData>();
 
-        //    try
-        //    {
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
 
-        //    }catch (Exception ex)
-        //    {
-        //        MessageBox.Show("Error: " + ex.Message, "SQL Error");
-        //    }
-        //}
+                    string sql = @"SELECT 
+                                    transaction_id,
+                                    MIN(storage_location) AS storage_location,
+                                    MIN(ToStorageLocation) AS ToStorageLocation,
+                                    SUM(quantity) AS TotalQuantity,
+                                    COUNT(partnumber) AS TotalBox,
+                                    MIN(entry_date) AS entry_date 
+                                   FROM Return_table WHERE 1 = 1";
+
+                    if (!string.IsNullOrWhiteSpace(docnum))
+                    {
+                        sql += " AND transaction_id LIKE @docnumber";
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(location))
+                    {
+                        sql += " AND ToStorageLocation = @storage";
+                    }
+
+                    if (from != DateTime.MinValue && to != DateTime.MinValue)
+                    {
+                        sql += " AND entry_date >= @fromDate AND entry_date < DATEADD(DAY, 1, @toDate)";
+                    }
+
+                    sql += " GROUP BY transaction_id";
+                    sql += " ORDER BY MIN(entry_date) ASC OFFSET @offset ROWS FETCH NEXT @size ROWS ONLY";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        int offset = (page - 1) * size;
+                        //MessageBox.Show($"page: {page}, size: {size}, offset: {offset}");
+                        if (!string.IsNullOrWhiteSpace(docnum))
+                            cmd.Parameters.Add("@docnumber", SqlDbType.NVarChar).Value = "%" + docnum + "%";
+
+                        if (!string.IsNullOrWhiteSpace(location))
+                            cmd.Parameters.Add("@storage", SqlDbType.NVarChar).Value = location;
+
+                        if (from != DateTime.MinValue && to != DateTime.MinValue)
+                        {
+                            cmd.Parameters.Add("@fromDate", SqlDbType.DateTime).Value = from;
+                            cmd.Parameters.Add("@toDate", SqlDbType.DateTime).Value = to;
+                        }
+
+                        cmd.Parameters.Add("@offset", SqlDbType.Int).Value = offset;
+                        cmd.Parameters.Add("@size", SqlDbType.Int).Value = size;
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                WHReturn.Add(new TransferSlipData
+                                {
+                                    DocumentNo = reader["transaction_id"]?.ToString() ?? "",
+                                    IssueDate = reader["entry_date"] != DBNull.Value
+                                        ? Convert.ToDateTime(reader["entry_date"]).ToString("yyyy-MM-dd")
+                                        : "",
+                                    TotalQuantity = reader["TotalQuantity"] != DBNull.Value ? Convert.ToInt32(reader["TotalQuantity"]) : 0,
+                                    TotalBoxes = reader["TotalBox"] != DBNull.Value ? Convert.ToInt32(reader["TotalBox"]) : 0,
+                                    LocationTo = reader["ToStorageLocation"]?.ToString() ?? "",
+                                    LocationFrom = reader["storage_location"]?.ToString() ?? "",
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+
+            return WHReturn;
+        }
+       
+        public int GetTotalReturnTableRows(string docnum, string location, DateTime from, DateTime to)
+        {
+            int count = 0;
+
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = @"SELECT COUNT(DISTINCT transaction_id) 
+                                   FROM Return_table WHERE 1=1";
+
+                    if (!string.IsNullOrWhiteSpace(docnum))
+                    {
+                        sql += " AND transaction_id LIKE @docno";
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(location))
+                    {
+                        sql += " AND ToStorageLocation = @location";
+                    }
+
+                    if (from != DateTime.MinValue && to != DateTime.MinValue)
+                    {
+                        sql += " AND entry_date >= @fromDate AND entry_date < DATEADD(DAY, 1, @toDate) ";
+                    }
+
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        if (!string.IsNullOrWhiteSpace(docnum))
+                        {
+                            cmd.Parameters.Add("@docno", SqlDbType.NVarChar).Value = "%" + docnum + "%";
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(location))
+                        {
+                            cmd.Parameters.Add("@location", SqlDbType.NVarChar).Value = location;
+                        }
+
+                        if (from != DateTime.MinValue && to != DateTime.MinValue)
+                        {
+                            cmd.Parameters.Add("@fromDate", SqlDbType.DateTime).Value = from;
+                            cmd.Parameters.Add("@toDate", SqlDbType.DateTime).Value = to;
+                        }
+
+                        object result = cmd.ExecuteScalar();
+
+                        count = result != null && result != DBNull.Value
+                            ? Convert.ToInt32(result)
+                            : 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return count;
+        }
+
+        public DataTable GetWHReturnExport(string docnum, string location, DateTime from, DateTime to)
+        {
+            DataTable WHReturn = new DataTable();
+
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = @"SELECT 
+                                    transaction_id,
+                                    MIN(storage_location) AS storage_location,
+                                    MIN(ToStorageLocation) AS ToStorageLocation,
+                                    SUM(quantity) AS TotalQuantity,
+                                    COUNT(partnumber) AS TotalBox,
+                                    MIN(entry_date) AS entry_date 
+                                   FROM Return_table WHERE 1 = 1";
+
+                    if (!string.IsNullOrWhiteSpace(docnum))
+                    {
+                        sql += " AND transaction_id LIKE @docnumber";
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(location))
+                    {
+                        sql += " AND ToStorageLocation = @storage";
+                    }
+
+                    if (from != DateTime.MinValue && to != DateTime.MinValue)
+                    {
+                        sql += " AND entry_date >= @fromDate AND entry_date < DATEADD(DAY, 1, @toDate)";
+                    }
+
+                    sql += " GROUP BY transaction_id";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        if (!string.IsNullOrWhiteSpace(docnum))
+                            cmd.Parameters.Add("@docnumber", SqlDbType.NVarChar).Value = "%" + docnum + "%";
+
+                        if (!string.IsNullOrWhiteSpace(location))
+                            cmd.Parameters.Add("@storage", SqlDbType.NVarChar).Value = location;
+
+                        if (from != DateTime.MinValue && to != DateTime.MinValue)
+                        {
+                            cmd.Parameters.Add("@fromDate", SqlDbType.DateTime).Value = from;
+                            cmd.Parameters.Add("@toDate", SqlDbType.DateTime).Value = to;
+                        }
+
+                        using (SqlDataAdapter dt = new SqlDataAdapter(cmd))
+                        {
+                            dt.Fill(WHReturn);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+
+            return WHReturn;
+        }
+
+        public List<TransferSlipData> GetTransferSlipData(string documentno)
+        {
+            List<TransferSlipData> allCards = new List<TransferSlipData>();
+
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+
+                    // 1. ONE efficient query to get all parts and their rows for this rack
+                    string sql = @"
+                                    SELECT 
+                                        transaction_id,
+                                        partnumber,
+                                        prod_date,
+                                        SUM(quantity) AS total_quantity,
+                                        COUNT(*) AS total_box,
+                                        MIN(storage_location) AS storage_location,
+                                        MIN(ToStorageLocation) AS ToStorageLocation,
+                                        MIN(entry_date) AS entry_date,
+                                        MIN(remarks) AS remarks
+                                    FROM Return_table
+                                    WHERE transaction_id = @documentno
+                                    GROUP BY transaction_id, partnumber, prod_date
+                                    ORDER BY prod_date ASC";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.Add("@documentno", SqlDbType.NVarChar).Value = documentno;
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            Dictionary<string, TransferSlipData> SlipByPart = new Dictionary<string, TransferSlipData>();
+
+                            while (reader.Read())
+                            {
+                                string documentid = reader["transaction_id"].ToString() ?? "";
+
+                                if (!SlipByPart.ContainsKey(documentid))
+                                {
+                                    SlipByPart[documentid] = new TransferSlipData
+                                    {
+                                        DocumentNo = documentid,
+                                        LocationFrom = reader["storage_location"].ToString() ?? "",
+                                        LocationTo = reader["ToStorageLocation"].ToString() ?? "",
+                                        IssueDate = reader["entry_date"] != DBNull.Value
+                                            ? Convert.ToDateTime(reader["entry_date"]).ToString("yyyy-MM-dd")
+                                            : "",
+                                        Rows = new List<TransferRow>()
+                                    };
+                                }
+
+                                string partnumber = reader["partnumber"].ToString() ?? "";
+                                string partname = GetPartname(partnumber);
+
+                                DateTime prodDate = reader["prod_date"] != DBNull.Value
+                                    ? Convert.ToDateTime(reader["prod_date"])
+                                    : DateTime.MinValue;
+
+                                int totalQty = reader["total_quantity"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["total_quantity"])
+                                    : 0;
+
+                                int totalBox = reader["total_box"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["total_box"])
+                                    : 0;
+
+                                int PPS = Convert.ToInt32(totalQty / totalBox);
+
+                                string remarks = reader["remarks"].ToString() ?? "";
+
+                                TransferRow row = new TransferRow
+                                {
+                                    MaterialCode = partnumber,
+                                    MaterialName = partname,
+                                    ProductionDate = prodDate != DateTime.MinValue
+                                        ? prodDate.ToString("yyyy-MM-dd")
+                                        : "",
+                                    Pcs = totalQty.ToString(),
+                                    Remarks = remarks,
+                                    NoBox = totalBox,
+                                    PPS = PPS
+                                };
+
+                                SlipByPart[documentid].Rows.Add(row);
+                            }
+
+                            allCards = SlipByPart.Values.ToList();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+
+            return allCards;
+
+        }
     }
 }
