@@ -1504,5 +1504,180 @@ namespace FGScanner.Util
             return allCards;
 
         }
+
+        public List<Packinglist> GetPackingListData(string docnum, DateTime from, DateTime to, int page, int size)
+        {
+            List<Packinglist> List = new List<Packinglist>();
+
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+
+                    string sql = @"SELECT 
+                                    transaction_id,
+                                    SUM(quantity) AS TotalQuantity,
+                                    COUNT(partnumber) AS TotalBox,
+                                    MIN(entry_date) AS entry_date 
+                                   FROM Shipment_table WHERE 1 = 1";
+
+                    if (!string.IsNullOrWhiteSpace(docnum))
+                    {
+                        sql += " AND transaction_id LIKE @docnumber";
+                    }
+
+                    if (from != DateTime.MinValue && to != DateTime.MinValue)
+                    {
+                        sql += " AND entry_date >= @fromDate AND entry_date < DATEADD(DAY, 1, @toDate)";
+                    }
+
+                    sql += " GROUP BY transaction_id";
+                    sql += " ORDER BY MIN(entry_date) ASC OFFSET @offset ROWS FETCH NEXT @size ROWS ONLY";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        int offset = (page - 1) * size;
+                        //MessageBox.Show($"page: {page}, size: {size}, offset: {offset}");
+                        if (!string.IsNullOrWhiteSpace(docnum))
+                            cmd.Parameters.Add("@docnumber", SqlDbType.NVarChar).Value = "%" + docnum + "%";
+
+                        if (from != DateTime.MinValue && to != DateTime.MinValue)
+                        {
+                            cmd.Parameters.Add("@fromDate", SqlDbType.DateTime).Value = from;
+                            cmd.Parameters.Add("@toDate", SqlDbType.DateTime).Value = to;
+                        }
+
+                        cmd.Parameters.Add("@offset", SqlDbType.Int).Value = offset;
+                        cmd.Parameters.Add("@size", SqlDbType.Int).Value = size;
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                List.Add(new Packinglist
+                                {
+                                    transaction_id = reader["transaction_id"]?.ToString() ?? "",
+                                    quantity = reader["TotalQuantity"] != DBNull.Value ? Convert.ToInt32(reader["TotalQuantity"]) : 0,
+                                    total_box = reader["TotalBox"] != DBNull.Value ? Convert.ToInt32(reader["TotalBox"]) : 0,
+                                    posting_date = reader["entry_date"] != DBNull.Value ? Convert.ToDateTime(reader["entry_date"]) : DateTime.MinValue
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+
+            return List;
+        }
+
+        public int GetTotalPackingTableRows(string docnum, DateTime from, DateTime to)
+        {
+            int count = 0;
+
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = @"SELECT COUNT(DISTINCT transaction_id) 
+                                   FROM Shipment_table WHERE 1=1";
+
+                    if (!string.IsNullOrWhiteSpace(docnum))
+                    {
+                        sql += " AND transaction_id LIKE @docno";
+                    }
+
+                    if (from != DateTime.MinValue && to != DateTime.MinValue)
+                    {
+                        sql += " AND entry_date >= @fromDate AND entry_date < DATEADD(DAY, 1, @toDate) ";
+                    }
+
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        if (!string.IsNullOrWhiteSpace(docnum))
+                        {
+                            cmd.Parameters.Add("@docno", SqlDbType.NVarChar).Value = "%" + docnum + "%";
+                        }
+
+                        if (from != DateTime.MinValue && to != DateTime.MinValue)
+                        {
+                            cmd.Parameters.Add("@fromDate", SqlDbType.DateTime).Value = from;
+                            cmd.Parameters.Add("@toDate", SqlDbType.DateTime).Value = to;
+                        }
+
+                        object result = cmd.ExecuteScalar();
+
+                        count = result != null && result != DBNull.Value
+                            ? Convert.ToInt32(result)
+                            : 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return count;
+        }
+
+        public DataTable GetPackingListExport(string docnum, DateTime from, DateTime to)
+        {
+            DataTable WHReturn = new DataTable();
+
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = @"SELECT 
+                                    transaction_id,
+                                    SUM(quantity) AS TotalQuantity,
+                                    COUNT(partnumber) AS TotalBox,
+                                    MIN(entry_date) AS entry_date 
+                                   FROM Shipment_table WHERE 1 = 1";
+
+                    if (!string.IsNullOrWhiteSpace(docnum))
+                    {
+                        sql += " AND transaction_id LIKE @docnumber";
+                    }
+
+                    if (from != DateTime.MinValue && to != DateTime.MinValue)
+                    {
+                        sql += " AND entry_date >= @fromDate AND entry_date < DATEADD(DAY, 1, @toDate)";
+                    }
+
+                    sql += " GROUP BY transaction_id";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        if (!string.IsNullOrWhiteSpace(docnum))
+                            cmd.Parameters.Add("@docnumber", SqlDbType.NVarChar).Value = "%" + docnum + "%";
+
+                        if (from != DateTime.MinValue && to != DateTime.MinValue)
+                        {
+                            cmd.Parameters.Add("@fromDate", SqlDbType.DateTime).Value = from;
+                            cmd.Parameters.Add("@toDate", SqlDbType.DateTime).Value = to;
+                        }
+
+                        using (SqlDataAdapter dt = new SqlDataAdapter(cmd))
+                        {
+                            dt.Fill(WHReturn);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+
+            return WHReturn;
+        }
     }
 }

@@ -163,4 +163,23 @@ namespace FGScanner.Model
         public DPIList Item { get; set; }
         public int TotalBox { get; set; }
     }
+
+    public class Packinglist
+    {
+        public string transaction_id { get; set; }
+        public int total_box { get; set; }
+        public int quantity { get; set; }
+        public DateTime posting_date { get; set; }
+        public List<PackingListRow> Row { get; set; } = new List<PackingListRow>();
+    }
+
+    public class PackingListRow
+    {
+        public string partnumber { get; set; }
+        public string customer { get; set; }
+        public string prod_ver { get; set; }
+        public DateTime prod_date { get; set; }
+        public int quantity { get; set; }
+        public int box { get; set; }
+    }
 }

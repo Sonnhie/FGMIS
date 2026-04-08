@@ -164,7 +164,8 @@ namespace FGScanner
 
         private void packingListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            PackingList packingList = new PackingList();
+            DisplayForm(packingList);
         }
     }
 }
