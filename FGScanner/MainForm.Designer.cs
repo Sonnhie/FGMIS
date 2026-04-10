@@ -49,8 +49,6 @@
             this.documentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.packingListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.warehouseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.configurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.partNumberMasterlistToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel2 = new System.Windows.Forms.Panel();
             this.TimeLbl = new System.Windows.Forms.Label();
             this.DateLbl = new System.Windows.Forms.Label();
@@ -69,15 +67,14 @@
             // 
             // menuStrip1
             // 
-            this.menuStrip1.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.menuStrip1.BackColor = System.Drawing.Color.White;
             this.menuStrip1.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuToolStripMenuItem,
             this.inventoryToolStripMenuItem,
             this.repoertToolStripMenuItem,
-            this.documentsToolStripMenuItem,
-            this.configurationToolStripMenuItem});
+            this.documentsToolStripMenuItem});
             this.menuStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
             this.menuStrip1.Location = new System.Drawing.Point(0, 36);
             this.menuStrip1.Name = "menuStrip1";
@@ -99,7 +96,7 @@
             // logoutToolStripMenuItem
             // 
             this.logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
-            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.logoutToolStripMenuItem.Text = "Logout";
             this.logoutToolStripMenuItem.Click += new System.EventHandler(this.logoutToolStripMenuItem_Click);
             // 
@@ -122,7 +119,7 @@
             this.cHANGELOCATIONToolStripMenuItem,
             this.warehouseReturnToolStripMenuItem});
             this.dataEntryToolStripMenuItem.Name = "dataEntryToolStripMenuItem";
-            this.dataEntryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.dataEntryToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.dataEntryToolStripMenuItem.Text = "Data Entry";
             // 
             // iNToolStripMenuItem
@@ -159,7 +156,7 @@
             this.warehouseToolStripMenuItem1,
             this.ecozoneToolStripMenuItem});
             this.rackViewerToolStripMenuItem.Name = "rackViewerToolStripMenuItem";
-            this.rackViewerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.rackViewerToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.rackViewerToolStripMenuItem.Text = "Rack Viewer";
             this.rackViewerToolStripMenuItem.Click += new System.EventHandler(this.rackViewerToolStripMenuItem_Click);
             // 
@@ -180,14 +177,14 @@
             // stockListToolStripMenuItem
             // 
             this.stockListToolStripMenuItem.Name = "stockListToolStripMenuItem";
-            this.stockListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.stockListToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.stockListToolStripMenuItem.Text = "Stock List";
             this.stockListToolStripMenuItem.Click += new System.EventHandler(this.stockListToolStripMenuItem_Click);
             // 
             // slowMovingListToolStripMenuItem
             // 
             this.slowMovingListToolStripMenuItem.Name = "slowMovingListToolStripMenuItem";
-            this.slowMovingListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.slowMovingListToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.slowMovingListToolStripMenuItem.Text = "Slow Moving List";
             this.slowMovingListToolStripMenuItem.Click += new System.EventHandler(this.slowMovingListToolStripMenuItem_Click);
             // 
@@ -228,20 +225,6 @@
             this.warehouseToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
             this.warehouseToolStripMenuItem.Text = "Warehouse Return Slip";
             this.warehouseToolStripMenuItem.Click += new System.EventHandler(this.warehouseToolStripMenuItem_Click);
-            // 
-            // configurationToolStripMenuItem
-            // 
-            this.configurationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.partNumberMasterlistToolStripMenuItem});
-            this.configurationToolStripMenuItem.Name = "configurationToolStripMenuItem";
-            this.configurationToolStripMenuItem.Size = new System.Drawing.Size(92, 19);
-            this.configurationToolStripMenuItem.Text = "Configuration";
-            // 
-            // partNumberMasterlistToolStripMenuItem
-            // 
-            this.partNumberMasterlistToolStripMenuItem.Name = "partNumberMasterlistToolStripMenuItem";
-            this.partNumberMasterlistToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.partNumberMasterlistToolStripMenuItem.Text = "Item Masterlist";
             // 
             // panel2
             // 
@@ -419,7 +402,5 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ToolStripMenuItem warehouseToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem ecozoneToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem configurationToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem partNumberMasterlistToolStripMenuItem;
     }
 }

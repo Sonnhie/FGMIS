@@ -62,6 +62,7 @@ namespace FGScanner.Util
                 }
             }
         }
+       
         public async Task InsertSingleTransaction(InventoryTransactionModel item, SqlConnection conn, SqlTransaction tx)
         {
             string sql = @"INSERT INTO transaction_history
@@ -87,6 +88,7 @@ namespace FGScanner.Util
                 await cmd.ExecuteNonQueryAsync();
             }
         }
+        
         public async Task InsertShipmentTransaction(InventoryTransactionModel item, SqlConnection conn, SqlTransaction tx)
         {
             string sql = @"INSERT INTO Shipment_table
@@ -107,8 +109,6 @@ namespace FGScanner.Util
                 await cmd.ExecuteNonQueryAsync();
             }
         }
-
-
 
         public async Task InsertReturnTransaction(InventoryTransactionModel item, SqlConnection conn, SqlTransaction tx)
         {
@@ -134,6 +134,7 @@ namespace FGScanner.Util
                 await cmd.ExecuteNonQueryAsync();
             }
         }
+        
         public int CheckStock(string partnumber, string location)
         {
             int result = 0;
@@ -161,6 +162,7 @@ namespace FGScanner.Util
 
             return result;
         }
+        
         public List<InventoryTransactionModel> GetTransactionHistory()
         {
             List<InventoryTransactionModel> Inventory = new List<InventoryTransactionModel>();
@@ -170,10 +172,14 @@ namespace FGScanner.Util
                 using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
-                    string sql = "SELECT * FROM transaction_history WHERE transaction_type = 'IN' AND entry_date >= CAST(GETDATE() AS Date) ORDER BY entry_date DESC";
+
+                    DateTime date = DateTime.Today;
+
+                    string sql = "SELECT * FROM transaction_history WHERE transaction_type = 'IN' AND CAST(entry_date AS Date) = @today ORDER BY entry_date DESC";
 
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
+                        cmd.Parameters.Add("@today", SqlDbType.Date).Value = date;
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -203,6 +209,7 @@ namespace FGScanner.Util
             }
             return Inventory;
         }
+        
         public List<string> GetRackLocations(string whname)
         {
             List<string> list = new List<string>();
@@ -234,6 +241,7 @@ namespace FGScanner.Util
             }
             return list;
         }
+        
         public List<string> GetStorageLocations()
         {
             List<string> list = new List<string>();
@@ -262,6 +270,7 @@ namespace FGScanner.Util
             }
             return list;
         }
+       
         public string GetCustomer(string partnumber)
         {
             string customer = string.Empty;
@@ -292,6 +301,7 @@ namespace FGScanner.Util
             }
             return customer;
         }
+        
         public int GetLatestTransactionId()
         {
             int latestId = 0;
@@ -313,6 +323,7 @@ namespace FGScanner.Util
             }
             return latestId;
         }
+       
         public int GetLatestReturnId()
         {
             int latestId = 0;
@@ -334,6 +345,7 @@ namespace FGScanner.Util
             }
             return latestId;
         }
+        
         public List<RackCount> GetTotalItemPerRack(string WHid)
         {
             List<RackCount> counts = new List<RackCount>();
@@ -456,6 +468,7 @@ namespace FGScanner.Util
 
             return Items;
         }
+             
         public int GetNextShipmentId()
         {
             int result = 0;
@@ -592,6 +605,7 @@ namespace FGScanner.Util
             }
             return Items;
         }
+        
         public List<InventoryTransactionModel> GetFilteredData(string partnumber, int page, int size)
         {
             List<InventoryTransactionModel> items = new List<InventoryTransactionModel> ();
@@ -649,6 +663,7 @@ namespace FGScanner.Util
             }
             return items;
         }
+        
         public int GetTotalRows(string partnumber)
         {
             int count = 0;
@@ -726,7 +741,7 @@ namespace FGScanner.Util
                 using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
-                    string sql = "SELECT DISTINCT YEAR(entry_date) AS YEAR FROM Shipment_table";
+                    string sql = "SELECT DISTINCT YEAR(entry_date) AS YEAR FROM Shipment_table ORDER BY YEAR(entry_date) ASC";
                     using (SqlCommand cmd = new SqlCommand(sql,conn))
                     {
                         using(SqlDataReader reader = cmd.ExecuteReader())
@@ -773,13 +788,21 @@ namespace FGScanner.Util
                         cmd.Parameters.Add("@year", SqlDbType.Int).Value = year;
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
+                            int runningStock = 0;
+
                             while (reader.Read())
                             {
+                                int month = reader["MonthNumber"] != DBNull.Value ? Convert.ToInt32(reader["MonthNumber"]) : 0;
+                                int totalIn = reader["TotalIN"] != DBNull.Value ? Convert.ToInt32(reader["TotalIN"]) : 0;
+                                int totalOut = reader["TotalOUT"] != DBNull.Value ? Convert.ToInt32(reader["TotalOUT"]) : 0;
+                                runningStock = runningStock + totalIn - totalOut;
+
                                 list.Add(new MonthlyInventorySummary
                                 {
-                                    Month = reader["MonthNumber"] != DBNull.Value ? Convert.ToInt32(reader["MonthNumber"]) : 0,
-                                    In = reader["TotalIN"] != DBNull.Value ? Convert.ToInt32(reader["TotalIN"]) : 0,
-                                    Out = reader["TotalOUT"] != DBNull.Value ? Convert.ToInt32(reader["TotalOUT"]) : 0
+                                    Month = month,
+                                    In = totalIn,
+                                    Out = totalOut,
+                                    EndingStock = runningStock
                                 });
                             }
                         }
@@ -1679,5 +1702,136 @@ namespace FGScanner.Util
 
             return WHReturn;
         }
+
+        public List<MonthlyShipment> GetMonthlyShipments(int year)
+        {
+            List<MonthlyShipment> list = new List<MonthlyShipment>();
+
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string query = @"SELECT 
+                    m.MonthNumber,
+                    SUM(quantity) as TotalShipped
+                    FROM (VALUES
+                    (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12)
+                    ) m(MonthNumber)
+                    LEFT JOIN Shipment_table t
+                    ON MONTH(t.entry_date) = m.MonthNumber
+                    AND YEAR(t.entry_date) = @year 
+                    GROUP BY m.MonthNumber
+                    ORDER BY m.MonthNumber";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.Add("@year", SqlDbType.Int).Value = year;
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+
+                            while (reader.Read())
+                            {
+                                int month = reader["MonthNumber"] != DBNull.Value ? Convert.ToInt32(reader["MonthNumber"]) : 0;
+                                int totalShip = reader["TotalShipped"] != DBNull.Value ? Convert.ToInt32(reader["TotalShipped"]) : 0;
+                              
+                                
+
+                                list.Add(new MonthlyShipment
+                                {
+                                    Month = month,
+                                    Out = totalShip
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return list;
+        }
+
+        public List<MonthlyReturn> GetMonthlyReturn(int year)
+        {
+            List<MonthlyReturn> list = new List<MonthlyReturn>();
+
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string query = @"SELECT 
+                    m.MonthNumber,
+                    SUM(quantity) as TotalReturn
+                    FROM (VALUES
+                    (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12)
+                    ) m(MonthNumber)
+                    LEFT JOIN Return_table t
+                    ON MONTH(t.entry_date) = m.MonthNumber
+                    AND YEAR(t.entry_date) = @year 
+                    GROUP BY m.MonthNumber
+                    ORDER BY m.MonthNumber";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.Add("@year", SqlDbType.Int).Value = year;
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+
+                            while (reader.Read())
+                            {
+                                int month = reader["MonthNumber"] != DBNull.Value ? Convert.ToInt32(reader["MonthNumber"]) : 0;
+                                int totalReturn = reader["TotalReturn"] != DBNull.Value ? Convert.ToInt32(reader["TotalReturn"]) : 0;
+
+
+
+                                list.Add(new MonthlyReturn
+                                {
+                                    Month = month,
+                                    Out = totalReturn
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return list;
+        }
+
+        public int GetTotalSlowmovingItems()
+        {
+            int count = 0;
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = @"SELECT COUNT(DISTINCT partnumber) 
+                                   FROM actual_inventory 
+                                   WHERE movement_classification = 'SLOW'
+                                   AND quantity > 0";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        object result = cmd.ExecuteScalar();
+                        count = result != null && result != DBNull.Value
+                            ? Convert.ToInt32(result)
+                            : 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return count;
+        }
     }
 }
+ 

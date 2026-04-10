@@ -17,6 +17,15 @@ namespace FGScanner.Model
         public int Month { get; set; }
         public int In { get; set; }
         public int Out { get; set; }
+        public int EndingStock { get; set; }
+        public int Change { get; set; }
+        public double ChangePercent { get; set; }
+    }
+
+    public class MonthlyStockSummary
+    {
+        public string Month { get; set; }
+        public int Stock { get; set; }
     }
 
     public class CustomerStock
@@ -29,5 +38,15 @@ namespace FGScanner.Model
     {
         public int Month { get; set; }
         public int Out { get; set; }
+        public int Change { get; set; }
+        public double ChangePercent { get; set; }
+    }
+
+    public class MonthlyReturn
+    {
+        public int Month { get; set; }
+        public int Out { get; set; }
+        public int Change { get; set; }
+        public double ChangePercent { get; set; }
     }
 }
