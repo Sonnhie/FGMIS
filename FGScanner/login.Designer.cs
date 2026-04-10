@@ -37,8 +37,10 @@
             this.TxtPassword = new MetroFramework.Controls.MetroTextBox();
             this.TxtUserId = new MetroFramework.Controls.MetroTextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.CloseBtn = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CloseBtn)).BeginInit();
             this.SuspendLayout();
             // 
             // pictureBox1
@@ -55,6 +57,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.CloseBtn);
             this.panel1.Controls.Add(this.BtnSignIn);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label2);
@@ -129,6 +132,17 @@
             this.label1.TabIndex = 7;
             this.label1.Text = "Login";
             // 
+            // CloseBtn
+            // 
+            this.CloseBtn.Image = ((System.Drawing.Image)(resources.GetObject("CloseBtn.Image")));
+            this.CloseBtn.Location = new System.Drawing.Point(292, 5);
+            this.CloseBtn.Name = "CloseBtn";
+            this.CloseBtn.Size = new System.Drawing.Size(15, 15);
+            this.CloseBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.CloseBtn.TabIndex = 13;
+            this.CloseBtn.TabStop = false;
+            this.CloseBtn.Click += new System.EventHandler(this.CloseBtn_Click);
+            // 
             // login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -144,6 +158,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CloseBtn)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -158,5 +173,6 @@
         private MetroFramework.Controls.MetroTextBox TxtPassword;
         private MetroFramework.Controls.MetroTextBox TxtUserId;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.PictureBox CloseBtn;
     }
 }

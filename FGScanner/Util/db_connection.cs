@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 
 namespace FGScanner.Util
 {
@@ -13,7 +14,14 @@ namespace FGScanner.Util
 
         public db_connection()
         {
-            _dbConnectionString = "Data Source=192.168.101.41;Initial Catalog=InventoryDB;User ID=Administrator;Encrypt=False";
+            var connStr = ConfigurationManager.ConnectionStrings["InventoryDb"];
+
+            if (connStr == null || string.IsNullOrEmpty(connStr.ConnectionString))
+            {
+                throw new Exception("Connection string 'InventoryDb' not found in App.config.");
+            }
+
+            _dbConnectionString = connStr.ConnectionString;
         }
 
         public SqlConnection Getconnection()
