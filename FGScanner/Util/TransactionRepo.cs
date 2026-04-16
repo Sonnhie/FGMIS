@@ -33,11 +33,12 @@ namespace FGScanner.Util
                 SqlTransaction tx = conn.BeginTransaction();
                 try
                 {
-                    string sql = "INSERT INTO transaction_history (partnumber, prod_date, customer_id, quantity, prod_ver, entry_date, transaction_type, location, remarks, storage_location, WH_id) " +
-                                     "VALUES (@partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @transaction_type, @location, @remarks, @storage_location, @WH_id)";
+                    string sql = "INSERT INTO transaction_history (TransactionId, partnumber, prod_date, customer_id, quantity, prod_ver, entry_date, transaction_type, location, remarks, storage_location, WH_id) " +
+                                     "VALUES (@TransactionId, @partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @transaction_type, @location, @remarks, @storage_location, @WH_id)";
 
                     using (SqlCommand cmd = new SqlCommand(sql, conn, tx))
                     {
+                        cmd.Parameters.Add("@TransactionId", SqlDbType.UniqueIdentifier).Value = Guid.NewGuid();
                         cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = item.PartNumber;
                         cmd.Parameters.Add("@prod_date", SqlDbType.Date).Value = item.ProductionDate;
                         cmd.Parameters.Add("@customer_id", SqlDbType.NVarChar).Value = item.Customer;
@@ -66,12 +67,13 @@ namespace FGScanner.Util
         public async Task InsertSingleTransaction(InventoryTransactionModel item, SqlConnection conn, SqlTransaction tx)
         {
             string sql = @"INSERT INTO transaction_history
-                   (partnumber, prod_date, customer_id, quantity, prod_ver, entry_date, transaction_type, location, remarks, storage_location, control_number, WH_id)
+                   (TransactionId, partnumber, prod_date, customer_id, quantity, prod_ver, entry_date, transaction_type, location, remarks, storage_location, control_number, WH_id)
                    VALUES
-                   (@partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @transaction_type, @location, @remarks, @storage_location, @id, @WH_id)";
+                   (@TransactionId, @partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @transaction_type, @location, @remarks, @storage_location, @id, @WH_id)";
 
             using (SqlCommand cmd = new SqlCommand(sql, conn, tx))
             {
+                cmd.Parameters.Add("@TransactionId", SqlDbType.UniqueIdentifier).Value = Guid.NewGuid();
                 cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = item.PartNumber;
                 cmd.Parameters.Add("@prod_date", SqlDbType.Date).Value = item.ProductionDate;
                 cmd.Parameters.Add("@customer_id", SqlDbType.NVarChar).Value = item.Customer;
@@ -92,11 +94,12 @@ namespace FGScanner.Util
         public async Task InsertShipmentTransaction(InventoryTransactionModel item, SqlConnection conn, SqlTransaction tx)
         {
             string sql = @"INSERT INTO Shipment_table
-                   (transaction_id, partnumber, prod_date, customer, quantity, prod_ver, entry_date, Whid)
+                   (ShipmentId, transaction_id, partnumber, prod_date, customer, quantity, prod_ver, entry_date, Whid)
                    VALUES
-                   (@transaction_id, @partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @whid)";
+                   (@ShipmentId, @transaction_id, @partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @whid)";
             using (SqlCommand cmd = new SqlCommand(sql, conn, tx))
             {
+                cmd.Parameters.Add("@ShipmentId", SqlDbType.UniqueIdentifier).Value = Guid.NewGuid();
                 cmd.Parameters.Add("@transaction_id", SqlDbType.NVarChar).Value = item.TransactionId;
                 cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = item.PartNumber;
                 cmd.Parameters.Add("@prod_date", SqlDbType.Date).Value = item.ProductionDate;
@@ -113,11 +116,12 @@ namespace FGScanner.Util
         public async Task InsertReturnTransaction(InventoryTransactionModel item, SqlConnection conn, SqlTransaction tx)
         {
             string sql = @"INSERT INTO return_table
-                   (transaction_id, partnumber, prod_date, customer, quantity, prod_ver, entry_date, location, storage_location, remarks, ToStorageLocation, Whid)
+                   (ReturnId, transaction_id, partnumber, prod_date, customer, quantity, prod_ver, entry_date, location, storage_location, remarks, ToStorageLocation, Whid)
                    VALUES
-                   (@transaction_id, @partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @location, @storage_location, @remarks, @ToStorageLocation, @whid)";
+                   (@ReturnId, @transaction_id, @partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @location, @storage_location, @remarks, @ToStorageLocation, @whid)";
             using (SqlCommand cmd = new SqlCommand(sql, conn, tx))
             {
+                cmd.Parameters.Add("@ReturnId", SqlDbType.UniqueIdentifier).Value = Guid.NewGuid();
                 cmd.Parameters.Add("@transaction_id", SqlDbType.NVarChar).Value = item.TransactionId;
                 cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = item.PartNumber;
                 cmd.Parameters.Add("@prod_date", SqlDbType.Date).Value = item.ProductionDate;
