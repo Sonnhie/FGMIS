@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
 using FGScanner.Util;
+using System.Reflection;
 
 namespace FGScanner
 {
@@ -52,7 +53,23 @@ namespace FGScanner
             }
         }
 
-        private void BtnSignIn_Click(object sender, EventArgs e)
+        private void CloseBtn_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Are you sure you want to close the application?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
+        }
+
+        private void login_Load(object sender, EventArgs e)
+        {
+            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            version_lbl.Text = $"Version: {version}";
+        }
+
+        private void BtnSignIn_Click_1(object sender, EventArgs e)
         {
             string username = TxtUserId.Text;
             string password = TxtPassword.Text;
@@ -64,16 +81,6 @@ namespace FGScanner
             }
 
             Login(username, password);
-        }
-
-        private void CloseBtn_Click(object sender, EventArgs e)
-        {
-            DialogResult result = MessageBox.Show("Are you sure you want to close the application?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
-            {
-                Application.Exit();
-            }
         }
     }
 }

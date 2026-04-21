@@ -30,6 +30,7 @@ namespace FGScanner
             _Connection = new db_connection();
             user_id = user;
             LoadAutosuggest();
+            toolStripStatusLabel1.Visible = false;
         }
 
         private readonly BindingList<ScannedModel> ShippingItems = new BindingList<ScannedModel>();
@@ -554,6 +555,7 @@ namespace FGScanner
 
                     progressBar.Value = 0;
                     progressBar.Visible = true;
+                    toolStripStatusLabel1.Visible = true;
                     toolStripStatusLabel1.Text = "Generating Transfer Slip...";
 
                     var progress = new Progress<int>(value =>

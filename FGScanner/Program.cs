@@ -71,7 +71,21 @@ namespace FGScanner
         {
             using (SqlConnection conn = _Connection.Getconnection())
             {
-                conn.Open();
+               if(conn == null)
+                    throw new Exception("Failed to create database connection.");
+                try
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand("SELECT TOP 1 * FROM actual_inventory", conn))
+                    {
+                        cmd.ExecuteScalar();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Database connection failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Environment.Exit(1);
+                }
             }
         }
     }

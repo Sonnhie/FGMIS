@@ -26,6 +26,7 @@ namespace FGScanner
             //}
 
             metroProgressBar1.Value = percent;
+            progresslabel.Parent = pictureBox1;
             progresslabel.Text = message;
 
             Application.DoEvents();

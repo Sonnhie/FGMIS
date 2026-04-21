@@ -28,30 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.materialLabel2 = new MaterialSkin.Controls.MaterialLabel();
             this.TxtPartnumber = new System.Windows.Forms.TextBox();
             this.LogsTable = new System.Windows.Forms.DataGridView();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.BtnExport = new System.Windows.Forms.Button();
-            this.materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
+            this.BtnExport = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.LogsTable)).BeginInit();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // materialLabel2
-            // 
-            this.materialLabel2.AutoSize = true;
-            this.materialLabel2.Depth = 0;
-            this.materialLabel2.Font = new System.Drawing.Font("Roboto", 11F);
-            this.materialLabel2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.materialLabel2.Location = new System.Drawing.Point(39, 45);
-            this.materialLabel2.MouseState = MaterialSkin.MouseState.HOVER;
-            this.materialLabel2.Name = "materialLabel2";
-            this.materialLabel2.Size = new System.Drawing.Size(122, 24);
-            this.materialLabel2.TabIndex = 22;
-            this.materialLabel2.Text = "Part Number:";
             // 
             // TxtPartnumber
             // 
@@ -82,11 +68,22 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripProgressBar1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 761);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 762);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1303, 26);
+            this.statusStrip1.Size = new System.Drawing.Size(1303, 25);
             this.statusStrip1.TabIndex = 29;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(151, 20);
+            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
+            // 
+            // toolStripProgressBar1
+            // 
+            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
+            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 19);
             // 
             // BtnExport
             // 
@@ -99,39 +96,24 @@
             this.BtnExport.UseVisualStyleBackColor = true;
             this.BtnExport.Click += new System.EventHandler(this.BtnExport_Click);
             // 
-            // materialLabel1
+            // label1
             // 
-            this.materialLabel1.AutoSize = true;
-            this.materialLabel1.Depth = 0;
-            this.materialLabel1.Font = new System.Drawing.Font("Roboto", 11F);
-            this.materialLabel1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.materialLabel1.Location = new System.Drawing.Point(39, 106);
-            this.materialLabel1.MouseState = MaterialSkin.MouseState.HOVER;
-            this.materialLabel1.Name = "materialLabel1";
-            this.materialLabel1.Size = new System.Drawing.Size(177, 24);
-            this.materialLabel1.TabIndex = 31;
-            this.materialLabel1.Text = "Slow Moving Items:";
-            // 
-            // toolStripStatusLabel1
-            // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(151, 20);
-            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
-            // 
-            // toolStripProgressBar1
-            // 
-            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
-            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 18);
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(26, 41);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(135, 28);
+            this.label1.TabIndex = 31;
+            this.label1.Text = "Part Number:";
             // 
             // Slowmoving
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1303, 787);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.BtnExport);
-            this.Controls.Add(this.materialLabel1);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.materialLabel2);
             this.Controls.Add(this.TxtPartnumber);
             this.Controls.Add(this.LogsTable);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -147,13 +129,13 @@
         }
 
         #endregion
-        private MaterialSkin.Controls.MaterialLabel materialLabel2;
+
         private System.Windows.Forms.TextBox TxtPartnumber;
         private System.Windows.Forms.DataGridView LogsTable;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Button BtnExport;
-        private MaterialSkin.Controls.MaterialLabel materialLabel1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
+        private System.Windows.Forms.Label label1;
     }
 }
