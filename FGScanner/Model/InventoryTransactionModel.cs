@@ -18,6 +18,7 @@ namespace FGScanner.Model
         public int Quantity { get; set; }
         public int Box { get; set; }
         public int Price { get; set; }
+        public int PPS { get; set; }
         public string TransactionType { get; set; }
         public DateTime TransactionDate { get; set; }
         public string User { get; set; }

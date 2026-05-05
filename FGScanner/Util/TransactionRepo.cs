@@ -672,8 +672,13 @@ namespace FGScanner.Util
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
+
                             while (reader.Read())
                             {
+                                int qty = Convert.ToInt32(reader["quantity"]);
+                                int box = Convert.ToInt32(reader["total_box"]);
+                                int PPS = qty / box;
+
                                 InventoryTransactionModel item = new InventoryTransactionModel
                                 {
                                     //TransactionDate = reader["entry_date"] != DBNull.Value ? Convert.ToDateTime(reader["entry_date"]).Date : DateTime.MinValue.Date,
@@ -685,6 +690,7 @@ namespace FGScanner.Util
                                     Location = reader["location"]?.ToString() ?? string.Empty,
                                     Storage_location = reader["storage_location"]?.ToString() ?? string.Empty,
                                     ProductionVersion = reader["prod_ver"]?.ToString() ?? string.Empty,
+                                    PPS = PPS,
                                     Status = reader["movement_classification"]?.ToString(),
                                     Updated_date = reader["updated_date"] != DBNull.Value ? Convert.ToDateTime(reader["updated_date"]).Date : DateTime.MinValue.Date,
                                 };

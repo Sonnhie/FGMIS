@@ -58,6 +58,7 @@ namespace FGScanner
                     dt.Columns.Add("Production Version", typeof(string));
                     dt.Columns.Add("Total Box", typeof(string));
                     dt.Columns.Add("Total Quantity", typeof(string));
+                    dt.Columns.Add("PPS", typeof(string));
                     dt.Columns.Add("Location", typeof(string));
                     dt.Columns.Add("Storage location", typeof(string));
                     dt.Columns.Add("Updated Inventory Date", typeof(string));
@@ -78,6 +79,7 @@ namespace FGScanner
                                 item.ProductionVersion,
                                 item.Box,
                                 item.Quantity,
+                                item.PPS,
                                 item.Location,
                                 item.Storage_location,
                                 item.Updated_date.ToString("MM/dd/yyyy"),
@@ -88,7 +90,7 @@ namespace FGScanner
                     LogsTable.Columns.Clear();
                     LogsTable.ReadOnly = true;
                     LogsTable.DataSource = dt;
-                    LogsTable.Columns["Part Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    LogsTable.Columns["Part Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Customer"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Production Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Production Version"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
