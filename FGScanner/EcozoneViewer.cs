@@ -1,5 +1,6 @@
 ﻿using FGScanner.Model;
 using FGScanner.Util;
+using OfficeOpenXml.Interfaces.SensitivityLabels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Zen.Barcode;
+using static MetroFramework.Drawing.MetroPaint;
 
 namespace FGScanner
 {
@@ -20,6 +22,8 @@ namespace FGScanner
         Dictionary<string, Button> rackButtons = new Dictionary<string, Button>();
         Dictionary<string, int> RackCountCache = new Dictionary<string, int>();
         Dictionary<string, int> LastRackIDCache = new Dictionary<string, int>();
+        private TransactionRepo Method = new TransactionRepo();
+        private Color backColor;
         private readonly string[] Racks = new string[] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q","R","S","T", "FL", "2F" };
         
         private readonly Dictionary<string, (int rows, int cols)> RackConfig = new Dictionary<string, (int rows, int cols)>()
@@ -62,7 +66,7 @@ namespace FGScanner
         private void LoadRackCount()
         {
             var Method = new TransactionRepo();
-            RackCountCache = Method.GetTotalItemPerRack("WH2").ToDictionary(x => x.RackId, x => x.Count);
+            RackCountCache = Method.GetTotalItemPerRack("WH1").ToDictionary(x => x.RackId, x => x.Count);
         }
 
         private void LoadData(string partnumber)
@@ -70,7 +74,7 @@ namespace FGScanner
             try
             {
                 var Method = new TransactionRepo();
-                var Datas = Method.RacksList(partnumber, "WH2");
+                var Datas = Method.RacksList(partnumber, "WH1");
 
                 if (Datas != null)
                 {
@@ -166,8 +170,8 @@ namespace FGScanner
                         Top = row * (buttonHeight + spacing),
                         Text = RackLabel,
                         Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                        BackColor = Color.Green,
-                        ForeColor = Color.White
+                        BackColor = Color.White,
+                        ForeColor = Color.Black
                     };
 
                     btn.Click += Buttom_Click;
@@ -190,15 +194,26 @@ namespace FGScanner
             Button btn = rackButtons[rackLabel];
             int RackCountValue = RackCountCache.TryGetValue(rackLabel, out int count) ? count : 0;
 
+            string customer = Method.GetRackCustomer(rackLabel, "WH2");
+
+            if (customer == "EPPI")
+                backColor = Color.LightGreen;
+            if (customer == "YAZAKI")
+                backColor = Color.MediumPurple;
+            if (customer == "BIPH")
+                backColor = Color.SkyBlue;
+            else
+            {
+                backColor = Color.Gold;
+            }
+
             if (RackCountValue == 0)
             {
-                btn.BackColor = Color.Green;
-                btn.ForeColor = Color.White;
+                btn.BackColor = Color.White;
             }
             else if (RackCountValue >= 1)
             {
-                btn.BackColor = Color.Blue;
-                btn.ForeColor = Color.White;
+                btn.BackColor = backColor;
             }
         }
 

@@ -23,6 +23,9 @@ namespace FGScanner
         private string _userid = string.Empty;
         private int currentCardIndex = 0;
         private List<InventoryCardData> cardsToPrint = new List<InventoryCardData>();
+        private TransactionRepo Method = new TransactionRepo();
+        private Color backColor;
+
         public WHDataEntry_Ship_OUT_(string userid)
         {
             InitializeComponent();
@@ -56,8 +59,7 @@ namespace FGScanner
 
         private void LoadRackCount()
         {
-            var Method = new TransactionRepo();
-            RackCountCache = Method.GetTotalItemPerRack("WH1").ToDictionary(x => x.RackId, x => x.Count);
+            RackCountCache = Method.GetTotalItemPerRack("WH2").ToDictionary(x => x.RackId, x => x.Count);
         }
 
         private void GenerateRackView(string RackID)
@@ -109,6 +111,7 @@ namespace FGScanner
 
                     string RackLabel = $"{RackID}{RackLabelIdentifiation1}-{RackLabelIdentifiation2:D2}";
 
+
                     Button btn = new Button
                     {
                         Width = buttonWidth,
@@ -117,8 +120,8 @@ namespace FGScanner
                         Top = row * (buttonHeight + spacing),
                         Text = RackLabel,
                         Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                        ForeColor = Color.White,
-                        BackColor = Color.Green
+                        ForeColor = Color.Black,
+                        BackColor = Color.White
                     };
 
                     btn.Click += Buttom_Click;
@@ -141,15 +144,22 @@ namespace FGScanner
             Button btn = rackButtons[rackLabel];
             int RackCountValue = RackCountCache.TryGetValue(rackLabel, out int count) ? count : 0;
 
+            string customer = Method.GetRackCustomer(rackLabel, "WH2");
+
+            if(customer == "EPPI")
+                backColor = Color.LightGreen;
+            if (customer == "YAZAKI")
+                backColor = Color.MediumPurple;
+            if (customer == "BIPH")
+                backColor = Color.SkyBlue;
+
             if (RackCountValue == 0)
             {
-                btn.BackColor = Color.Green;
-                btn.ForeColor = Color.White;
+                btn.BackColor = Color.White;
             }
             else if (RackCountValue >= 1)
             {
-                btn.BackColor = Color.Blue;
-                btn.ForeColor = Color.White;
+                btn.BackColor = backColor;
             }
         }
 

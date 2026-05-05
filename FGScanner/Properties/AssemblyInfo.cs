@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("FGScanner")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Inventory Management System for Warehouse")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Nidec Instruments Philippines Corporation")]
 [assembly: AssemblyProduct("FGScanner")]
 [assembly: AssemblyCopyright("Copyright ©  2026")]
 [assembly: AssemblyTrademark("")]

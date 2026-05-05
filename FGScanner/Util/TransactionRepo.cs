@@ -386,6 +386,38 @@ namespace FGScanner.Util
 
             return counts;
         }
+        public string GetRackCustomer(string location, string whid)
+        {
+            string customer = string.Empty;
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string query = "SELECT DISTINCT customer from actual_inventory where location = @loc and WhId = @whid";
+
+                    using(SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@loc", SqlDbType.NVarChar).Value = location;
+                        cmd.Parameters.AddWithValue("@whid", SqlDbType.NVarChar).Value = whid;
+
+                        using(SqlDataReader rd = cmd.ExecuteReader())
+                        {
+                            if(rd.Read())
+                            {
+                                customer = rd["customer"].ToString() ?? string.Empty;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+
+            return customer;
+        }
 
         public int GetItemCountByRack(string rack, string whid)
         {
