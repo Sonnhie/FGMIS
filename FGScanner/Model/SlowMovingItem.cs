@@ -15,7 +15,7 @@ namespace FGScanner.Model
             public int Quantity { get; set; }
             public string Location { get; set; }
             public string Storage_location { get; set; }
-            public DateTime Lastmovement { get; set; }
+            public DateTime? Lastmovement { get; set; }
             public string Classification { get; set; }
 
     }

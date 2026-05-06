@@ -225,7 +225,7 @@ namespace FGScanner
                                     item.Box,
                                     item.Quantity,
                                     item.Location,
-                                    item.Lastmovement.ToString("MM/dd/yyyy"),
+                                    item.Lastmovement.HasValue ? item.Lastmovement.Value.ToString("MM/dd/yyyy") : "",
                                     item.Classification,
                                     item.Storage_location
                                 );

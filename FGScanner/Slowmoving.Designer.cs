@@ -41,9 +41,10 @@
             // 
             // TxtPartnumber
             // 
-            this.TxtPartnumber.Location = new System.Drawing.Point(167, 47);
+            this.TxtPartnumber.Location = new System.Drawing.Point(125, 38);
+            this.TxtPartnumber.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.TxtPartnumber.Name = "TxtPartnumber";
-            this.TxtPartnumber.Size = new System.Drawing.Size(217, 22);
+            this.TxtPartnumber.Size = new System.Drawing.Size(164, 20);
             this.TxtPartnumber.TabIndex = 19;
             this.TxtPartnumber.TextChanged += new System.EventHandler(this.TxtPartnumber_TextChanged);
             // 
@@ -51,15 +52,17 @@
             // 
             this.LogsTable.AllowUserToAddRows = false;
             this.LogsTable.AllowUserToDeleteRows = false;
+            this.LogsTable.AllowUserToResizeRows = false;
             this.LogsTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.LogsTable.BackgroundColor = System.Drawing.SystemColors.Control;
             this.LogsTable.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.LogsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.LogsTable.Location = new System.Drawing.Point(43, 149);
+            this.LogsTable.Location = new System.Drawing.Point(32, 121);
+            this.LogsTable.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.LogsTable.Name = "LogsTable";
             this.LogsTable.RowHeadersWidth = 51;
-            this.LogsTable.Size = new System.Drawing.Size(1219, 602);
+            this.LogsTable.Size = new System.Drawing.Size(914, 489);
             this.LogsTable.TabIndex = 18;
             // 
             // statusStrip1
@@ -68,29 +71,31 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripProgressBar1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 762);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 617);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1303, 25);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 10, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(977, 22);
             this.statusStrip1.TabIndex = 29;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(151, 20);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
             this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
             // toolStripProgressBar1
             // 
             this.toolStripProgressBar1.Name = "toolStripProgressBar1";
-            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 19);
+            this.toolStripProgressBar1.Size = new System.Drawing.Size(75, 16);
             // 
             // BtnExport
             // 
             this.BtnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnExport.Location = new System.Drawing.Point(1123, 101);
+            this.BtnExport.Location = new System.Drawing.Point(842, 82);
+            this.BtnExport.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.BtnExport.Name = "BtnExport";
-            this.BtnExport.Size = new System.Drawing.Size(139, 37);
+            this.BtnExport.Size = new System.Drawing.Size(104, 30);
             this.BtnExport.TabIndex = 30;
             this.BtnExport.Text = "Export Data";
             this.BtnExport.UseVisualStyleBackColor = true;
@@ -100,23 +105,25 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(26, 41);
+            this.label1.Location = new System.Drawing.Point(20, 33);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(135, 28);
+            this.label1.Size = new System.Drawing.Size(108, 21);
             this.label1.TabIndex = 31;
             this.label1.Text = "Part Number:";
             // 
             // Slowmoving
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1303, 787);
+            this.ClientSize = new System.Drawing.Size(977, 639);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.BtnExport);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.TxtPartnumber);
             this.Controls.Add(this.LogsTable);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Slowmoving";
             this.Text = "Slowmoving";
             this.Load += new System.EventHandler(this.Slowmoving_Load);

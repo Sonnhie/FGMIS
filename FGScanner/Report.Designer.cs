@@ -29,14 +29,14 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title5 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title6 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label13 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -47,9 +47,11 @@
             this.monthstock_lbl = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.shipanalytic_lbl = new System.Windows.Forms.Label();
             this.ship_lbl = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.returnanalytic_lbl = new System.Windows.Forms.Label();
             this.return_lbl = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.panel5 = new System.Windows.Forms.Panel();
@@ -61,8 +63,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.SlowmovingTable = new System.Windows.Forms.DataGridView();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.shipanalytic_lbl = new System.Windows.Forms.Label();
-            this.returnanalytic_lbl = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -192,6 +192,18 @@
             this.panel3.Size = new System.Drawing.Size(289, 121);
             this.panel3.TabIndex = 1;
             // 
+            // shipanalytic_lbl
+            // 
+            this.shipanalytic_lbl.AutoSize = true;
+            this.shipanalytic_lbl.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.shipanalytic_lbl.ForeColor = System.Drawing.Color.Green;
+            this.shipanalytic_lbl.Location = new System.Drawing.Point(19, 91);
+            this.shipanalytic_lbl.Margin = new System.Windows.Forms.Padding(10);
+            this.shipanalytic_lbl.Name = "shipanalytic_lbl";
+            this.shipanalytic_lbl.Size = new System.Drawing.Size(94, 17);
+            this.shipanalytic_lbl.TabIndex = 8;
+            this.shipanalytic_lbl.Text = "12.5% increase";
+            // 
             // ship_lbl
             // 
             this.ship_lbl.AutoSize = true;
@@ -225,6 +237,18 @@
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(300, 121);
             this.panel4.TabIndex = 2;
+            // 
+            // returnanalytic_lbl
+            // 
+            this.returnanalytic_lbl.AutoSize = true;
+            this.returnanalytic_lbl.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.returnanalytic_lbl.ForeColor = System.Drawing.Color.Green;
+            this.returnanalytic_lbl.Location = new System.Drawing.Point(23, 91);
+            this.returnanalytic_lbl.Margin = new System.Windows.Forms.Padding(10);
+            this.returnanalytic_lbl.Name = "returnanalytic_lbl";
+            this.returnanalytic_lbl.Size = new System.Drawing.Size(94, 17);
+            this.returnanalytic_lbl.TabIndex = 9;
+            this.returnanalytic_lbl.Text = "12.5% increase";
             // 
             // return_lbl
             // 
@@ -297,78 +321,78 @@
             // 
             // chart1
             // 
-            chartArea5.AxisX.IsLabelAutoFit = false;
-            chartArea5.AxisX.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            chartArea5.AxisX.MajorGrid.Enabled = false;
-            chartArea5.AxisX.MajorGrid.LineColor = System.Drawing.Color.LightGray;
-            chartArea5.AxisX.Title = "Month";
-            chartArea5.AxisX.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            chartArea5.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
-            chartArea5.AxisY.IsLabelAutoFit = false;
-            chartArea5.AxisY.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            chartArea5.AxisY.MajorGrid.LineColor = System.Drawing.Color.LightGray;
-            chartArea5.AxisY.Title = "Quantity";
-            chartArea5.AxisY.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            chartArea5.Name = "ChartArea1";
-            chartArea5.ShadowColor = System.Drawing.Color.Gainsboro;
-            chartArea5.ShadowOffset = 5;
-            this.chart1.ChartAreas.Add(chartArea5);
-            legend5.Enabled = false;
-            legend5.Name = "Legend1";
-            this.chart1.Legends.Add(legend5);
+            chartArea1.AxisX.IsLabelAutoFit = false;
+            chartArea1.AxisX.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            chartArea1.AxisX.MajorGrid.Enabled = false;
+            chartArea1.AxisX.MajorGrid.LineColor = System.Drawing.Color.LightGray;
+            chartArea1.AxisX.Title = "Month";
+            chartArea1.AxisX.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            chartArea1.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
+            chartArea1.AxisY.IsLabelAutoFit = false;
+            chartArea1.AxisY.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.LightGray;
+            chartArea1.AxisY.Title = "Quantity";
+            chartArea1.AxisY.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            chartArea1.Name = "ChartArea1";
+            chartArea1.ShadowColor = System.Drawing.Color.Gainsboro;
+            chartArea1.ShadowOffset = 5;
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(20, 161);
             this.chart1.Margin = new System.Windows.Forms.Padding(10);
             this.chart1.Name = "chart1";
-            series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series5.Legend = "Legend1";
-            series5.Name = "Series1";
-            this.chart1.Series.Add(series5);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
             this.chart1.Size = new System.Drawing.Size(866, 256);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
-            title5.Alignment = System.Drawing.ContentAlignment.TopLeft;
-            title5.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            title5.Name = "Title1";
-            title5.Text = "Monthly Inventory";
-            this.chart1.Titles.Add(title5);
+            title1.Alignment = System.Drawing.ContentAlignment.TopLeft;
+            title1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            title1.Name = "Title1";
+            title1.Text = "Monthly Inventory";
+            this.chart1.Titles.Add(title1);
             // 
             // chart2
             // 
-            chartArea6.AxisX.IsLabelAutoFit = false;
-            chartArea6.AxisX.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            chartArea6.AxisX.MajorGrid.Enabled = false;
-            chartArea6.AxisX.MajorGrid.LineColor = System.Drawing.Color.LightGray;
-            chartArea6.AxisX.Title = "Customer";
-            chartArea6.AxisX.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            chartArea6.AxisY.IsLabelAutoFit = false;
-            chartArea6.AxisY.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            chartArea6.AxisY.MajorGrid.LineColor = System.Drawing.Color.LightGray;
-            chartArea6.AxisY.Title = "Quantity";
-            chartArea6.AxisY.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            chartArea6.Name = "ChartArea1";
-            chartArea6.ShadowColor = System.Drawing.Color.Gainsboro;
-            chartArea6.ShadowOffset = 5;
-            this.chart2.ChartAreas.Add(chartArea6);
-            legend6.Enabled = false;
-            legend6.Name = "Legend1";
-            this.chart2.Legends.Add(legend6);
+            chartArea2.AxisX.IsLabelAutoFit = false;
+            chartArea2.AxisX.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            chartArea2.AxisX.MajorGrid.Enabled = false;
+            chartArea2.AxisX.MajorGrid.LineColor = System.Drawing.Color.LightGray;
+            chartArea2.AxisX.Title = "Customer";
+            chartArea2.AxisX.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            chartArea2.AxisY.IsLabelAutoFit = false;
+            chartArea2.AxisY.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            chartArea2.AxisY.MajorGrid.LineColor = System.Drawing.Color.LightGray;
+            chartArea2.AxisY.Title = "Quantity";
+            chartArea2.AxisY.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            chartArea2.Name = "ChartArea1";
+            chartArea2.ShadowColor = System.Drawing.Color.Gainsboro;
+            chartArea2.ShadowOffset = 5;
+            this.chart2.ChartAreas.Add(chartArea2);
+            legend2.Enabled = false;
+            legend2.Name = "Legend1";
+            this.chart2.Legends.Add(legend2);
             this.chart2.Location = new System.Drawing.Point(906, 161);
             this.chart2.Margin = new System.Windows.Forms.Padding(10);
             this.chart2.Name = "chart2";
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Pie;
-            series6.Legend = "Legend1";
-            series6.Name = "Series1";
-            this.chart2.Series.Add(series6);
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Pie;
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.chart2.Series.Add(series2);
             this.chart2.Size = new System.Drawing.Size(313, 256);
             this.chart2.TabIndex = 1;
             this.chart2.Text = "chart2";
-            title6.Alignment = System.Drawing.ContentAlignment.TopLeft;
-            title6.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            title6.Name = "Title1";
-            title6.Text = "Stock By Customer";
-            this.chart2.Titles.Add(title6);
+            title2.Alignment = System.Drawing.ContentAlignment.TopLeft;
+            title2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            title2.Name = "Title1";
+            title2.Text = "Stock By Customer";
+            this.chart2.Titles.Add(title2);
             // 
             // label2
             // 
@@ -383,6 +407,8 @@
             // 
             // SlowmovingTable
             // 
+            this.SlowmovingTable.AllowUserToResizeColumns = false;
+            this.SlowmovingTable.AllowUserToResizeRows = false;
             this.SlowmovingTable.BackgroundColor = System.Drawing.Color.White;
             this.SlowmovingTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.SlowmovingTable.Location = new System.Drawing.Point(20, 472);
@@ -394,30 +420,6 @@
             // timer1
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // shipanalytic_lbl
-            // 
-            this.shipanalytic_lbl.AutoSize = true;
-            this.shipanalytic_lbl.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.shipanalytic_lbl.ForeColor = System.Drawing.Color.Green;
-            this.shipanalytic_lbl.Location = new System.Drawing.Point(19, 91);
-            this.shipanalytic_lbl.Margin = new System.Windows.Forms.Padding(10);
-            this.shipanalytic_lbl.Name = "shipanalytic_lbl";
-            this.shipanalytic_lbl.Size = new System.Drawing.Size(94, 17);
-            this.shipanalytic_lbl.TabIndex = 8;
-            this.shipanalytic_lbl.Text = "12.5% increase";
-            // 
-            // returnanalytic_lbl
-            // 
-            this.returnanalytic_lbl.AutoSize = true;
-            this.returnanalytic_lbl.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.returnanalytic_lbl.ForeColor = System.Drawing.Color.Green;
-            this.returnanalytic_lbl.Location = new System.Drawing.Point(23, 91);
-            this.returnanalytic_lbl.Margin = new System.Windows.Forms.Padding(10);
-            this.returnanalytic_lbl.Name = "returnanalytic_lbl";
-            this.returnanalytic_lbl.Size = new System.Drawing.Size(94, 17);
-            this.returnanalytic_lbl.TabIndex = 9;
-            this.returnanalytic_lbl.Text = "12.5% increase";
             // 
             // Report
             // 

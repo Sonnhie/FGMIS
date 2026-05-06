@@ -783,7 +783,7 @@ namespace FGScanner.Util
                 using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
-                    string sql = "SELECT DISTINCT YEAR(entry_date) AS YEAR FROM Shipment_table ORDER BY YEAR(entry_date) ASC";
+                    string sql = "SELECT DISTINCT YEAR(entry_date) AS YEAR FROM transaction_history ORDER BY YEAR(entry_date) ASC";
                     using (SqlCommand cmd = new SqlCommand(sql,conn))
                     {
                         using(SqlDataReader reader = cmd.ExecuteReader())
@@ -1008,7 +1008,7 @@ namespace FGScanner.Util
                     string sql = @"SELECT partnumber,customer, prod_date,location, total_box,quantity ,storage_location,last_out_date, movement_classification
                                    FROM actual_inventory 
                                    WHERE 1 = 1";
-                    sql += " AND movement_classification = 'SLOW'";
+                    sql += " AND movement_classification = 'SLOW' OR movement_classification = 'NO MOVEMENT' ";
                     if (!string.IsNullOrWhiteSpace(partnumber))
                     {
                         sql += " AND partnumber LIKE @partnumber";
@@ -1022,6 +1022,7 @@ namespace FGScanner.Util
                     {
                         if (!string.IsNullOrEmpty(partnumber))
                             cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = partnumber;
+
 
                         using (SqlDataReader read = cmd.ExecuteReader())
                         {
@@ -1037,7 +1038,7 @@ namespace FGScanner.Util
                                     Location = read["location"].ToString() ?? string.Empty,
                                     Storage_location = read["storage_location"].ToString() ?? string.Empty,
                                     Classification = read["movement_classification"].ToString() ?? string.Empty,
-                                    Lastmovement = read["last_out_date"] != DBNull.Value ? Convert.ToDateTime(read["last_out_date"]).Date : DateTime.MinValue.Date
+                                    Lastmovement = read["last_out_date"] != DBNull.Value ? Convert.ToDateTime(read["last_out_date"]).Date : (DateTime?)null
                                 };
                                 items.Add(item);
                             }
