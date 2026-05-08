@@ -29,6 +29,8 @@ namespace FGScanner
             toolStripStatusLabel1.Visible = false;
             TxtDocNumber.CharacterCasing = CharacterCasing.Upper;
             cmbStorageLocation.SelectedIndex = 0;
+            toolStripProgressBar1.Visible = false;
+            toolStripStatusLabel1.Visible= false;
         }
 
         private void LoadData() 
@@ -108,7 +110,6 @@ namespace FGScanner
         }
 
         
-
         private void cmbStorageLocation_SelectedIndexChanged(object sender, EventArgs e)
         {
             LoadData();
@@ -456,5 +457,24 @@ namespace FGScanner
         {
             LoadData();
         }
+
+        private void Returntable_SelectionChanged(object sender, EventArgs e)
+        {
+            decimal total = 0;
+
+            foreach (DataGridViewCell cell in Returntable.SelectedCells)
+            {
+                if (cell.OwningColumn.Name == "Total Quantity")
+                {
+                    if (cell.Value != null && decimal.TryParse(cell.Value.ToString(), out decimal qty))
+                    {
+                        total += qty;
+                    }
+                }
+            }
+            total_sum.Text = $"Total Quantity: {total:N0}";
+        }
+
     }
 }
+

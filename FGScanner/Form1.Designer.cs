@@ -29,14 +29,14 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cmbStorageLocation = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.PostingDate2 = new System.Windows.Forms.DateTimePicker();
+            this.PostingDate1 = new System.Windows.Forms.DateTimePicker();
+            this.TxtDocNumber = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.TxtDocNumber = new System.Windows.Forms.TextBox();
-            this.PostingDate1 = new System.Windows.Forms.DateTimePicker();
-            this.PostingDate2 = new System.Windows.Forms.DateTimePicker();
-            this.label4 = new System.Windows.Forms.Label();
-            this.cmbStorageLocation = new System.Windows.Forms.ComboBox();
             this.Returntable = new System.Windows.Forms.DataGridView();
             this.BtnNext = new System.Windows.Forms.Button();
             this.BtnPrev = new System.Windows.Forms.Button();
@@ -46,6 +46,7 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
+            this.total_sum = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Returntable)).BeginInit();
             this.statusStrip1.SuspendLayout();
@@ -68,6 +69,64 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Filters";
+            // 
+            // cmbStorageLocation
+            // 
+            this.cmbStorageLocation.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbStorageLocation.FormattingEnabled = true;
+            this.cmbStorageLocation.Items.AddRange(new object[] {
+            "SINA",
+            "ASSA",
+            "MOLD",
+            "ASSB",
+            "SINB"});
+            this.cmbStorageLocation.Location = new System.Drawing.Point(905, 40);
+            this.cmbStorageLocation.Name = "cmbStorageLocation";
+            this.cmbStorageLocation.Size = new System.Drawing.Size(101, 25);
+            this.cmbStorageLocation.TabIndex = 9;
+            this.cmbStorageLocation.SelectedIndexChanged += new System.EventHandler(this.cmbStorageLocation_SelectedIndexChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(789, 48);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(110, 17);
+            this.label4.TabIndex = 8;
+            this.label4.Text = "Storage Location:";
+            // 
+            // PostingDate2
+            // 
+            this.PostingDate2.Checked = false;
+            this.PostingDate2.CustomFormat = "yyyy-MM-dd";
+            this.PostingDate2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.PostingDate2.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.PostingDate2.Location = new System.Drawing.Point(642, 42);
+            this.PostingDate2.Name = "PostingDate2";
+            this.PostingDate2.Size = new System.Drawing.Size(101, 25);
+            this.PostingDate2.TabIndex = 7;
+            this.PostingDate2.ValueChanged += new System.EventHandler(this.PostingDate2_ValueChanged);
+            // 
+            // PostingDate1
+            // 
+            this.PostingDate1.Checked = false;
+            this.PostingDate1.CustomFormat = "yyyy-MM-dd";
+            this.PostingDate1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.PostingDate1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.PostingDate1.Location = new System.Drawing.Point(515, 42);
+            this.PostingDate1.Name = "PostingDate1";
+            this.PostingDate1.Size = new System.Drawing.Size(101, 25);
+            this.PostingDate1.TabIndex = 6;
+            this.PostingDate1.ValueChanged += new System.EventHandler(this.PostingDate1_ValueChanged);
+            // 
+            // TxtDocNumber
+            // 
+            this.TxtDocNumber.Location = new System.Drawing.Point(152, 42);
+            this.TxtDocNumber.Name = "TxtDocNumber";
+            this.TxtDocNumber.Size = new System.Drawing.Size(228, 25);
+            this.TxtDocNumber.TabIndex = 5;
+            this.TxtDocNumber.TextChanged += new System.EventHandler(this.TxtDocNumber_TextChanged);
             // 
             // label3
             // 
@@ -99,66 +158,9 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Document #:";
             // 
-            // TxtDocNumber
-            // 
-            this.TxtDocNumber.Location = new System.Drawing.Point(152, 42);
-            this.TxtDocNumber.Name = "TxtDocNumber";
-            this.TxtDocNumber.Size = new System.Drawing.Size(228, 25);
-            this.TxtDocNumber.TabIndex = 5;
-            this.TxtDocNumber.TextChanged += new System.EventHandler(this.TxtDocNumber_TextChanged);
-            // 
-            // PostingDate1
-            // 
-            this.PostingDate1.Checked = false;
-            this.PostingDate1.CustomFormat = "yyyy-MM-dd";
-            this.PostingDate1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PostingDate1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.PostingDate1.Location = new System.Drawing.Point(515, 42);
-            this.PostingDate1.Name = "PostingDate1";
-            this.PostingDate1.Size = new System.Drawing.Size(101, 25);
-            this.PostingDate1.TabIndex = 6;
-            this.PostingDate1.ValueChanged += new System.EventHandler(this.PostingDate1_ValueChanged);
-            // 
-            // PostingDate2
-            // 
-            this.PostingDate2.Checked = false;
-            this.PostingDate2.CustomFormat = "yyyy-MM-dd";
-            this.PostingDate2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PostingDate2.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.PostingDate2.Location = new System.Drawing.Point(642, 42);
-            this.PostingDate2.Name = "PostingDate2";
-            this.PostingDate2.Size = new System.Drawing.Size(101, 25);
-            this.PostingDate2.TabIndex = 7;
-            this.PostingDate2.ValueChanged += new System.EventHandler(this.PostingDate2_ValueChanged);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(789, 48);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(110, 17);
-            this.label4.TabIndex = 8;
-            this.label4.Text = "Storage Location:";
-            // 
-            // cmbStorageLocation
-            // 
-            this.cmbStorageLocation.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmbStorageLocation.FormattingEnabled = true;
-            this.cmbStorageLocation.Items.AddRange(new object[] {
-            "SINA",
-            "ASSA",
-            "MOLD",
-            "ASSB",
-            "SINB"});
-            this.cmbStorageLocation.Location = new System.Drawing.Point(905, 40);
-            this.cmbStorageLocation.Name = "cmbStorageLocation";
-            this.cmbStorageLocation.Size = new System.Drawing.Size(101, 25);
-            this.cmbStorageLocation.TabIndex = 9;
-            this.cmbStorageLocation.SelectedIndexChanged += new System.EventHandler(this.cmbStorageLocation_SelectedIndexChanged);
-            // 
             // Returntable
             // 
+            this.Returntable.AllowUserToAddRows = false;
             this.Returntable.AllowUserToDeleteRows = false;
             this.Returntable.BackgroundColor = System.Drawing.Color.White;
             this.Returntable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -168,6 +170,7 @@
             this.Returntable.Size = new System.Drawing.Size(1131, 437);
             this.Returntable.TabIndex = 2;
             this.Returntable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.Returntable_CellClick);
+            this.Returntable.SelectionChanged += new System.EventHandler(this.Returntable_SelectionChanged);
             // 
             // BtnNext
             // 
@@ -235,11 +238,22 @@
             // 
             this.printDocument1.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.printDocument1_PrintPage);
             // 
+            // total_sum
+            // 
+            this.total_sum.AutoSize = true;
+            this.total_sum.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.total_sum.Location = new System.Drawing.Point(857, 167);
+            this.total_sum.Name = "total_sum";
+            this.total_sum.Size = new System.Drawing.Size(97, 17);
+            this.total_sum.TabIndex = 11;
+            this.total_sum.Text = "Total Quantity:";
+            // 
             // WHRForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1245, 724);
+            this.Controls.Add(this.total_sum);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.BtnExport);
             this.Controls.Add(this.LblPage);
@@ -281,5 +295,6 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Drawing.Printing.PrintDocument printDocument1;
+        private System.Windows.Forms.Label total_sum;
     }
 }

@@ -56,6 +56,7 @@ namespace FGScanner
 
                     dt.Columns.Add("Transaction ID", typeof(string));
                     dt.Columns.Add("Posting Date", typeof(string));
+                    dt.Columns.Add("Customer", typeof(string));
                     dt.Columns.Add("Total Box", typeof(string));
                     dt.Columns.Add("Total Quantity", typeof(string));
 
@@ -67,6 +68,7 @@ namespace FGScanner
                         (
                            item.transaction_id,
                            item.posting_date,
+                           item.customer,
                            item.total_box,
                            item.quantity
                         );
@@ -79,6 +81,7 @@ namespace FGScanner
 
                     PackinglistTable.Columns["Transaction ID"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     PackinglistTable.Columns["Posting Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    PackinglistTable.Columns["Customer"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     PackinglistTable.Columns["Total Box"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     PackinglistTable.Columns["Total Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
 
@@ -307,6 +310,23 @@ namespace FGScanner
                 package.SaveAs(new FileInfo(Filepath));
                 Progress?.Report(100);
             }
+        }
+
+        private void PackinglistTable_SelectionChanged(object sender, EventArgs e)
+        {
+            decimal total = 0;
+
+            foreach(DataGridViewCell cell in PackinglistTable.SelectedCells)
+            {
+                if(cell.OwningColumn.Name == "Total Quantity")
+                {
+                    if(cell.Value != null && decimal.TryParse(cell.Value.ToString(), out decimal qty))
+                    {
+                        total += qty;
+                    }
+                }
+            } 
+            total_sum.Text = $"Total Quantity: {total:N0}";
         }
     }
 }

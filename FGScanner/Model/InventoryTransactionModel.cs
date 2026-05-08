@@ -6,6 +6,31 @@ using System.Windows.Media.Imaging;
 
 namespace FGScanner.Model
 {
+
+    public class StockResult
+    {
+        public StockInfo info {  get; set; }
+        public List<StockLedger> ledgers { get; set; } = new List<StockLedger>();
+    }
+
+    public class StockInfo
+    {
+        public string PartNumber { get; set; }
+        public string PartName { get; set; }
+        public string customer {  get; set; }
+        public int BegginingBalance { get; set; }      
+    }
+
+    public class StockLedger
+    {
+        public DateTime EntryDate { get; set; }
+        public int TotalIn {  get; set; }
+        public int TotalOut { get; set; }
+        public int RunningbBalance { get; set; }
+        public string Remarks {  get; set; }
+        public string Incharge { get; set; }
+    }
+
     public class InventoryTransactionModel
     {
         //Transaction Data Model
@@ -169,6 +194,7 @@ namespace FGScanner.Model
     {
         public string transaction_id { get; set; }
         public int total_box { get; set; }
+        public string customer {  get; set; }
         public int quantity { get; set; }
         public DateTime posting_date { get; set; }
         public List<PackingListRow> Row { get; set; } = new List<PackingListRow>();

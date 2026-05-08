@@ -59,6 +59,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
+            this.iNOUTLedgerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -104,7 +105,8 @@
             this.dataEntryToolStripMenuItem,
             this.rackViewerToolStripMenuItem,
             this.stockListToolStripMenuItem,
-            this.slowMovingListToolStripMenuItem});
+            this.slowMovingListToolStripMenuItem,
+            this.iNOUTLedgerToolStripMenuItem});
             this.inventoryToolStripMenuItem.Name = "inventoryToolStripMenuItem";
             this.inventoryToolStripMenuItem.Size = new System.Drawing.Size(70, 19);
             this.inventoryToolStripMenuItem.Text = "Inventory";
@@ -117,7 +119,7 @@
             this.cHANGELOCATIONToolStripMenuItem,
             this.warehouseReturnToolStripMenuItem});
             this.dataEntryToolStripMenuItem.Name = "dataEntryToolStripMenuItem";
-            this.dataEntryToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.dataEntryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.dataEntryToolStripMenuItem.Text = "Data Entry";
             // 
             // iNToolStripMenuItem
@@ -154,7 +156,7 @@
             this.warehouseToolStripMenuItem1,
             this.ecozoneToolStripMenuItem});
             this.rackViewerToolStripMenuItem.Name = "rackViewerToolStripMenuItem";
-            this.rackViewerToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.rackViewerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.rackViewerToolStripMenuItem.Text = "Rack Viewer";
             this.rackViewerToolStripMenuItem.Click += new System.EventHandler(this.rackViewerToolStripMenuItem_Click);
             // 
@@ -175,14 +177,14 @@
             // stockListToolStripMenuItem
             // 
             this.stockListToolStripMenuItem.Name = "stockListToolStripMenuItem";
-            this.stockListToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.stockListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.stockListToolStripMenuItem.Text = "Stock List";
             this.stockListToolStripMenuItem.Click += new System.EventHandler(this.stockListToolStripMenuItem_Click);
             // 
             // slowMovingListToolStripMenuItem
             // 
             this.slowMovingListToolStripMenuItem.Name = "slowMovingListToolStripMenuItem";
-            this.slowMovingListToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.slowMovingListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.slowMovingListToolStripMenuItem.Text = "Slow Moving List";
             this.slowMovingListToolStripMenuItem.Click += new System.EventHandler(this.slowMovingListToolStripMenuItem_Click);
             // 
@@ -316,7 +318,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(53, 20);
             this.label1.TabIndex = 0;
-            this.label1.Text = "FGMIS";
+            this.label1.Text = "FGIMS";
             // 
             // timer1
             // 
@@ -330,6 +332,13 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1245, 724);
             this.panel1.TabIndex = 3;
+            // 
+            // iNOUTLedgerToolStripMenuItem
+            // 
+            this.iNOUTLedgerToolStripMenuItem.Name = "iNOUTLedgerToolStripMenuItem";
+            this.iNOUTLedgerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.iNOUTLedgerToolStripMenuItem.Text = "IN & OUT Ledger";
+            this.iNOUTLedgerToolStripMenuItem.Click += new System.EventHandler(this.iNOUTLedgerToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -387,5 +396,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ToolStripMenuItem warehouseToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem ecozoneToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem iNOUTLedgerToolStripMenuItem;
     }
 }

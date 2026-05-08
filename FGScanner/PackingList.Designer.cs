@@ -43,6 +43,7 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.progressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.BtnExport = new System.Windows.Forms.Button();
+            this.total_sum = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PackinglistTable)).BeginInit();
             this.statusStrip1.SuspendLayout();
@@ -128,15 +129,18 @@
             // 
             // PackinglistTable
             // 
+            this.PackinglistTable.AllowUserToAddRows = false;
             this.PackinglistTable.AllowUserToDeleteRows = false;
             this.PackinglistTable.BackgroundColor = System.Drawing.Color.White;
             this.PackinglistTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.PackinglistTable.EnableHeadersVisualStyles = false;
             this.PackinglistTable.Location = new System.Drawing.Point(51, 157);
             this.PackinglistTable.Name = "PackinglistTable";
             this.PackinglistTable.ReadOnly = true;
             this.PackinglistTable.Size = new System.Drawing.Size(1147, 467);
             this.PackinglistTable.TabIndex = 3;
             this.PackinglistTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.Returntable_CellClick);
+            this.PackinglistTable.SelectionChanged += new System.EventHandler(this.PackinglistTable_SelectionChanged);
             // 
             // BtnPrev
             // 
@@ -198,11 +202,22 @@
             this.BtnExport.UseVisualStyleBackColor = true;
             this.BtnExport.Click += new System.EventHandler(this.BtnExport_Click);
             // 
+            // total_sum
+            // 
+            this.total_sum.AutoSize = true;
+            this.total_sum.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.total_sum.Location = new System.Drawing.Point(908, 134);
+            this.total_sum.Name = "total_sum";
+            this.total_sum.Size = new System.Drawing.Size(97, 17);
+            this.total_sum.TabIndex = 10;
+            this.total_sum.Text = "Total Quantity:";
+            // 
             // PackingList
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1245, 724);
+            this.Controls.Add(this.total_sum);
             this.Controls.Add(this.BtnExport);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.LblPage);
@@ -241,5 +256,6 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripProgressBar progressBar;
         private System.Windows.Forms.Button BtnExport;
+        private System.Windows.Forms.Label total_sum;
     }
 }

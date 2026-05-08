@@ -167,5 +167,11 @@ namespace FGScanner
             PackingList packingList = new PackingList();
             DisplayForm(packingList);
         }
+
+        private void iNOUTLedgerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StockCard stockCard = new StockCard();
+            DisplayForm(stockCard);
+        }
     }
 }

@@ -242,6 +242,12 @@
     <Compile Include="SplashScreen.Designer.cs">
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="StockCard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StockCard.Designer.cs">
+      <DependentUpon>StockCard.cs</DependentUpon>
+    </Compile>
     <Compile Include="Util\AuditLogsRepo.cs" />
     <Compile Include="Util\db_connection.cs" />
     <Compile Include="Util\ExportService.cs" />
@@ -326,6 +332,9 @@
     <EmbeddedResource Include="SplashScreen.resx">
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="StockCard.resx">
+      <DependentUpon>StockCard.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Viewer.resx">
       <DependentUpon>Viewer.cs</DependentUpon>
     </EmbeddedResource>
@@ -364,6 +373,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\TransferSlip.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\SF-78-FG003_Rev.00_Stock Card.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Templates\WithdrawalSlip.xlsx" />

@@ -1582,7 +1582,7 @@ namespace FGScanner.Util
                     conn.Open();
 
                     string sql = @"SELECT 
-                                    transaction_id,
+                                    transaction_id, customer,
                                     SUM(quantity) AS TotalQuantity,
                                     COUNT(partnumber) AS TotalBox,
                                     MIN(entry_date) AS entry_date 
@@ -1598,7 +1598,7 @@ namespace FGScanner.Util
                         sql += " AND entry_date >= @fromDate AND entry_date < DATEADD(DAY, 1, @toDate)";
                     }
 
-                    sql += " GROUP BY transaction_id";
+                    sql += " GROUP BY transaction_id, customer";
                     sql += " ORDER BY MIN(entry_date) ASC OFFSET @offset ROWS FETCH NEXT @size ROWS ONLY";
 
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -1626,6 +1626,7 @@ namespace FGScanner.Util
                                     transaction_id = reader["transaction_id"]?.ToString() ?? "",
                                     quantity = reader["TotalQuantity"] != DBNull.Value ? Convert.ToInt32(reader["TotalQuantity"]) : 0,
                                     total_box = reader["TotalBox"] != DBNull.Value ? Convert.ToInt32(reader["TotalBox"]) : 0,
+                                    customer = reader["customer"].ToString() ?? string.Empty,
                                     posting_date = reader["entry_date"] != DBNull.Value ? Convert.ToDateTime(reader["entry_date"]) : DateTime.MinValue
                                 });
                             }
@@ -1874,6 +1875,124 @@ namespace FGScanner.Util
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
             return count;
+        }
+
+        public List<StockResult> GetINOUTinventory(string partnumber, DateTime startdate, DateTime enddate)
+        {
+            List<StockResult> result = new List<StockResult>();
+            List<StockLedger> list = new List<StockLedger>();
+            StockInfo info = null;
+
+            try
+            {
+                using(SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = @"DECLARE @BeginningBalance INT = (
+                                        SELECT 
+                                        ISNULL(SUM(
+                                        CASE 
+                                            WHEN transaction_type = 'IN' THEN Quantity
+                                            WHEN transaction_type = 'OUT' THEN Quantity
+                                            ELSE 0
+                                        END
+                                        ),0) FROM transaction_history WHERE PartNumber = @PartNumber AND entry_date < @StartDate);
+
+                                        WITH DailyTransaction AS (
+                                                SELECT 
+                                                    CAST(entry_date AS DATE) AS TransactionDay,
+                                                    PartNumber,
+                                                    SUM(CASE 
+                                                            WHEN transaction_type = 'IN' 
+                                                            THEN Quantity 
+                                                            ELSE 0 
+                                                        END) AS TotalIN,
+
+                                                    SUM(CASE 
+                                                            WHEN transaction_type = 'OUT' 
+                                                            THEN Quantity 
+                                                            ELSE 0 
+                                                        END) AS TotalOUT,
+                                                CASE 
+                                                   WHEN control_number LIKE 'AS-%' AND transaction_type = 'OUT' THEN 'Return - OUT'
+                                                   WHEN control_number LIKE 'SHIPID-%' AND transaction_type = 'OUT' THEN 'DELIVERY - OUT'
+                                                   WHEN control_number = '' AND transaction_type = 'OUT' THEN 'TRANSFER LOCATION - OUT'
+                                                   ELSE ''
+                                                END AS Remarks
+
+                                                FROM transaction_history
+
+                                                WHERE PartNumber = @PartNumber
+                                                AND entry_date >= @StartDate
+                                                AND entry_date < DATEADD(DAY, 1, @EndDate)
+
+                                                GROUP BY 
+                                                    CAST(entry_date AS DATE),
+                                                    PartNumber, transaction_type, control_number)
+
+                                                SELECT
+                                                    TransactionDay,
+                                                    TotalIN,
+                                                    TotalOUT,
+                                                    Remarks,
+                                                    @BeginningBalance +
+                                                    SUM(TotalIN - TotalOUT)
+                                                    OVER (
+                                                        ORDER BY TransactionDay
+                                                    ) AS RunningBalance,
+                                                    @BeginningBalance AS BeginningBalance
+
+                                                FROM DailyTransaction
+
+                                                ORDER BY TransactionDay";
+                    using(SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.Add("@PartNumber", SqlDbType.NVarChar).Value = partnumber;
+                        cmd.Parameters.Add("@StartDate", SqlDbType.DateTime).Value = startdate;
+                        cmd.Parameters.Add("@EndDate", SqlDbType.DateTime).Value = enddate;
+
+                        using(SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            bool firstRow = true;
+
+                            while (reader.Read())
+                            {
+                                if (firstRow)
+                                {
+                                    info =  new StockInfo
+                                    {
+                                        PartNumber = partnumber ?? string.Empty,
+                                        PartName = GetPartname(partnumber) ?? string.Empty,
+                                        customer = GetCustomer(partnumber) ?? string.Empty,
+                                        BegginingBalance = Convert.ToInt32(reader["BeginningBalance"])
+                                    };
+
+                                    firstRow = false;
+                                }
+
+                                list.Add(new StockLedger
+                                {
+                                    EntryDate = reader["TransactionDay"] != DBNull.Value ? Convert.ToDateTime(reader["TransactionDay"]) : DateTime.MinValue,
+                                    TotalIn = Convert.ToInt32(reader["TotalIN"]),
+                                    TotalOut = Convert.ToInt32(reader["TotalOUT"]),
+                                    RunningbBalance = Convert.ToInt32(reader["RunningBalance"]),
+                                    Remarks = reader["Remarks"].ToString() ?? string.Empty
+                                });
+                            }
+
+                            result.Add(new StockResult
+                            {
+                                info = info,
+                                ledgers = list
+                            });
+                        }
+                    }
+                }
+            }catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return result;
         }
     }
 }
