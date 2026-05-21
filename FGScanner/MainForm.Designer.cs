@@ -44,6 +44,7 @@
             this.ecozoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stockListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.slowMovingListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.iNOUTLedgerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.repoertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.inventorySummaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -59,7 +60,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
-            this.iNOUTLedgerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -119,8 +119,9 @@
             this.cHANGELOCATIONToolStripMenuItem,
             this.warehouseReturnToolStripMenuItem});
             this.dataEntryToolStripMenuItem.Name = "dataEntryToolStripMenuItem";
-            this.dataEntryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.dataEntryToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.dataEntryToolStripMenuItem.Text = "Data Entry";
+            this.dataEntryToolStripMenuItem.Click += new System.EventHandler(this.dataEntryToolStripMenuItem_Click);
             // 
             // iNToolStripMenuItem
             // 
@@ -156,7 +157,7 @@
             this.warehouseToolStripMenuItem1,
             this.ecozoneToolStripMenuItem});
             this.rackViewerToolStripMenuItem.Name = "rackViewerToolStripMenuItem";
-            this.rackViewerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.rackViewerToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.rackViewerToolStripMenuItem.Text = "Rack Viewer";
             this.rackViewerToolStripMenuItem.Click += new System.EventHandler(this.rackViewerToolStripMenuItem_Click);
             // 
@@ -177,16 +178,23 @@
             // stockListToolStripMenuItem
             // 
             this.stockListToolStripMenuItem.Name = "stockListToolStripMenuItem";
-            this.stockListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.stockListToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.stockListToolStripMenuItem.Text = "Stock List";
             this.stockListToolStripMenuItem.Click += new System.EventHandler(this.stockListToolStripMenuItem_Click);
             // 
             // slowMovingListToolStripMenuItem
             // 
             this.slowMovingListToolStripMenuItem.Name = "slowMovingListToolStripMenuItem";
-            this.slowMovingListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.slowMovingListToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.slowMovingListToolStripMenuItem.Text = "Slow Moving List";
             this.slowMovingListToolStripMenuItem.Click += new System.EventHandler(this.slowMovingListToolStripMenuItem_Click);
+            // 
+            // iNOUTLedgerToolStripMenuItem
+            // 
+            this.iNOUTLedgerToolStripMenuItem.Name = "iNOUTLedgerToolStripMenuItem";
+            this.iNOUTLedgerToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.iNOUTLedgerToolStripMenuItem.Text = "IN & OUT Ledger";
+            this.iNOUTLedgerToolStripMenuItem.Click += new System.EventHandler(this.iNOUTLedgerToolStripMenuItem_Click);
             // 
             // repoertToolStripMenuItem
             // 
@@ -332,13 +340,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1245, 724);
             this.panel1.TabIndex = 3;
-            // 
-            // iNOUTLedgerToolStripMenuItem
-            // 
-            this.iNOUTLedgerToolStripMenuItem.Name = "iNOUTLedgerToolStripMenuItem";
-            this.iNOUTLedgerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.iNOUTLedgerToolStripMenuItem.Text = "IN & OUT Ledger";
-            this.iNOUTLedgerToolStripMenuItem.Click += new System.EventHandler(this.iNOUTLedgerToolStripMenuItem_Click);
             // 
             // MainForm
             // 

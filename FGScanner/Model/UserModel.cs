@@ -15,6 +15,7 @@ namespace FGScanner.Model
         public string Name { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdate { get; set; }
-        public string UserGroup { get; set; }
+        public int UserGroup { get; set; }
+        public string Role {  get; set; }
     }
 }

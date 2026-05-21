@@ -33,8 +33,8 @@ namespace FGScanner.Util
                 SqlTransaction tx = conn.BeginTransaction();
                 try
                 {
-                    string sql = "INSERT INTO transaction_history (TransactionId, partnumber, prod_date, customer_id, quantity, prod_ver, entry_date, transaction_type, location, remarks, storage_location, WH_id) " +
-                                     "VALUES (@TransactionId, @partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @transaction_type, @location, @remarks, @storage_location, @WH_id)";
+                    string sql = "INSERT INTO transaction_history (TransactionId, partnumber, prod_date, customer_id, quantity, prod_ver, entry_date, transaction_type, location, remarks, storage_location, WH_id, in_charge) " +
+                                     "VALUES (@TransactionId, @partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @transaction_type, @location, @remarks, @storage_location, @WH_id,  @_in_charge)";
 
                     using (SqlCommand cmd = new SqlCommand(sql, conn, tx))
                     {
@@ -50,7 +50,7 @@ namespace FGScanner.Util
                         cmd.Parameters.Add("@remarks", SqlDbType.NVarChar).Value = item.Remarks;
                         cmd.Parameters.Add("@storage_location", SqlDbType.NVarChar).Value = item.Storage_location;
                         cmd.Parameters.Add("@WH_id", SqlDbType.NVarChar).Value = item.WhId;
-
+                        cmd.Parameters.Add("@_in_charge", SqlDbType.NVarChar).Value = item.User;
 
                         cmd.ExecuteNonQuery();
                         tx.Commit();
@@ -67,9 +67,9 @@ namespace FGScanner.Util
         public async Task InsertSingleTransaction(InventoryTransactionModel item, SqlConnection conn, SqlTransaction tx)
         {
             string sql = @"INSERT INTO transaction_history
-                   (TransactionId, partnumber, prod_date, customer_id, quantity, prod_ver, entry_date, transaction_type, location, remarks, storage_location, control_number, WH_id)
+                   (TransactionId, partnumber, prod_date, customer_id, quantity, prod_ver, entry_date, transaction_type, location, remarks, storage_location, control_number, WH_id, in_charge)
                    VALUES
-                   (@TransactionId, @partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @transaction_type, @location, @remarks, @storage_location, @id, @WH_id)";
+                   (@TransactionId, @partnumber, @prod_date, @customer_id, @quantity, @prod_ver, @entry_date, @transaction_type, @location, @remarks, @storage_location, @id, @WH_id, @_in_charge)";
 
             using (SqlCommand cmd = new SqlCommand(sql, conn, tx))
             {
@@ -85,7 +85,8 @@ namespace FGScanner.Util
                 cmd.Parameters.Add("@remarks", SqlDbType.NVarChar).Value = item.Remarks;
                 cmd.Parameters.Add("@storage_location", SqlDbType.NVarChar).Value = item.Storage_location;
                 cmd.Parameters.Add("@id", SqlDbType.NVarChar).Value = item.TransactionId;
-                cmd.Parameters.Add("@WH_id", SqlDbType.NVarChar).Value = item.WhId; 
+                cmd.Parameters.Add("@WH_id", SqlDbType.NVarChar).Value = item.WhId;
+                cmd.Parameters.Add("@_in_charge", SqlDbType.NVarChar).Value = item.User;
 
                 await cmd.ExecuteNonQueryAsync();
             }
@@ -139,7 +140,7 @@ namespace FGScanner.Util
             }
         }
         
-        public int CheckStock(string partnumber, string location)
+        public int CheckStock(string partnumber, DateTime prodDate, string location)
         {
             int result = 0;
             try
@@ -147,14 +148,15 @@ namespace FGScanner.Util
                 using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
-                    string sql = "SELECT ISNULL(SUM(CASE WHEN transaction_type = 'IN' THEN 1 else 0 END),0) - " +
-                                 "ISNULL(SUM(CASE WHEN transaction_type = 'OUT' THEN 1 else 0 END),0) " +
+                    string sql = "SELECT ISNULL(SUM(CASE WHEN transaction_type = 'IN' THEN quantity else 0 END),0) - " +
+                                 "ISNULL(SUM(CASE WHEN transaction_type = 'OUT' THEN quantity else 0 END),0) " +
                                  "as TotalItems FROM transaction_history " +
-                                 "WHERE partnumber = @partnumber AND location = @location";
+                                 "WHERE partnumber = @partnumber AND location = @location AND prod_date = @prod_date";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = partnumber;
                         cmd.Parameters.Add("@location", SqlDbType.NVarChar).Value = location;
+                        cmd.Parameters.Add("@prod_date", SqlDbType.DateTime).Value = prodDate;
                         result = Convert.ToInt32(cmd.ExecuteScalar());  
                     }
                 }
@@ -199,7 +201,8 @@ namespace FGScanner.Util
                                     TransactionType = reader["transaction_type"]?.ToString() ?? string.Empty,
                                     Location = reader["location"]?.ToString() ?? string.Empty,
                                     Storage_location = reader["storage_location"]?.ToString() ?? string.Empty,
-                                    Remarks = reader["remarks"]?.ToString() ?? string.Empty
+                                    Remarks = reader["remarks"]?.ToString() ?? string.Empty,
+                                    User = reader["in_charge"]?.ToString() ?? string.Empty
                                 };
                                 Inventory.Add(item);
                             }
@@ -359,7 +362,7 @@ namespace FGScanner.Util
                 using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
-                    string sql = @"SELECT location, COUNT(partnumber) AS item FROM actual_inventory WHERE WhId = @whid GROUP BY location";
+                    string sql = @"SELECT location, SUM(quantity) AS item FROM actual_inventory WHERE WhId = @whid GROUP BY location";
 
                     using (SqlCommand cmd = new SqlCommand(sql,conn))
                     {
@@ -641,7 +644,44 @@ namespace FGScanner.Util
             }
             return Items;
         }
-        
+
+        public List<OrdersSummary> GetPackinglistInvoice(string shipmenID)
+        {
+            List<OrdersSummary> Items = new List<OrdersSummary>();
+            try
+            {
+                string sql = "SELECT control_number, customer_id, partnumber, SUM(quantity) AS TotalQuantity, COUNT(partnumber) AS TotalBox FROM transaction_history where control_number = @id ";
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.Add("@id", SqlDbType.NVarChar).Value = shipmenID;
+                        conn.Open();
+                        using (SqlDataReader read = cmd.ExecuteReader())
+                        {
+                            while (read.Read())
+                            {
+                                OrdersSummary inv = new OrdersSummary
+                                {
+                                    TransactionId = read["control_number"]?.ToString() ?? string.Empty,
+                                    Partnumber = read["partnumber"]?.ToString() ?? string.Empty,
+                                    Quantity = Convert.ToInt32(read["TotalQuantity"]),
+                                    Customer = read["customer_id"]?.ToString() ?? string.Empty,
+                                    Box = Convert.ToInt32(read["TotalBox"])
+                                };
+                                Items.Add(inv);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return Items;
+        }
+
         public List<InventoryTransactionModel> GetFilteredData(string partnumber, int page, int size)
         {
             List<InventoryTransactionModel> items = new List<InventoryTransactionModel> ();
@@ -783,7 +823,7 @@ namespace FGScanner.Util
                 using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
-                    string sql = "SELECT DISTINCT YEAR(entry_date) AS YEAR FROM transaction_history ORDER BY YEAR(entry_date) ASC";
+                    string sql = "SELECT DISTINCT YEAR(entry_date) AS YEAR FROM transaction_history ORDER BY YEAR(entry_date) DESC";
                     using (SqlCommand cmd = new SqlCommand(sql,conn))
                     {
                         using(SqlDataReader reader = cmd.ExecuteReader())
@@ -1191,7 +1231,7 @@ namespace FGScanner.Util
 
                     // 1. ONE efficient query to get all parts and their rows for this rack
                     string sql = @"
-                        SELECT storage_location, partnumber, prod_date, total_box, quantity 
+                        SELECT storage_location, partnumber, prod_date, total_box, quantity, location 
                         FROM actual_inventory 
                         WHERE location = @location AND WhId = @whid
                         ORDER BY partnumber, prod_date";
@@ -1219,6 +1259,7 @@ namespace FGScanner.Util
                                         MonthYear = DateTime.Now.ToString("yyyy MMMM").ToUpper(),
                                         GrandTotalBoxes = 0,
                                         GrandTotalQuantity = 0,
+                                        location = reader["location"].ToString() ?? string.Empty,
                                         Rows = new List<InventoryRow>() // Make sure the list is initialized
                                     };
                                 }
@@ -1902,6 +1943,7 @@ namespace FGScanner.Util
                                                 SELECT 
                                                     CAST(entry_date AS DATE) AS TransactionDay,
                                                     PartNumber,
+                                                    in_charge,
                                                     SUM(CASE 
                                                             WHEN transaction_type = 'IN' 
                                                             THEN Quantity 
@@ -1928,13 +1970,14 @@ namespace FGScanner.Util
 
                                                 GROUP BY 
                                                     CAST(entry_date AS DATE),
-                                                    PartNumber, transaction_type, control_number)
+                                                    PartNumber, in_charge, transaction_type, control_number)
 
                                                 SELECT
                                                     TransactionDay,
                                                     TotalIN,
                                                     TotalOUT,
-                                                    Remarks,
+                                                    in_charge,
+                                                    Remarks,    
                                                     @BeginningBalance +
                                                     SUM(TotalIN - TotalOUT)
                                                     OVER (
@@ -1976,7 +2019,8 @@ namespace FGScanner.Util
                                     TotalIn = Convert.ToInt32(reader["TotalIN"]),
                                     TotalOut = Convert.ToInt32(reader["TotalOUT"]),
                                     RunningbBalance = Convert.ToInt32(reader["RunningBalance"]),
-                                    Remarks = reader["Remarks"].ToString() ?? string.Empty
+                                    Remarks = reader["Remarks"].ToString() ?? string.Empty,
+                                    Incharge = reader["in_charge"] != DBNull.Value ? reader["in_charge"].ToString() : string.Empty,
                                 });
                             }
 
@@ -1993,6 +2037,63 @@ namespace FGScanner.Util
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
             return result;
+        }
+
+        public List<SlowMovingItem> GetSlowMovingItem(string partnumber = null)
+        {
+            List<SlowMovingItem> items = new List<SlowMovingItem>();
+
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = @"SELECT partnumber,customer, prod_date,location, total_box,quantity ,storage_location,last_out_date, movement_classification
+                                   FROM actual_inventory 
+                                   WHERE 1 = 1";
+                    sql += " AND movement_classification = 'SLOW' ";
+                    if (!string.IsNullOrWhiteSpace(partnumber))
+                    {
+                        sql += " AND partnumber LIKE @partnumber";
+                    }
+
+                    sql += @" GROUP BY location, partnumber, customer, prod_date, storage_location, movement_classification, total_box, quantity, last_out_date    
+                              HAVING
+                              SUM(quantity) > 0";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        if (!string.IsNullOrEmpty(partnumber))
+                            cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = partnumber;
+
+
+                        using (SqlDataReader read = cmd.ExecuteReader())
+                        {
+                            while (read.Read())
+                            {
+                                SlowMovingItem item = new SlowMovingItem
+                                {
+                                    Partnumber = read["partnumber"].ToString() ?? string.Empty,
+                                    Customer = read["customer"].ToString() ?? string.Empty,
+                                    ProdDate = read["prod_date"] != DBNull.Value ? Convert.ToDateTime(read["prod_date"]).Date : DateTime.MinValue.Date,
+                                    Box = Convert.ToInt32(read["total_box"]),
+                                    Quantity = Convert.ToInt32(read["quantity"]),
+                                    Location = read["location"].ToString() ?? string.Empty,
+                                    Storage_location = read["storage_location"].ToString() ?? string.Empty,
+                                    Classification = read["movement_classification"].ToString() ?? string.Empty,
+                                    Lastmovement = read["last_out_date"] != DBNull.Value ? Convert.ToDateTime(read["last_out_date"]).Date : (DateTime?)null
+                                };
+                                items.Add(item);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return items;
         }
     }
 }

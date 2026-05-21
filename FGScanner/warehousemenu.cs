@@ -20,18 +20,18 @@ namespace FGScanner
 
         private void BtnDataEntryIn_Click(object sender, EventArgs e)
         {
-            string TransactionType = "IN";
-            WHDataEntryIN wh = new WHDataEntryIN(TransactionType);
-            wh.Show();
-            this.Hide();
+            //string TransactionType = "IN";
+            //WHDataEntryIN wh = new WHDataEntryIN(TransactionType);
+            //wh.Show();
+            //this.Hide();
         }
 
         private void BtnDataEntryOut_Click(object sender, EventArgs e)
         {
-            string TransactionType = "OUT";
-            WH_OUT whout = new WH_OUT(TransactionType);
-            whout.Show();
-            this.Hide();
+            //string TransactionType = "OUT";
+            //WH_OUT whout = new WH_OUT(TransactionType);
+            //whout.Show();
+            //this.Hide();
         }
 
         private void BtnBacktoLogin_Click(object sender, EventArgs e)

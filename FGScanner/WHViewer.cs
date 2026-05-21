@@ -25,6 +25,7 @@ namespace FGScanner
         private List<InventoryCardData> cardsToPrint = new List<InventoryCardData>();
         private TransactionRepo Method = new TransactionRepo();
         private Color backColor;
+        private readonly string whId = "WH2";
 
         public WHDataEntry_Ship_OUT_(string userid)
         {
@@ -59,7 +60,7 @@ namespace FGScanner
 
         private void LoadRackCount()
         {
-            RackCountCache = Method.GetTotalItemPerRack("WH2").ToDictionary(x => x.RackId, x => x.Count);
+            RackCountCache = Method.GetTotalItemPerRack(whId).ToDictionary(x => x.RackId, x => x.Count);
         }
 
         private void GenerateRackView(string RackID)
@@ -144,7 +145,7 @@ namespace FGScanner
             Button btn = rackButtons[rackLabel];
             int RackCountValue = RackCountCache.TryGetValue(rackLabel, out int count) ? count : 0;
 
-            string customer = Method.GetRackCustomer(rackLabel, "WH2");
+            string customer = Method.GetRackCustomer(rackLabel, whId);
 
             if(customer == "EPPI")
                 backColor = Color.LightGreen;
@@ -172,7 +173,7 @@ namespace FGScanner
             {
                 if (!LastRackIDCache.ContainsKey(item.Key) || LastRackIDCache[item.Key] != item.Value)
                 {
-                    int newCount = repo.GetItemCountByRack(item.Key, "WH1");
+                    int newCount = repo.GetItemCountByRack(item.Key, whId);
 
                     RackCountCache[item.Key] = newCount;
 
@@ -188,7 +189,7 @@ namespace FGScanner
             try
             {
                 var Method = new TransactionRepo();
-                var Datas = Method.GetItemByLocation(location, "WH1");
+                var Datas = Method.GetItemByLocation(location, whId);
 
                 if (Datas != null)
                 {
@@ -257,7 +258,7 @@ namespace FGScanner
             try
             {
                 var Method = new TransactionRepo();
-                var Datas = Method.RacksList(partnumber, "WH1");
+                var Datas = Method.RacksList(partnumber, whId);
 
                 if (Datas != null)
                 {
@@ -307,10 +308,9 @@ namespace FGScanner
         private void button1_Click(object sender, EventArgs e)
         {
             string location = LblRack.Text;
-            string whid = "WH1";
 
             var Repo = new TransactionRepo();
-            cardsToPrint = Repo.GetInventoryCardData(location, whid);
+            cardsToPrint = Repo.GetInventoryCardData(location, whId);
 
             if (cardsToPrint == null || cardsToPrint.Count == 0)
             {
@@ -344,7 +344,9 @@ namespace FGScanner
             printPreviewDialog.ShowDialog();
         }
         // 1. Notice the new 'InventoryCardData data' parameter at the end!
-        private void DrawInventoryCard(Graphics g, int width, int height, int startX, int startY, InventoryCardData data)
+
+        private int _currentRowIndex = 0;
+        private void DrawInventoryCard(Graphics g, int width, int height, int startX, int startY, InventoryCardData data, PrintPageEventArgs e)
         {
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
@@ -356,47 +358,38 @@ namespace FGScanner
             Font smallFont = new Font("Arial", 8);
             Font bodyFont = new Font("Arial", 10, FontStyle.Bold);
             Font headerFont = new Font("Arial", 18, FontStyle.Regular);
-            Font largeDataFont = new Font("Arial Narrow", 28, FontStyle.Regular);
-            Font watermarkFont = new Font("Arial", 60, FontStyle.Bold);
-
+            Font largeDataFont = new Font("Arial Narrow", 24, FontStyle.Regular); // Slightly smaller to fit rows better
             Brush textBrush = Brushes.Black;
-            Brush watermarkBrush = new SolidBrush(Color.FromArgb(60, 128, 128, 128));
 
             StringFormat centerFmt = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
             StringFormat rightFmt = new StringFormat { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center };
             StringFormat leftFmt = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center };
 
             int stubHeight = 80;
-            int mainHeight = height - stubHeight - 30;
+            int mainHeight = height - stubHeight - 40;
+            int maxRowsPerPage = 14;
+            int rowsDrawnOnThisPage = 0;
 
             // --- DRAW BORDER ---
             g.DrawRectangle(borderPen, startX, startY, width, mainHeight);
 
-            // --- DRAW HEADERS WITH REAL DATA ---
+            // --- DRAW HEADERS (Repeats on every page) ---
             int currentY = startY;
             int rowH = 25;
-
             g.DrawString("Inventory Card", bodyFont, textBrush, new Rectangle(startX, currentY, width, rowH), centerFmt);
             currentY += rowH; g.DrawLine(borderPen, startX, currentY, startX + width, currentY);
 
-            // Month & Year (e.g., "2026 MARCH")
             rowH = 35;
             g.DrawString(data.MonthYear, headerFont, textBrush, new Rectangle(startX, currentY, width, rowH), centerFmt);
             currentY += rowH; g.DrawLine(linePen, startX, currentY, startX + width, currentY);
 
-            // ERP & Prepared By
             rowH = 30;
             int midX = startX + (int)(width * 0.34);
             int midX2 = startX + (int)(width * 0.50);
             int midX3 = startX + (int)(width * 0.75);
             g.DrawString("ERP Location:", bodyFont, textBrush, new Rectangle(startX + 5, currentY, midX - startX, rowH), leftFmt);
-
-            // FILL ERP LOCATION
             g.DrawString(data.ErpLocation, headerFont, textBrush, new Rectangle(midX, currentY, midX2 - midX, rowH), centerFmt);
-
             g.DrawString("Prepared by:", bodyFont, textBrush, new Rectangle(midX2 + 5, currentY, midX3 - midX2, rowH), leftFmt);
-
-            // FILL PREPARED BY
             g.DrawString(_userid, headerFont, textBrush, new Rectangle(midX3, currentY, (startX + width) - midX3, rowH), centerFmt);
 
             g.DrawLine(linePen, midX, currentY, midX, currentY + rowH);
@@ -404,28 +397,20 @@ namespace FGScanner
             g.DrawLine(linePen, midX3, currentY, midX3, currentY + rowH);
             currentY += rowH; g.DrawLine(linePen, startX, currentY, startX + width, currentY);
 
-            // Control No
             rowH = 50;
             g.DrawString("Control no.", bodyFont, textBrush, new Rectangle(startX + 5, currentY, midX - startX, rowH), leftFmt);
-
-            // FILL CONTROL NO
-            g.DrawString(data.ControlNo.ToString(), largeDataFont, textBrush, new Rectangle(midX, currentY, (startX + width) - midX, rowH), centerFmt);
+            g.DrawString($"{data.ControlNo} - ({data.location})", largeDataFont, textBrush, new Rectangle(midX, currentY, (startX + width) - midX, rowH), centerFmt);
             g.DrawLine(linePen, midX, currentY, midX, currentY + rowH * 2);
             currentY += rowH; g.DrawLine(linePen, startX, currentY, startX + width, currentY);
 
-            // Part No
             g.DrawString("Part No.", headerFont, textBrush, new Rectangle(startX + 5, currentY, midX - startX, rowH), leftFmt);
-
-            // FILL PART NO
             g.DrawString(data.PartNo, largeDataFont, textBrush, new Rectangle(midX, currentY, (startX + width) - midX, rowH), centerFmt);
             currentY += rowH; g.DrawLine(linePen, startX, currentY, startX + width, currentY);
 
-            // --- DRAW TABLE GRID & ROWS ---
+            // --- TABLE GRID HEADERS ---
             rowH = 40;
-            int tableStartY = currentY;
             float[] colW = { width * 0.34f, width * 0.16f, width * 0.22f, width * 0.28f };
             string[] cols = { "Lot No.", "No.\nof Boxes", "Quantity", "Total Qty." };
-
             float cx = startX;
             for (int i = 0; i < cols.Length; i++)
             {
@@ -435,86 +420,113 @@ namespace FGScanner
             }
             currentY += rowH; g.DrawLine(linePen, startX, currentY, startX + width, currentY);
 
-            // LOOP THROUGH ACTUAL DATABASE ROWS
-            for (int r = 0; r < 14; r++) // We loop 9 times to draw the empty grid lines even if there are only 2 rows
+            // --- DRAW ROWS (Pagination Logic) ---
+            while (_currentRowIndex < data.Rows.Count && rowsDrawnOnThisPage < maxRowsPerPage)
             {
-                if (r < data.Rows.Count)
-                {
-                    var row = data.Rows[r]; // Get the specific row from our DB list
-                    cx = startX;
-                    g.DrawString(row.LotNo, largeDataFont, textBrush, new RectangleF(cx, currentY, colW[0], rowH), centerFmt); cx += colW[0];
-                    g.DrawString(row.Boxes.ToString(), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[1], rowH), centerFmt); cx += colW[1];
-                    g.DrawString(row.Quantity.ToString(), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[2], rowH), centerFmt); cx += colW[2];
-                    g.DrawString(row.TotalQty.ToString("N0"), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[3], rowH), centerFmt);
-                }
-                currentY += rowH; g.DrawLine(linePen, startX, currentY, startX + width, currentY);
+                var row = data.Rows[_currentRowIndex];
+                cx = startX;
+                g.DrawString(row.LotNo, largeDataFont, textBrush, new RectangleF(cx, currentY, colW[0], rowH), centerFmt); cx += colW[0];
+                g.DrawString(row.Boxes.ToString(), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[1], rowH), centerFmt); cx += colW[1];
+                g.DrawString(row.Quantity.ToString(), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[2], rowH), centerFmt); cx += colW[2];
+                g.DrawString(row.TotalQty.ToString("N0"), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[3], rowH), centerFmt);
+
+                currentY += rowH;
+                g.DrawLine(linePen, startX, currentY, startX + width, currentY);
+
+                _currentRowIndex++;
+                rowsDrawnOnThisPage++;
             }
 
-            // --- GRAND TOTALS ---
-            g.DrawString("Grand Total", headerFont, textBrush, new Rectangle(startX + 5, currentY, (int)colW[0], rowH), leftFmt);
+            // Fill remaining empty rows for visual consistency if it's the last page
+            bool isLastPage = (_currentRowIndex >= data.Rows.Count);
+            if (isLastPage)
+            {
+                while (rowsDrawnOnThisPage < maxRowsPerPage)
+                {
+                    currentY += rowH;
+                    g.DrawLine(linePen, startX, currentY, startX + width, currentY);
+                    rowsDrawnOnThisPage++;
+                }
 
-            // FILL GRAND TOTAL BOXES
-            g.DrawString(data.GrandTotalBoxes.ToString(), largeDataFont, textBrush, new RectangleF(startX + colW[0], currentY, colW[1], rowH), centerFmt);
+                // --- DRAW GRAND TOTALS (Only on Last Page) ---
+                g.DrawString("Grand Total", headerFont, textBrush, new Rectangle(startX + 5, currentY, (int)colW[0], rowH), leftFmt);
+                g.DrawString(data.GrandTotalBoxes.ToString(), largeDataFont, textBrush, new RectangleF(startX + colW[0], currentY, colW[1], rowH), centerFmt);
+                g.DrawString(data.GrandTotalQuantity.ToString("N0"), largeDataFont, textBrush, new RectangleF(startX + colW[0] + colW[1] + colW[2], currentY, colW[3], rowH), centerFmt);
+            }
 
-            // FILL GRAND TOTAL QUANTITY
-            g.DrawString(data.GrandTotalQuantity.ToString("N0"), largeDataFont, textBrush, new RectangleF(startX + colW[0] + colW[1] + colW[2], currentY, colW[3], rowH), centerFmt);
-
-            // --- FOOTER & CUT LINE ---
+            // --- FOOTER ---
             int footerY = startY + mainHeight + 2;
             g.DrawString("CF-260(Rev. 00)", smallFont, textBrush, startX, footerY);
-            g.DrawString(DateTime.Now.ToString("dd/MM/yyyy HH:mm"), smallFont, textBrush, new Rectangle(startX, footerY, width, 15), rightFmt);
+            string pageInfo = isLastPage ? "" : "(Continued on next page...)";
+            g.DrawString($"{pageInfo}  {DateTime.Now:dd/MM/yyyy HH:mm}", smallFont, textBrush, new Rectangle(startX, footerY, width, 15), rightFmt);
 
-            int cutLineY = footerY + 15;
-            g.DrawLine(dashedPen, startX, cutLineY, startX + width, cutLineY);
-
-            // --- BOTTOM STUBS (WITH DB DATA AND REAL QR CODE) ---
-            int stubY = cutLineY + 10;
-            int stubW = (width / 2) - 10;
-
-            for (int i = 0; i < 2; i++)
+            // --- STUBS (Only on Last Page) ---
+            if (isLastPage)
             {
-                int sx = startX + (i * (stubW + 20));
-                g.DrawRectangle(linePen, sx, stubY, stubW, stubHeight);
+                int cutLineY = footerY + 15;
+                g.DrawLine(dashedPen, startX, cutLineY, startX + width, cutLineY);
 
-                int labelW = 70;
-                int qrSize = stubHeight - 10;
-                int dataW = stubW - labelW - qrSize - 10;
+                int stubY = cutLineY + 10;
+                int stubW = (width / 2) - 10;
 
-                g.DrawLine(linePen, sx + labelW, stubY, sx + labelW, stubY + stubHeight);
-                g.DrawLine(linePen, sx + labelW + dataW, stubY, sx + labelW + dataW, stubY + stubHeight);
-                g.DrawLine(linePen, sx, stubY + 26, sx + labelW + dataW, stubY + 26);
-                g.DrawLine(linePen, sx, stubY + 52, sx + labelW + dataW, stubY + 52);
-
-                g.DrawString("Control no.", smallFont, textBrush, sx + 2, stubY + 6);
-                g.DrawString("Part No.", smallFont, textBrush, sx + 2, stubY + 32);
-                g.DrawString("Quantity", smallFont, textBrush, sx + 2, stubY + 58);
-
-                // FILL STUB DATA
-                g.DrawString(data.ControlNo.ToString(), smallFont, textBrush, new Rectangle(sx + labelW, stubY, dataW, 26), centerFmt);
-                g.DrawString(data.PartNo, smallFont, textBrush, new Rectangle(sx + labelW, stubY + 26, dataW, 26), centerFmt);
-                g.DrawString(data.GrandTotalQuantity.ToString(), smallFont, textBrush, new Rectangle(sx + labelW, stubY + 52, dataW, 26), centerFmt);
-
-                // DRAW THE REAL QR CODE FROM THE DATA MODEL
-                if (data.QrCode != null)
+                for (int i = 0; i < 2; i++)
                 {
-                    g.DrawImage(data.QrCode, sx + labelW + dataW + 5, stubY + 5, qrSize, qrSize);
+                    int sx = startX + (i * (stubW + 20));
+                    g.DrawRectangle(linePen, sx, stubY, stubW, stubHeight);
+                    int labelW = 70;
+                    int qrSize = stubHeight - 10;
+                    int dataW = stubW - labelW - qrSize - 10;
+
+                    g.DrawLine(linePen, sx + labelW, stubY, sx + labelW, stubY + stubHeight);
+                    g.DrawLine(linePen, sx + labelW + dataW, stubY, sx + labelW + dataW, stubY + stubHeight);
+                    g.DrawLine(linePen, sx, stubY + 26, sx + labelW + dataW, stubY + 26);
+                    g.DrawLine(linePen, sx, stubY + 52, sx + labelW + dataW, stubY + 52);
+
+                    g.DrawString("Control no.", smallFont, textBrush, sx + 2, stubY + 6);
+                    g.DrawString("Part No.", smallFont, textBrush, sx + 2, stubY + 32);
+                    g.DrawString("Quantity", smallFont, textBrush, sx + 2, stubY + 58);
+
+                    g.DrawString(data.ControlNo.ToString(), smallFont, textBrush, new Rectangle(sx + labelW, stubY, dataW, 26), centerFmt);
+                    g.DrawString(data.PartNo, smallFont, textBrush, new Rectangle(sx + labelW, stubY + 26, dataW, 26), centerFmt);
+                    g.DrawString(data.GrandTotalQuantity.ToString(), smallFont, textBrush, new Rectangle(sx + labelW, stubY + 52, dataW, 26), centerFmt);
+
+                    if (data.QrCode != null)
+                        g.DrawImage(data.QrCode, sx + labelW + dataW + 5, stubY + 5, qrSize, qrSize);
                 }
+
+                e.HasMorePages = false;
+                _currentRowIndex = 0; // Reset for next print job
+            }
+            else
+            {
+                e.HasMorePages = true; // Tell the printer to trigger PrintPage again
             }
         }
         private void printDocument1_PrintPage(object sender, PrintPageEventArgs e)
         {
             InventoryCardData cardForthisPage = cardsToPrint[currentCardIndex];
 
-            DrawInventoryCard(e.Graphics, e.MarginBounds.Width, e.MarginBounds.Height, e.MarginBounds.Left, e.MarginBounds.Top, cardForthisPage);
-            currentCardIndex++;
+            // 1. Get the data for the current part/card being processed
+            InventoryCardData cardForThisPage = cardsToPrint[currentCardIndex];
 
-            if (currentCardIndex < cardsToPrint.Count)
+            // 2. Call the drawing method. 
+            // Note: This method now handles setting e.HasMorePages internally 
+            // based on whether it finished all the rows for this specific card.
+            DrawInventoryCard(e.Graphics, e.MarginBounds.Width, e.MarginBounds.Height,
+                              e.MarginBounds.Left, e.MarginBounds.Top, cardForThisPage, e);
+
+            // 3. LOGIC CHECK: Did we finish all rows for this card?
+            // We only move to the next Card Index if the row tracker was reset to 0.
+            if (!e.HasMorePages)
             {
-                e.HasMorePages = true;
-            }
-            else
-            {
-                e.HasMorePages = false;
+                currentCardIndex++;
+
+                // 4. If there are more CARDS (Part Numbers) in the list, 
+                // we need to tell the printer to keep going.
+                if (currentCardIndex < cardsToPrint.Count)
+                {
+                    e.HasMorePages = true;
+                }
             }
         }
 

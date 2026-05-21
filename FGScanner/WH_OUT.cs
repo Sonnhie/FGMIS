@@ -26,17 +26,18 @@ namespace FGScanner
         private readonly BindingList<ScannedModel> ShippingItems = new BindingList<ScannedModel>();
         private readonly BindingList<DPIList> DPIItems = new BindingList<DPIList>();
         private Dictionary<string, DPIList> DPIDict = new Dictionary<string, DPIList>();
-
-        public WH_OUT(string TransactionType)
+        private string _userid = string.Empty;
+        private HashSet<string> warnedPartNumbers = new HashSet<string>();
+        public WH_OUT(string TransactionType, string user)
         {
             InitializeComponent();
             _TransactionType = TransactionType;
-            LoadAutosuggest();
             _Connection = new db_connection();
             progressBar.Visible = false;
             toolStripStatusLabel1.Text = "";
             Loadreference();
             btnSave.Enabled = false;
+            _userid = user;
         }
 
         private void Loadreference()
@@ -55,103 +56,93 @@ namespace FGScanner
                 );
         }
 
-        private bool OnScanProcess(string QRCode)
+        private bool OnScanProcess(string QRCode, string location)
         {
             var Process = new ScannerUtility();
             var Insert = new TransactionRepo();
+
            
-            if (string.IsNullOrEmpty(QRCode))
+            if (string.IsNullOrEmpty(QRCode)) return false;
+            if (!Process.ProcessQRData(QRCode, out var itemModel, out var error))
             {
-                MessageBox.Show("QR Code Error or empty!");
+                MessageBox.Show(error, "Error");
                 return false;
             }
 
-            if (!Process.ProcessQRData(QRCode, out var itemModel, out var error))
+            if (string.IsNullOrEmpty(itemModel.PartNumber))
             {
                 MessageBox.Show(error, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
                 return false;
             }
 
-            if (DPIDict == null)
+            if (DPIDict == null || !DPIDict.TryGetValue(itemModel.PartNumber, out var reference))
             {
-                MessageBox.Show("Upload reference DPI excel first before scanning.", "Missing Reference", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
+                
+                string fallbackPart = "";
+                if (itemModel.PartNumber.Contains("-"))
+                {
+                    int lastDash = itemModel.PartNumber.LastIndexOf("-");
+                    fallbackPart = itemModel.PartNumber.Substring(0, lastDash);
+                }
+
+            
+                if (string.IsNullOrEmpty(fallbackPart) || !DPIDict.TryGetValue(fallbackPart, out reference))
+                {
+                    MessageBox.Show($"Part Number {itemModel.PartNumber} not found in DPI list.", "DPI Error");
+                    return false;
+                }
             }
 
-            if (!DPIDict.TryGetValue(itemModel.PartNumber, out var reference))
-            {
-                MessageBox.Show($"Part number {itemModel.PartNumber} not found in DPI list. Please upload the correct DPI file.", "DPI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
 
-            var ShippingSum = ShippingItems.Where(x => x.PartNumber == itemModel.PartNumber).Sum(x => x.Quantity);
-            var updatedScannedQty = ShippingItems
-                                    .Where(x => x.PartNumber == itemModel.PartNumber)
-                                    .Sum(x => x.Quantity);
-            var remaining = reference.Quantity - updatedScannedQty;
-            var newTotal = ShippingSum + itemModel.Quantity;
+            // Calculations
+            var currentScannedQty = ShippingItems.Where(x => x.PartNumber == itemModel.PartNumber).Sum(x => x.Quantity);
+            var newTotal = currentScannedQty + itemModel.Quantity;
+            int stockCount = Insert.CheckStock(itemModel.PartNumber, itemModel.ProductionDate, location);
+
+            // --- VALIDATION 1: DPI Excel Reference ---
             if (newTotal > reference.Quantity)
             {
-                MessageBox.Show(
-                   $"Total scanned quantity for part number {itemModel.PartNumber} exceeds the DPI reference.\n" +
-                   $"Current: {ShippingSum}, Incoming: {itemModel.Quantity}, DPI: {reference.Quantity}",
-                   "DPI Quantity Warning",
-                   MessageBoxButtons.OK,
-                   MessageBoxIcon.Warning);
+                MessageBox.Show($"Exceeds DPI! Allowed: {reference.Quantity}, Scanned: {newTotal}", "DPI Error");
                 return false;
             }
 
-            int partcount = ShippingItems.Count(x => x.PartNumber == itemModel.PartNumber);
-            int StockCount = Insert.CheckStock(itemModel.PartNumber, TxtRackno.Text);
-            var lastIndex = ShippingItems.Count - 1;
-            var customer = Insert.GetCustomer(itemModel.PartNumber);
-
-            if (StockCount > partcount)
+            // --- VALIDATION 2: Physical Stock ---
+            if (newTotal > stockCount)
             {
-                ShippingItems.Add(new ScannedModel
+                if (!warnedPartNumbers.Contains(itemModel.PartNumber))
                 {
-                    TransactionDate = DateTime.Now,
-                    Customer = customer,
-                    PartNumber = itemModel.PartNumber,
-                    ProductionDate = itemModel.ProductionDate,
-                    ProductionVersion = itemModel.ProductionVer,
-                    Quantity = itemModel.Quantity,
-                    TransactionType = _TransactionType,
-                    Location = TxtRackno.Text,
-                    Storage_location = "9151",
-                    Remarks = "N/A",
-                    TransactionId = TxtcontrolNumber.Text,
-                });
-            }
-            else
-            {
-                MessageBox.Show($"Scanned quantity for part number {itemModel.PartNumber} exceeds available stock in the selected rack. Current scanned quantity: {partcount}, Available stock: {StockCount}", "Stock Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(
+                        $"Stock Overflow for {itemModel.PartNumber}!\n" +
+                        $"Available: {stockCount}\nScanned: {currentScannedQty}\nIncoming: {itemModel.Quantity}",
+                        "Stock Warning");
+                    warnedPartNumbers.Add(itemModel.PartNumber);
+                }
                 return false;
             }
 
-            int DPIQty = DPIItems.Sum(x => x.Quantity);
-            int ShippingQty = ShippingItems.Sum(x => x.Quantity);
+            // --- ALL CHECKS PASSED: INSERT DATA ---
+            ShippingItems.Add(new ScannedModel
+            {
+                TransactionDate = DateTime.Now,
+                Customer = Insert.GetCustomer(itemModel.PartNumber),
+                PartNumber = itemModel.PartNumber,
+                ProductionDate = itemModel.ProductionDate,
+                ProductionVersion = itemModel.ProductionVer,
+                Quantity = itemModel.Quantity,
+                TransactionType = _TransactionType,
+                Location = location,
+                Storage_location = "9151",
+                Remarks = "N/A",
+                TransactionId = TxtcontrolNumber.Text,
+            });
 
-            if(ShippingQty == DPIQty)
+            // Post-Insert logic
+            if (ShippingItems.Sum(x => x.Quantity) == DPIItems.Sum(x => x.Quantity))
             {
                 btnSave.Enabled = true;
             }
 
-
-            UpdateShiplogs(); 
-
-            LblPartNumber.Text = itemModel.PartNumber;
-            LblProDate.Text = itemModel.ProductionDate.ToString("dd-MM-yy");
-            LblProVer.Text = itemModel.ProductionVer;
-            LblQuantity.Text = itemModel.Quantity.ToString();
-            LblTranscType.Text = _TransactionType.ToString();
-            LblCustomer.Text = customer;
-
-
-            LblTotalQuantity.Text = ShippingItems.Sum(item => item.Quantity).ToString();
-            LblTotalbox.Text = ShippingItems.Count.ToString();
-       
-
+            UpdateShiplogs();
             return true;
         }
 
@@ -164,24 +155,11 @@ namespace FGScanner
             logstable.DataSource = bs;
         }
 
-        private void LoadAutosuggest()
-        {
-            string whid = CmbWHid.Text;
-            var List = new TransactionRepo();
-            var data = List.GetRackLocations(whid);
-
-            AutoCompleteStringCollection auto = new AutoCompleteStringCollection();
-            auto.AddRange(data.ToArray());
-
-            TxtRackno.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            TxtRackno.AutoCompleteSource = AutoCompleteSource.CustomSource;
-            TxtRackno.AutoCompleteCustomSource = auto;
-        }
+ 
 
         private void WH_OUT_Load(object sender, EventArgs e)
         {
             timer1.Start();
-            TxtScanData.Focus();
             TxtcontrolNumber.Text = GenerateTransactionNumber();
             Loadreference();
         }
@@ -195,7 +173,7 @@ namespace FGScanner
 
         private void WH_OUT_Shown(object sender, EventArgs e)
         {
-            TxtScanData.Focus();
+          
         }
 
         private async Task<bool> UploadData()
@@ -231,7 +209,8 @@ namespace FGScanner
                                 Remarks = item.Remarks,
                                 Storage_location = item.Storage_location,
                                 TransactionId = item.TransactionId,
-                                WhId = CmbWHid.Text
+                                WhId = CmbWHid.Text,
+                                User = _userid
                             }, con, tx);
 
                             await Repo.InsertShipmentTransaction(new InventoryTransactionModel
@@ -277,7 +256,23 @@ namespace FGScanner
 
             using (ExcelPackage package = new ExcelPackage(new FileInfo(templatePath)))
             {
-                var ws = package.Workbook.Worksheets["LOT DATE"];
+                var ws = package.Workbook.Worksheets["WarehouseCopy"];
+                var wscopy = package.Workbook.Worksheets["InvoiceCopy"];
+
+
+                var summarizedOrders =  orders
+                    .GroupBy(o => o.Partnumber)
+                    .Select(g => new OrdersSummary
+                    {
+                        Partnumber = g.Key,
+                        Quantity = g.Sum(o => o.Quantity),
+                        Box = g.Sum(o => o.Box),
+                        Customer = g.First().Customer,
+                    })
+                    .ToList();
+                                
+
+
                 var startrow = 10;
                 DateTime today = DateTime.Now;
                 string date = today.ToString("MM/dd/yyyy");
@@ -289,6 +284,15 @@ namespace FGScanner
                 ws.Cells["J7"].Value = orders[0].TransactionId;
 
                 int current = 0;
+
+                foreach (var items in summarizedOrders)
+                {
+                    int PPS = items.Quantity / items.Box;
+                    ws.Cells[startrow, 2].Value = items.Partnumber;
+                    ws.Cells[startrow, 5].Value = items.Box;
+                    ws.Cells[startrow, 6].Value = PPS;
+                    ws.Cells[startrow, 7].Value = items.Quantity;
+                }
 
                 foreach (var item in orders)
                 {
@@ -310,37 +314,6 @@ namespace FGScanner
 
                 package.SaveAs(new FileInfo(Filepath));
                 Progress?.Report(100);
-            }
-        }
-
-        private void TxtScanData_KeyDown_1(object sender, KeyEventArgs e)
-        {
-            var List = new TransactionRepo();
-            string whid = CmbWHid.Text;
-            var data = List.GetRackLocations(whid);
-
-            if (!data.Contains(TxtRackno.Text))
-            {
-                MessageBox.Show("Rack no. is invalid!", "Error location");
-                TxtRackno.Focus();
-                return;
-            }
-
-            if (e.KeyCode == Keys.Enter)
-            {
-                var ParsedData = TxtScanData.Text;
-                var IsProcessed = OnScanProcess(ParsedData);
-                if (IsProcessed)
-                {
-                    TxtScanData.Clear();
-                    e.SuppressKeyPress = true;
-                    TxtScanData.Focus();
-                    DPILogsTable.Refresh();
-                }
-                else
-                {
-                    TxtScanData.Clear();
-                }
             }
         }
 
@@ -426,7 +399,7 @@ namespace FGScanner
 
         private void CmbWHid_SelectedIndexChanged_1(object sender, EventArgs e)
         {
-            LoadAutosuggest();
+           
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -546,8 +519,11 @@ namespace FGScanner
             }
 
             var ShippingSum = ShippingItems.Where(x => x.PartNumber == partnumber).Sum(x => x.Quantity);
-
-            if (ShippingSum > reference.Quantity)
+            if(ShippingSum <= 0)
+            {
+                row.DefaultCellStyle.BackColor = Color.LightYellow;
+            }
+            else if (ShippingSum > reference.Quantity)
             {
                 row.DefaultCellStyle.BackColor = Color.LightCoral;
                 
@@ -560,7 +536,6 @@ namespace FGScanner
              else
             {
                 row.DefaultCellStyle.BackColor = Color.LightYellow;
-              
             }
         }
 
@@ -570,6 +545,99 @@ namespace FGScanner
             DPIDict?.Clear();
             DPILogsTable.DataSource = null;
             DPILogsTable.Refresh();
+        }
+
+        private async void UploadScanDataBtn_Click(object sender, EventArgs e)
+        {
+
+            if (string.IsNullOrWhiteSpace(CmbWHid.Text))
+            {
+                MessageBox.Show("Select warehouse first.");
+                return;
+            }
+
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Excel Files|*.xlsx;*.xls";
+                openFileDialog.Title = "Select an Excel File";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string filepath = openFileDialog.FileName;
+
+                    FileInfo fileInfo = new FileInfo(filepath);
+
+                    var progress = new Progress<int>(value =>
+                    {
+                        progressBar.Value = value;
+                        toolStripStatusLabel1.Text = $"Processing... {value}%";
+                    });
+
+                    try
+                    {
+                        progressBar.Visible = true;
+                        toolStripStatusLabel1.Text = "Processing...";
+                        await ProcessScanUpload(fileInfo, progress);
+                    }
+                    catch (Exception ex)
+                    {
+                        toolStripStatusLabel1.Text = "Processing failed!";
+                        toolStripStatusLabel1.ForeColor = Color.Red;
+                        MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        Loadreference();
+                        DPILogs();
+                        progressBar.Visible = false;
+                        toolStripStatusLabel1.Text = "Processing completed!";
+                    }
+                }
+            }
+        }
+
+        private async Task ProcessScanUpload(FileInfo fileInfo, IProgress<int> progress)
+        {
+
+            try
+            {
+                ExcelPackage.License.SetNonCommercialPersonal("NIDEC");
+
+                using (ExcelPackage package = new ExcelPackage(fileInfo))
+                {
+                    ExcelWorksheet ws = package.Workbook.Worksheets[0];
+
+                    int startRow = 1;
+                    int rowCount = ws.Dimension.Rows;
+                    int totalRows = rowCount - startRow + 1;
+
+                    int current = 0;
+                    string qrcodedata = null;
+                    string location = null;
+                    for (int row = startRow; row <= rowCount; row++)
+                    {
+                        current++;
+                        qrcodedata = ws.Cells[row, 1].Value.ToString();
+                        location = ws.Cells[row, 2].Value.ToString().ToUpper();
+                        if (qrcodedata != null)
+                        {
+                            OnScanProcess(qrcodedata, location);
+                        }
+
+                        int percent = (int)((double)current / totalRows * 100);
+                        percent = Math.Min(percent, 100);
+                        if (current % 10 == 0)
+                            progress?.Report(percent);
+                        progress?.Report(percent);
+                    }
+                    await Task.Delay(100);
+                }
+                progress?.Report(100);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
     }
 }

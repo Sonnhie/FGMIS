@@ -34,17 +34,17 @@ namespace FGScanner
                     return;
                 }
 
-                string userid = Service.VerifyUser(username, password);
+                var userid = Service.VerifyUser(username, password);
 
-                if (string.IsNullOrEmpty(userid))
+                if (userid.Role == "User")
                 {
-                    MessageBox.Show("Invalid Credentials", "Login error");
-                    return;
+                    //MessageBox.Show($"User Group: {userid.UserGroup}");
+                    MainForm main = new MainForm(userid.Name, userid.UserGroup);
+                    this.Hide();
+                    main.Show();
                 }
 
-                MainForm main = new MainForm(userid);
-                this.Hide();
-                main.Show();
+
 
             }
             catch (Exception ex)

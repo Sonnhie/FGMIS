@@ -14,7 +14,8 @@ namespace FGScanner
     public partial class MainForm : Form
     {
         private string _TransactionType = string.Empty;
-        private readonly string userid = string.Empty;
+        private readonly string _userid = string.Empty;
+        private readonly int usergroup = 0;
         [DllImport("user32.dll")]
         public static extern bool ReleaseCapture();
 
@@ -24,12 +25,31 @@ namespace FGScanner
         const int WM_NCLBUTTONDOWN = 0xA1;
         const int HTCAPTION = 0x2;
 
-        public MainForm(string userid)
+        public MainForm(string userid, int usergroup)
         {
             InitializeComponent();
             LoadDashboard();
-            this.userid = userid;
+            this._userid = userid;
+            this.usergroup = usergroup;
             LblUser.Text = userid;
+            AccessControlFeatures(usergroup);
+            //MessageBox.Show("user:" + _userid);
+        }
+
+        private void AccessControlFeatures(int usergroup)
+        {
+            if (usergroup != 2)
+            {
+                iNToolStripMenuItem.Enabled = false;
+                oUTToolStripMenuItem.Enabled = false;
+                cHANGELOCATIONToolStripMenuItem.Enabled = false;
+                warehouseReturnToolStripMenuItem.Enabled = false;
+                rackViewerToolStripMenuItem.Enabled = false;
+                warehouseToolStripMenuItem.Enabled = false;
+                packingListToolStripMenuItem.Enabled = false;
+                iNOUTLedgerToolStripMenuItem.Enabled = false;
+                dataEntryToolStripMenuItem.Enabled = false;
+            }
         }
 
         private void DisplayDateTime()
@@ -58,7 +78,7 @@ namespace FGScanner
         private void iNToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _TransactionType = "IN";
-            WHDataEntryIN DataEntryIn = new WHDataEntryIN(_TransactionType);
+            WHDataEntryIN DataEntryIn = new WHDataEntryIN(_TransactionType,_userid);
             DisplayForm(DataEntryIn);
         }
 
@@ -71,7 +91,7 @@ namespace FGScanner
         private void oUTToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _TransactionType = "OUT";
-            WH_OUT DataEntryOut = new WH_OUT(_TransactionType);
+            WH_OUT DataEntryOut = new WH_OUT(_TransactionType, _userid);
             DisplayForm(DataEntryOut);
         }
 
@@ -100,7 +120,7 @@ namespace FGScanner
 
         private void cHANGELOCATIONToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ChangeLocation changeLocation = new ChangeLocation();
+            ChangeLocation changeLocation = new ChangeLocation(_userid);
             DisplayForm(changeLocation);
         }
 
@@ -118,7 +138,7 @@ namespace FGScanner
 
         private void warehouseReturnToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WarehouseReturn wr = new WarehouseReturn(userid);
+            WarehouseReturn wr = new WarehouseReturn(_userid);
             DisplayForm(wr);
         }
 
@@ -141,7 +161,7 @@ namespace FGScanner
         private void warehouseToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             string warehouse = "Warehouse";
-            var form = Viewer.GetInstance(warehouse,userid);
+            var form = Viewer.GetInstance(warehouse,_userid);
 
             form.Show();
             form.BringToFront();
@@ -150,7 +170,7 @@ namespace FGScanner
         private void ecozoneToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string warehouse = "Ecozone";
-            var form = Viewer.GetInstance(warehouse, userid);
+            var form = Viewer.GetInstance(warehouse, _userid);
 
             form.Show();
             form.BringToFront();
@@ -172,6 +192,11 @@ namespace FGScanner
         {
             StockCard stockCard = new StockCard();
             DisplayForm(stockCard);
+        }
+
+        private void dataEntryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

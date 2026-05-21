@@ -41,16 +41,16 @@ namespace FGScanner.Util
             }
         }
 
-        public string VerifyUser(string username, string password)
+        public UserModel VerifyUser(string username, string password)
         {
-            string userid = null;
+            UserModel user = new UserModel();
 
             try
             {
                 using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
-                    string sql = @"SELECT name FROM users 
+                    string sql = @"SELECT name, role, group_id FROM users 
                                    WHERE user_id COLLATE Latin1_General_CS_AS = @username and password COLLATE Latin1_General_CS_AS = @password";
 
                     using (SqlCommand command = new SqlCommand(sql, conn))
@@ -62,7 +62,9 @@ namespace FGScanner.Util
                         {
                             if (reader.Read())
                             {
-                                userid = reader["name"].ToString();
+                                user.Name = reader["name"].ToString() ?? string.Empty;
+                                user.UserGroup = Convert.ToInt32(reader["group_id"]);
+                                user.Role = reader["role"].ToString() ?? string.Empty;
                             }
                         }
                     }
@@ -71,7 +73,7 @@ namespace FGScanner.Util
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
-            return userid;
+            return user;
         }
 
     }

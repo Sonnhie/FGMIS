@@ -18,7 +18,7 @@ namespace FGScanner.Model
         public string PartNumber { get; set; }
         public string PartName { get; set; }
         public string customer {  get; set; }
-        public int BegginingBalance { get; set; }      
+        public int BegginingBalance { get; set; } 
     }
 
     public class StockLedger
@@ -132,6 +132,7 @@ namespace FGScanner.Model
         public string PreparedBy { get; set; }
         public int ControlNo { get; set; }
         public string PartNo { get; set; }
+        public string location { get; set; }
         public int PPS { get; set; }
         public int GrandTotalBoxes { get; set; }
         public int GrandTotalQuantity { get; set; }

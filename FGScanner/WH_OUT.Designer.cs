@@ -31,11 +31,9 @@
             this.components = new System.ComponentModel.Container();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.TxtRackno = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
+            this.UploadScanDataBtn = new System.Windows.Forms.Button();
             this.CmbWHid = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.TxtScanData = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.LblCustomer = new System.Windows.Forms.Label();
@@ -79,40 +77,28 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.TxtRackno);
-            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.UploadScanDataBtn);
             this.groupBox1.Controls.Add(this.CmbWHid);
             this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.TxtScanData);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(45, 12);
+            this.groupBox1.Location = new System.Drawing.Point(45, 57);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(453, 216);
+            this.groupBox1.Size = new System.Drawing.Size(453, 158);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Data Inputs";
             // 
-            // TxtRackno
+            // UploadScanDataBtn
             // 
-            this.TxtRackno.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtRackno.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtRackno.Location = new System.Drawing.Point(164, 139);
-            this.TxtRackno.Name = "TxtRackno";
-            this.TxtRackno.Size = new System.Drawing.Size(258, 25);
-            this.TxtRackno.TabIndex = 10;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(55, 147);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(91, 17);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Rack Location:";
+            this.UploadScanDataBtn.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.UploadScanDataBtn.Location = new System.Drawing.Point(164, 42);
+            this.UploadScanDataBtn.Name = "UploadScanDataBtn";
+            this.UploadScanDataBtn.Size = new System.Drawing.Size(75, 23);
+            this.UploadScanDataBtn.TabIndex = 12;
+            this.UploadScanDataBtn.Text = "Upload";
+            this.UploadScanDataBtn.UseVisualStyleBackColor = true;
+            this.UploadScanDataBtn.Click += new System.EventHandler(this.UploadScanDataBtn_Click);
             // 
             // CmbWHid
             // 
@@ -136,15 +122,6 @@
             this.label2.Size = new System.Drawing.Size(111, 17);
             this.label2.TabIndex = 2;
             this.label2.Text = "Warehouse Code:";
-            // 
-            // TxtScanData
-            // 
-            this.TxtScanData.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtScanData.Location = new System.Drawing.Point(164, 40);
-            this.TxtScanData.Name = "TxtScanData";
-            this.TxtScanData.Size = new System.Drawing.Size(258, 25);
-            this.TxtScanData.TabIndex = 1;
-            this.TxtScanData.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtScanData_KeyDown_1);
             // 
             // label1
             // 
@@ -531,10 +508,8 @@
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox TxtScanData;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox CmbWHid;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
@@ -566,7 +541,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label LblTranscType;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.TextBox TxtRackno;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button UploadScanDataBtn;
     }
 }

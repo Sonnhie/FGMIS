@@ -242,31 +242,34 @@ namespace FGScanner
             }
         }
 
-        private int DrawTransferSlip(Graphics g, int width, int height, int startX, int startY, TransferSlipData data)
+        private int _transferRowIndex = 0;
+        private int DrawTransferSlip(Graphics g, int width, int height, int startX, int startY, TransferSlipData data, string label)
         {
-
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
             // --- PENS & FONTS ---
             Pen pen = new Pen(Color.Black, 1);
             Pen dashedPen = new Pen(Color.Black, 1) { DashPattern = new float[] { 4, 4 } };
-
             Font titleFont = new Font("Arial", 22, FontStyle.Bold);
             Font headerFont = new Font("Arial", 9, FontStyle.Bold);
-            Font bodyFont = new Font("Arial", 8, FontStyle.Regular);
+            Font bodyFont = new Font("Arial", 7, FontStyle.Regular);
             Font smallFont = new Font("Arial", 8, FontStyle.Regular);
+            Font labelFont = new Font("Arial", 10, FontStyle.Italic | FontStyle.Bold); // For the "COPY" label
 
             StringFormat centerFmt = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
             StringFormat leftFmt = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center };
+            StringFormat rightFmt = new StringFormat { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center };
 
             int y = startY;
-            int docNoWidth = (int)(width * 0.15f); // 15% of the paper width
+            int docNoWidth = (int)(width * 0.15f);
+
+            // --- 0. DRAW THE LABEL (TOP RIGHT) ---
+            g.DrawString(label, labelFont, Brushes.DimGray, new Rectangle(startX, y - 15, width, 15), rightFmt);
+
             // --- 1. TITLE & DOCUMENT NO ROW ---
             int titleH = 40;
             g.DrawRectangle(pen, startX, y, width, titleH);
             g.DrawString("TRANSFER SLIP", titleFont, Brushes.Black, new Rectangle(startX, y, width - docNoWidth, titleH), centerFmt);
-
-            // Document No Box
             g.DrawLine(pen, startX + width - docNoWidth, y, startX + width - docNoWidth, y + titleH + 40);
             g.DrawString("Document No.", headerFont, Brushes.Black, startX + width - docNoWidth + 5, y + 5);
             g.DrawString(data.DocumentNo, bodyFont, Brushes.Black, new Rectangle(startX + width - docNoWidth, y + 15, docNoWidth, titleH - 15), centerFmt);
@@ -278,45 +281,28 @@ namespace FGScanner
             g.DrawString("Shift:", headerFont, Brushes.Black, startX + 5, y + 7);
             g.DrawLine(pen, startX + 60, y, startX + 60, y + shiftH);
             g.DrawLine(pen, startX + 100, y, startX + 100, y + shiftH);
-
             g.DrawString(data.Shift, bodyFont, Brushes.Black, new Rectangle(startX + 60, y, 40, shiftH), centerFmt);
             y += shiftH;
 
             // --- 3. ISSUE DATE & PERSONNEL ROW ---
             int persH = 50;
             g.DrawRectangle(pen, startX, y, width, persH);
-
-            // Calculate widths for the upper sections
             float[] topCols = { width * 0.15f, width * 0.25f, width * 0.15f, width * 0.15f, width * 0.15f, width * 0.15f };
             float cx = startX;
-
             string[] topLabels = { "Issue Date", "Location", "Prepared by:", "Checked by:", "Received by:", "Encoded by:" };
             string[] topValues = { data.IssueDate, "", data.PreparedBy, data.CheckedBy, data.ReceivedBy, data.EncodedBy };
 
             for (int i = 0; i < topCols.Length; i++)
             {
-                // Draw vertical lines
                 if (i > 0) g.DrawLine(pen, cx, y, cx, y + persH);
-
-                if (i == 1) // Location has a split sub-header AND data values
+                if (i == 1)
                 {
-                    // 1. Top Section: "Location" Header (18 pixels tall)
-                    g.DrawString(topLabels[i], headerFont, Brushes.Black, new RectangleF(cx, y, topCols[i], 18), centerFmt);
-                    g.DrawLine(pen, cx, y + 18, cx + topCols[i], y + 18); // First horizontal line
-
-                    // Draw the vertical line down the middle
+                    g.DrawString(topLabels[i], headerFont, Brushes.Black, new RectangleF(cx, y, topCols[i], persH / 2), centerFmt);
+                    g.DrawLine(pen, cx, y + persH / 2, cx + topCols[i], y + persH / 2);
                     float halfLoc = topCols[i] / 2;
-                    g.DrawLine(pen, cx + halfLoc, y + 18, cx + halfLoc, y + persH);
-
-                    // 2. Middle Section: "From" and "To" Sub-headers (14 pixels tall)
-                    g.DrawString("From", smallFont, Brushes.Black, new RectangleF(cx, y + 18, halfLoc, 14), centerFmt);
-                    g.DrawString("To", smallFont, Brushes.Black, new RectangleF(cx + halfLoc, y + 18, halfLoc, 14), centerFmt);
-                    g.DrawLine(pen, cx, y + 32, cx + topCols[i], y + 32); // Second horizontal line
-
-                    // 3. Bottom Section: FILL THE ACTUAL VALUES HERE!
-                    // We use data.LocationFrom and data.LocationTo and position them in the bottom space
-                    g.DrawString(data.LocationFrom, bodyFont, Brushes.Black, new RectangleF(cx, y + 32, halfLoc, persH - 32), centerFmt);
-                    g.DrawString(data.LocationTo, bodyFont, Brushes.Black, new RectangleF(cx + halfLoc, y + 32, halfLoc, persH - 32), centerFmt);
+                    g.DrawLine(pen, cx + halfLoc, y + persH / 2, cx + halfLoc, y + persH);
+                    g.DrawString("From", headerFont, Brushes.Black, new RectangleF(cx, y + persH / 2, halfLoc, persH / 2), centerFmt);
+                    g.DrawString("To", headerFont, Brushes.Black, new RectangleF(cx + halfLoc, y + persH / 2, halfLoc, persH / 2), centerFmt);
                 }
                 else
                 {
@@ -330,25 +316,20 @@ namespace FGScanner
             // --- 4. MAIN TABLE HEADERS ---
             int headH = 50;
             g.DrawRectangle(pen, startX, y, width, headH);
-
-            // Main Columns: MatCode(15%), MatName(21%), Rev(5%), Insp(10%), Prod(10%), Qty(19%), Remarks(20%)
             float[] colW = { width * 0.15f, width * 0.21f, width * 0.05f, width * 0.10f, width * 0.10f, width * 0.19f, width * 0.20f };
             string[] headers = { "Material Code", "Material Name", "Rev.\nNo", "Inspection\nDate", "Production\nDate", "Quantity", "Remarks" };
 
             cx = startX;
             for (int i = 0; i < colW.Length; i++)
             {
-                if (i > 0) g.DrawLine(pen, cx, y, cx, y + headH); // Vertical Lines
-
-                if (i == 5) // Quantity has sub-headers (No.Box, PPS, Pcs)
+                if (i > 0) g.DrawLine(pen, cx, y, cx, y + headH);
+                if (i == 5)
                 {
                     g.DrawString(headers[i], headerFont, Brushes.Black, new RectangleF(cx, y, colW[i], headH / 2), centerFmt);
-                    g.DrawLine(pen, cx, y + headH / 2, cx + colW[i], y + headH / 2); // Horizontal split
-
+                    g.DrawLine(pen, cx, y + headH / 2, cx + colW[i], y + headH / 2);
                     float qW = colW[i] / 3;
                     g.DrawLine(pen, cx + qW, y + headH / 2, cx + qW, y + headH);
                     g.DrawLine(pen, cx + (qW * 2), y + headH / 2, cx + (qW * 2), y + headH);
-
                     g.DrawString("No.Box", smallFont, Brushes.Black, new RectangleF(cx, y + headH / 2, qW, headH / 2), centerFmt);
                     g.DrawString("PPS", smallFont, Brushes.Black, new RectangleF(cx + qW, y + headH / 2, qW, headH / 2), centerFmt);
                     g.DrawString("Pcs", smallFont, Brushes.Black, new RectangleF(cx + (qW * 2), y + headH / 2, qW, headH / 2), centerFmt);
@@ -363,84 +344,96 @@ namespace FGScanner
 
             // --- 5. MAIN TABLE DATA ROWS ---
             int rowH = 30;
-            int numRows = 10; // Draw 10 empty lines for the grid
-
-            // Flatten the column widths for data drawing
+            int numRowsPerPage = 10;
             float[] dataColW = { colW[0], colW[1], colW[2], colW[3], colW[4], colW[5] / 3, colW[5] / 3, colW[5] / 3, colW[6] };
 
-            for (int r = 0; r < numRows; r++)
+            for (int r = 0; r < numRowsPerPage; r++)
             {
+                int currentRowIndex = _transferRowIndex + r;
                 cx = startX;
                 for (int c = 0; c < dataColW.Length; c++)
                 {
-                    if (c > 0) g.DrawLine(pen, cx, y, cx, y + rowH); // Vertical grid lines
-
-                    // If we have actual data in the list, print it
-                    if (data != null && r < data.Rows.Count)
+                    if (c > 0) g.DrawLine(pen, cx, y, cx, y + rowH);
+                    if (data != null && currentRowIndex < data.Rows.Count)
                     {
-                        var dRow = data.Rows[r];
-                        // (Paste this instead)
-                        string cellData = "";
-                        switch (c)
-                        {
-                            case 0: cellData = dRow.MaterialCode; break;
-                            case 1: cellData = dRow.MaterialName; break;
-                            case 2: cellData = dRow.RevNo; break;
-                            case 3: cellData = dRow.InspectionDate; break;
-                            case 4: cellData = dRow.ProductionDate; break;
-                            case 5: cellData = dRow.NoBox.ToString(); break;
-                            case 6: cellData = dRow.PPS.ToString(); break;
-                            case 7: cellData = dRow.Pcs; break;
-                            case 8: cellData = dRow.Remarks; break;
-                        }
+                        var dRow = data.Rows[currentRowIndex];
+                        string cellData = GetCellData(c, dRow);
                         g.DrawString(cellData, bodyFont, Brushes.Black, new RectangleF(cx, y, dataColW[c], rowH), centerFmt);
                     }
                     cx += dataColW[c];
                 }
-
-                // Outer border and horizontal line
                 g.DrawLine(pen, startX, y + rowH, startX + width, y + rowH);
-                g.DrawLine(pen, startX, y, startX, y + rowH); // Left border
-                g.DrawLine(pen, startX + width, y, startX + width, y + rowH); // Right border
+                g.DrawLine(pen, startX, y, startX, y + rowH);
+                g.DrawLine(pen, startX + width, y, startX + width, y + rowH);
                 y += rowH;
             }
 
             // --- 6. FOOTER ---
             g.DrawString("CF-140 (Rev.00)", smallFont, Brushes.Black, startX, y + 5);
             y += 25;
-            g.DrawLine(dashedPen, startX, y, startX + width, y); // The dashed cut line
+            g.DrawLine(dashedPen, startX, y, startX + width, y);
 
-            // ADD THIS LINE: Return the final Y position + 20 pixels of spacing
-            return y + 20;
+            return y + 25; // Return position for the next copy
         }
 
         private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
         {
             TransferSlipData myData = data.FirstOrDefault();
+            if (myData == null) return;
 
-            if (myData == null)
-            {
-                e.Graphics.DrawString("No data available to print.", new Font("Arial", 12), Brushes.Black, new PointF(100, 100));
-                return;
-            }
-
+            // --- DRAW TOP COPY (Original) ---
             int middleOfPage = DrawTransferSlip(
                 e.Graphics,
                 e.MarginBounds.Width,
                 e.MarginBounds.Height,
                 e.MarginBounds.Left,
                 e.MarginBounds.Top,
-                myData
+                myData,
+                "ORIGINAL COPY"
             );
 
+            // --- DRAW BOTTOM COPY (Duplicate) ---
+            // This will print the same Rows as the top because _transferRowIndex hasn't changed yet!
             DrawTransferSlip(
-                    e.Graphics,
-                    e.MarginBounds.Width,
-                    e.MarginBounds.Height,
-                    e.MarginBounds.Left,
-                    middleOfPage,
-                    myData
-                );
+                e.Graphics,
+                e.MarginBounds.Width,
+                e.MarginBounds.Height,
+                e.MarginBounds.Left,
+                middleOfPage + 20, // Add a little extra gap for the cut line
+                myData,
+                "DUPLICATE COPY"
+            );
+
+            // --- NOW UPDATE THE INDEX FOR THE NEXT SHEET ---
+            _transferRowIndex += 10;
+
+            // Handle Pagination
+            if (_transferRowIndex < myData.Rows.Count)
+            {
+                e.HasMorePages = true;
+            }
+            else
+            {
+                e.HasMorePages = false;
+                _transferRowIndex = 0; // Reset for the next time you print
+            }
+        }
+
+        private string GetCellData(int column, TransferRow dRow)
+        {
+            switch (column)
+            {
+                case 0: return dRow.MaterialCode;
+                case 1: return dRow.MaterialName;
+                case 2: return dRow.RevNo;
+                case 3: return dRow.InspectionDate;
+                case 4: return dRow.ProductionDate;
+                case 5: return dRow.NoBox.ToString();
+                case 6: return dRow.PPS.ToString();
+                case 7: return dRow.Pcs;
+                case 8: return dRow.Remarks;
+                default: return "";
+            }
         }
 
         private void TxtDocNumber_TextChanged(object sender, EventArgs e)

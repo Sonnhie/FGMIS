@@ -54,6 +54,7 @@ namespace FGScanner
                     dt.Columns.Add("OUT", typeof(string));
                     dt.Columns.Add("Running Stock", typeof(string));
                     dt.Columns.Add("Remarks", typeof(string));
+                    dt.Columns.Add("PIC", typeof(string));
 
                     var Header = result.info;
 
@@ -73,7 +74,8 @@ namespace FGScanner
                            item.TotalIn,
                            item.TotalOut,
                            item.RunningbBalance,
-                           item.Remarks
+                           item.Remarks,
+                           item.Incharge.ToString() ?? string.Empty
                         );
                     }
 
@@ -87,6 +89,7 @@ namespace FGScanner
                     StockCardtable.Columns["OUT"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     StockCardtable.Columns["Running Stock"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     StockCardtable.Columns["Remarks"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    StockCardtable.Columns["PIC"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 }
             }
             catch (Exception ex)
@@ -137,6 +140,7 @@ namespace FGScanner
                     ws.Cells[startrow, 2].Value = item.TotalIn;
                     ws.Cells[startrow, 3].Value = item.TotalOut;
                     ws.Cells[startrow, 4].Value = item.RunningbBalance;
+                    ws.Cells[startrow, 5].Value = item.Incharge;
                     ws.Cells[startrow, 6].Value = item.Remarks;
 
                     startrow++;

@@ -48,6 +48,7 @@
             this.controlnumberLabel = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.UploadScanDataBtn = new System.Windows.Forms.Button();
             this.remarktext = new System.Windows.Forms.RichTextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.CmbWHid = new System.Windows.Forms.ComboBox();
@@ -56,9 +57,6 @@
             this.cmbfrom = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.TxtRackno = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.TxtScanData = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.printDialog1 = new System.Windows.Forms.PrintDialog();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
@@ -266,6 +264,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.UploadScanDataBtn);
             this.groupBox1.Controls.Add(this.remarktext);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.CmbWHid);
@@ -274,9 +273,6 @@
             this.groupBox1.Controls.Add(this.cmbfrom);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Controls.Add(this.TxtRackno);
-            this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.TxtScanData);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(42, 39);
@@ -286,9 +282,20 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Data Inputs";
             // 
+            // UploadScanDataBtn
+            // 
+            this.UploadScanDataBtn.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.UploadScanDataBtn.Location = new System.Drawing.Point(158, 38);
+            this.UploadScanDataBtn.Name = "UploadScanDataBtn";
+            this.UploadScanDataBtn.Size = new System.Drawing.Size(75, 23);
+            this.UploadScanDataBtn.TabIndex = 13;
+            this.UploadScanDataBtn.Text = "Upload";
+            this.UploadScanDataBtn.UseVisualStyleBackColor = true;
+            this.UploadScanDataBtn.Click += new System.EventHandler(this.UploadScanDataBtn_Click);
+            // 
             // remarktext
             // 
-            this.remarktext.Location = new System.Drawing.Point(157, 281);
+            this.remarktext.Location = new System.Drawing.Point(158, 241);
             this.remarktext.Name = "remarktext";
             this.remarktext.Size = new System.Drawing.Size(277, 65);
             this.remarktext.TabIndex = 12;
@@ -298,7 +305,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(31, 281);
+            this.label6.Location = new System.Drawing.Point(32, 241);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(103, 17);
             this.label6.TabIndex = 11;
@@ -327,7 +334,7 @@
             "ASSA",
             "ASSB",
             "MOLD"});
-            this.cmbto.Location = new System.Drawing.Point(157, 225);
+            this.cmbto.Location = new System.Drawing.Point(158, 185);
             this.cmbto.Name = "cmbto";
             this.cmbto.Size = new System.Drawing.Size(121, 23);
             this.cmbto.TabIndex = 9;
@@ -336,7 +343,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(60, 231);
+            this.label5.Location = new System.Drawing.Point(61, 191);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(74, 17);
             this.label5.TabIndex = 8;
@@ -349,7 +356,7 @@
             this.cmbfrom.Items.AddRange(new object[] {
             "9151",
             "9150"});
-            this.cmbfrom.Location = new System.Drawing.Point(157, 174);
+            this.cmbfrom.Location = new System.Drawing.Point(158, 134);
             this.cmbfrom.Name = "cmbfrom";
             this.cmbfrom.Size = new System.Drawing.Size(121, 23);
             this.cmbfrom.TabIndex = 7;
@@ -358,7 +365,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(24, 180);
+            this.label4.Location = new System.Drawing.Point(25, 140);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(110, 17);
             this.label4.TabIndex = 6;
@@ -374,32 +381,6 @@
             this.label3.TabIndex = 4;
             this.label3.Text = "Warehouse Id:";
             // 
-            // TxtRackno
-            // 
-            this.TxtRackno.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtRackno.Location = new System.Drawing.Point(158, 125);
-            this.TxtRackno.Name = "TxtRackno";
-            this.TxtRackno.Size = new System.Drawing.Size(120, 23);
-            this.TxtRackno.TabIndex = 3;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(77, 131);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(60, 17);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Rack No:";
-            // 
-            // TxtScanData
-            // 
-            this.TxtScanData.Location = new System.Drawing.Point(158, 34);
-            this.TxtScanData.Name = "TxtScanData";
-            this.TxtScanData.Size = new System.Drawing.Size(276, 23);
-            this.TxtScanData.TabIndex = 1;
-            this.TxtScanData.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtScanData_KeyDown);
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -408,7 +389,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(38, 17);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Scan:";
+            this.label1.Text = "Data:";
             // 
             // printDialog1
             // 
@@ -457,9 +438,6 @@
         private System.Windows.Forms.ComboBox cmbfrom;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox TxtRackno;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox TxtScanData;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label LblTranscType;
@@ -478,5 +456,6 @@
         private System.Windows.Forms.Button GBtn;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button UploadScanDataBtn;
     }
 }

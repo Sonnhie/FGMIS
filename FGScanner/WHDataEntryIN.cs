@@ -1,42 +1,53 @@
-﻿using System;
+﻿using FGScanner.Model;
+using FGScanner.Util;
+using OfficeOpenXml;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using FGScanner.Util;
-using FGScanner.Model;
 
 namespace FGScanner
 {
     public partial class WHDataEntryIN : Form
     {
         private readonly string _TransactionType = string.Empty;
+        private string _userid = string.Empty;
 
-        public WHDataEntryIN(string TransactionType)
+        public WHDataEntryIN(string TransactionType , string userid)
         {
             InitializeComponent();
             _TransactionType = TransactionType;
-            LoadAutosuggest();
+            _userid = userid;
+            toolStripProgressBar1.Visible = false;
+            toolStripStatusLabel1.Visible = false;
             LoadStorageLocations();
             Loadtransactionlogs();
         }
-        private bool OnScanProcess(string QRCode)
+        private bool OnScanProcess(string QRCode, string location)
         {
             var Process = new ScannerUtility();
             var Insert = new TransactionRepo();
              
             if (string.IsNullOrEmpty(QRCode))
             {
-                MessageBox.Show("QR Code Error or empty!");
+                MessageBox.Show("QR Code Error or empty!");  
                 return false;
             }
               
             if (!Process.ProcessQRData(QRCode,out var itemModel, out var error))
+            {
+                MessageBox.Show(error, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(itemModel.PartNumber))
             {
                 MessageBox.Show(error, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
                 return false;
@@ -54,11 +65,12 @@ namespace FGScanner
                     Customer = customer,
                     Quantity = itemModel.Quantity,
                     TransactionType = _TransactionType,
-                    Location = TxtRackno.Text,
+                    Location = location.ToUpper(),
                     TransactionDate = DateTime.Now,
                     Remarks = CmbRemarks.Text,
                     Storage_location = CmbStorageLocation.Text,
-                    WhId = CmbWHid.Text
+                    WhId = CmbWHid.Text,
+                    User = _userid
                 });
 
                 Insert.RunMovementClassification();
@@ -85,21 +97,7 @@ namespace FGScanner
             CmbStorageLocation.SelectedIndex = +1;
             CmbRemarks.SelectedIndex = 0;
         }
-        private void LoadAutosuggest()
-        {
-            string WhId = CmbWHid.Text;
-            var List = new TransactionRepo();
-            var data = List.GetRackLocations(WhId);
-
-            TxtRackno.CharacterCasing = CharacterCasing.Upper;
-
-            AutoCompleteStringCollection auto = new AutoCompleteStringCollection();
-            auto.AddRange(data.ToArray());
-
-            TxtRackno.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            TxtRackno.AutoCompleteSource = AutoCompleteSource.CustomSource;
-            TxtRackno.AutoCompleteCustomSource = auto;
-        }
+  
         public void Loadtransactionlogs()
         {
             try
@@ -120,6 +118,7 @@ namespace FGScanner
                     dt.Columns.Add("Location", typeof(string));
                     dt.Columns.Add("Remarks", typeof(string));
                     dt.Columns.Add("Storage location", typeof(string));
+                    dt.Columns.Add("Transacted By:", typeof(string));
 
                     foreach (var Data in Datas)
                     {
@@ -133,7 +132,8 @@ namespace FGScanner
                           Data.Customer,
                           Data.Location,
                           Data.Remarks,
-                          Data.Storage_location
+                          Data.Storage_location,
+                          Data.User
                         );
                     }
 
@@ -150,6 +150,7 @@ namespace FGScanner
                     LogsTable.Columns["Location"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Remarks"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Storage location"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    LogsTable.Columns["Transacted By:"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                 }
             }
             catch (Exception ex)
@@ -157,40 +158,101 @@ namespace FGScanner
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
             }
         }
-        private void TxtScanData_KeyDown(object sender, KeyEventArgs e)
-        {
-            var List = new TransactionRepo();
-            string WhId = CmbWHid.Text;
-            var data = List.GetRackLocations(WhId);
 
-            if (!data.Contains(TxtRackno.Text))
+        private void CmbWHid_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            
+        }
+
+        private async void UploadScanDataBtn_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(CmbWHid.Text))
             {
-                MessageBox.Show("Rack no. is invalid!", "Error location");
-                TxtRackno.Focus();
+                MessageBox.Show("Select warehouse first.");
                 return;
             }
 
-            if (e.KeyCode == Keys.Enter)
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                var ParsedData = TxtScanData.Text;
-                var IsProcessed = OnScanProcess(ParsedData);
-                if (IsProcessed)
+                openFileDialog.Filter = "Excel Files|*.xlsx;*.xls";
+                openFileDialog.Title = "Select an Excel File";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    TxtScanData.Clear();
-                    e.SuppressKeyPress = true;
-                    TxtScanData.Focus();
-                    Loadtransactionlogs();
-                }
-                else
-                {
-                    TxtScanData.Clear();
+                    string filepath = openFileDialog.FileName;
+
+                    FileInfo fileInfo = new FileInfo(filepath);
+
+                    var progress = new Progress<int>(value =>
+                    {
+                        toolStripProgressBar1.Value = value;
+                        toolStripStatusLabel1.Text = $"Processing... {value}%";
+                    });
+
+                    try
+                    {
+                        toolStripProgressBar1.Visible = true;
+                        toolStripStatusLabel1.Text = "Processing...";
+                        await ProcessUpload(fileInfo, progress);
+                    }
+                    catch (Exception ex)
+                    {
+                        toolStripStatusLabel1.Text = "Processing failed!";
+                        toolStripStatusLabel1.ForeColor = Color.Red;
+                        MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        Loadtransactionlogs();
+                        toolStripProgressBar1.Visible = false;
+                        toolStripStatusLabel1.Text = "Processing completed!";
+                    }
                 }
             }
         }
 
-        private void CmbWHid_SelectedIndexChanged_1(object sender, EventArgs e)
+        private async Task ProcessUpload(FileInfo fileInfo, IProgress<int> progress)
         {
-            LoadAutosuggest();
+            if (string.IsNullOrWhiteSpace(CmbWHid.Text))
+            {
+                MessageBox.Show("Select warehouse first.");
+                return;
+            }
+
+            ExcelPackage.License.SetNonCommercialPersonal("NIDEC");
+
+            using (ExcelPackage package = new ExcelPackage(fileInfo))
+            {
+                ExcelWorksheet ws = package.Workbook.Worksheets[0];
+
+                int startRow = 1;
+                int rowCount = ws.Dimension.Rows;
+                int totalRows = rowCount - startRow + 1;
+
+                int current = 0;
+                string qrcodedata = null;
+                string location = null;
+
+                for (int row = startRow; row <= rowCount; row++)
+                {
+                    current++;
+                    qrcodedata = ws.Cells[row, 1].Value.ToString();
+                    location = ws.Cells[row, 2].Value.ToString().ToUpper();
+                    if (qrcodedata != null)
+                    {
+                       OnScanProcess(qrcodedata, location);
+                    }
+
+                    int percent = (int)((double)current / totalRows * 100);
+                    percent = Math.Min(percent, 100);
+                    if (current % 10 == 0)
+                        progress?.Report(percent);
+                    progress?.Report(percent);
+                }
+                await Task.Delay(100);
+            }
+
+            progress?.Report(100);
         }
     }
 }

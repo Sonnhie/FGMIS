@@ -31,6 +31,7 @@ namespace FGScanner.Model
         public string Status { get; set; }
         public string Storage_location { get; set; }
         public string Whid { get; set; }
+        public string user {  get; set; }
        
     }
 

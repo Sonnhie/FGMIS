@@ -230,5 +230,22 @@ namespace FGScanner
         {
 
         }
+
+        private void LogsTable_SelectionChanged(object sender, EventArgs e)
+        {
+            decimal total = 0;
+
+            foreach (DataGridViewCell cell in LogsTable.SelectedCells)
+            {
+                if (cell.OwningColumn.Name == "Total Quantity")
+                {
+                    if (cell.Value != null && decimal.TryParse(cell.Value.ToString(), out decimal qty))
+                    {
+                        total += qty;
+                    }
+                }
+            }
+            total_sum.Text = $"Total Quantity: {total:N0}";
+        }
     }
 }

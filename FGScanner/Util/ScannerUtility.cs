@@ -56,7 +56,12 @@ namespace FGScanner.Util
             {
                Partnumber = LeftPart[0] + "-" + LeftPart[1] + "-" + LeftPart[2];
                ProductionVer = LeftPart[3];
-             }
+            }
+            else if (LeftPart.Length == 5)
+            {
+                Partnumber = LeftPart[0] + "-" + LeftPart[1] + "-" + LeftPart[2] + "-" + LeftPart[3];
+                ProductionVer = LeftPart[4];
+            }
 
             var RightPart = SlashedPart[1].Split('-');
 
@@ -89,6 +94,11 @@ namespace FGScanner.Util
                 return false;
             }
 
+            if (string.IsNullOrWhiteSpace(Partnumber))
+            {
+                error = "Part number is emty or invallid parsing.";
+                return false;
+            }
 
             itemModel = new InventoryItemModel
             {

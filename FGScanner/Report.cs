@@ -197,7 +197,7 @@ namespace FGScanner
             try
             {
                 var Repo = new TransactionRepo();
-                var Data = Repo.GetSlowMovingItems();
+                var Data = Repo.GetSlowMovingItem();
 
                 if (Data != null)
                 {
@@ -256,27 +256,27 @@ namespace FGScanner
             var Repo = new TransactionRepo();
             var Data = Repo.GetMonthlyInventory(year);
             int maxStock = Data.Max(d => d.EndingStock);
-            double yInterval = maxStock > 0 ? Math.Ceiling(maxStock / 5.0 / 1000000) * 1000000 : 1000000;
+            double yInterval = maxStock > 0 ? Math.Ceiling(maxStock / 5.0 / 30000000) * 30000000 : 30000000;
 
-            if (maxStock <= 50000)
+            if (maxStock <= 5000000)
             {
-                yInterval = 10000;
+                yInterval = 1000000;
             }
-            else if (maxStock <= 100000)
+            else if (maxStock <= 10000000)
             {
-                yInterval = 20000;
+                yInterval = 5000000;
             }
-            else if (maxStock <= 500000)
+            else if (maxStock <= 15000000)
             {
-                yInterval = 50000;
+                yInterval = 10000000;
             }
-            else if (maxStock <= 1000000)
+            else if (maxStock <= 30000000)
             {
-                yInterval = 100000;
+                yInterval = 20000000;
             }
             else
             {
-                yInterval = Math.Ceiling(maxStock / 5.0 / 1000000) * 1000000;
+                yInterval = Math.Ceiling(maxStock / 5.0 / 30000000) * 30000000;
             }
 
             chart1.Series.Clear();
