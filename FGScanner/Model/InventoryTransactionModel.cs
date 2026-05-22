@@ -33,6 +33,7 @@ namespace FGScanner.Model
 
     public class InventoryTransactionModel
     {
+        public int id { get; set; }
         //Transaction Data Model
         public string TransactionId { get; set; }
         public string PartNumber { get; set; }

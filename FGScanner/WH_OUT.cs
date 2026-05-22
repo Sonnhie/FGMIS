@@ -274,6 +274,7 @@ namespace FGScanner
 
 
                 var startrow = 10;
+                var copystartrow = 10;
                 DateTime today = DateTime.Now;
                 string date = today.ToString("MM/dd/yyyy");
                 string time = today.ToString("HH:mm:ss");
@@ -283,15 +284,21 @@ namespace FGScanner
                 ws.Cells["J6"].Value = orders[0].Customer;
                 ws.Cells["J7"].Value = orders[0].TransactionId;
 
+                wscopy.Cells["C6"].Value = date;
+                wscopy.Cells["C7"].Value = time;
+                wscopy.Cells["J6"].Value = orders[0].Customer;
+                wscopy.Cells["J7"].Value = orders[0].TransactionId;
+
                 int current = 0;
 
                 foreach (var items in summarizedOrders)
                 {
                     int PPS = items.Quantity / items.Box;
-                    ws.Cells[startrow, 2].Value = items.Partnumber;
-                    ws.Cells[startrow, 5].Value = items.Box;
-                    ws.Cells[startrow, 6].Value = PPS;
-                    ws.Cells[startrow, 7].Value = items.Quantity;
+                    wscopy.Cells[copystartrow, 2].Value = items.Partnumber;
+                    wscopy.Cells[copystartrow, 5].Value = items.Box;
+                    wscopy.Cells[copystartrow, 6].Value = PPS;
+                    wscopy.Cells[copystartrow, 7].Value = items.Quantity;
+                    copystartrow++;
                 }
 
                 foreach (var item in orders)
@@ -453,7 +460,7 @@ namespace FGScanner
             {
                 ExcelWorksheet ws = package.Workbook.Worksheets[0];
 
-                int startRow = 3;
+                int startRow = 2;
                 int rowCount = ws.Dimension.Rows;
                 int totalRows = rowCount - startRow + 1;
 
@@ -464,10 +471,10 @@ namespace FGScanner
                     current++;
                     DPIItems.Add(new DPIList
                     {
-                        Partnumber = ws.Cells[row, 2].Value.ToString(),
-                        Quantity = Convert.ToInt32(ws.Cells[row, 5].Value),
-                        PPS = Convert.ToInt32(ws.Cells[row, 4].Value),
-                        Box = Convert.ToInt32(ws.Cells[row, 6].Value)
+                        Partnumber = ws.Cells[row, 1].Value.ToString(),
+                        Quantity = Convert.ToInt32(ws.Cells[row, 2].Value),
+                        PPS = Convert.ToInt32(ws.Cells[row, 3].Value),
+                        Box = Convert.ToInt32(ws.Cells[row, 4].Value)
                     });
 
                     int percent = (int)((double)current / totalRows * 100);

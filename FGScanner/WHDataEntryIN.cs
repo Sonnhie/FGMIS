@@ -108,7 +108,7 @@ namespace FGScanner
                 if (Datas != null)
                 {
                     DataTable dt = new DataTable();
-
+                    dt.Columns.Add("ID", typeof(int));
                     dt.Columns.Add("Entry Date", typeof(string));
                     dt.Columns.Add("Part Number", typeof(string));
                     dt.Columns.Add("Quantity", typeof(string));
@@ -119,11 +119,13 @@ namespace FGScanner
                     dt.Columns.Add("Remarks", typeof(string));
                     dt.Columns.Add("Storage location", typeof(string));
                     dt.Columns.Add("Transacted By:", typeof(string));
+                  
 
                     foreach (var Data in Datas)
                     {
                         dt.Rows.Add
                         (
+                          Data.id.ToString(),
                           Data.TransactionDate.ToString("MM/dd/yyyy"),
                           Data.PartNumber,
                           Data.Quantity,
@@ -136,9 +138,9 @@ namespace FGScanner
                           Data.User
                         );
                     }
-
+                   
                     LogsTable.Columns.Clear();
-                    LogsTable.ReadOnly = true;
+                  //  LogsTable.ReadOnly = true;
                     LogsTable.DataSource = dt;
 
                     LogsTable.Columns["Entry Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
@@ -151,6 +153,30 @@ namespace FGScanner
                     LogsTable.Columns["Remarks"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Storage location"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Transacted By:"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    
+                    LogsTable.Columns["ID"].Visible = false;
+                    LogsTable.Columns["Entry Date"].ReadOnly = true;
+                    LogsTable.Columns["Part Number"].ReadOnly = true;
+                    LogsTable.Columns["Quantity"].ReadOnly = true;
+                    LogsTable.Columns["Production Date"].ReadOnly = true;
+                    LogsTable.Columns["Production Version"].ReadOnly = true;
+                    LogsTable.Columns["Customer"].ReadOnly = true;
+                    LogsTable.Columns["Location"].ReadOnly = true;
+                    LogsTable.Columns["Remarks"].ReadOnly = true;
+                    LogsTable.Columns["Storage location"].ReadOnly = true;
+                    LogsTable.Columns["Transacted By:"].ReadOnly = true;
+
+
+                    if (_userid == "N. Marquez")
+                    {
+                        DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn = new DataGridViewCheckBoxColumn
+                        {
+                            Name = "ActionCheckbox",
+                            HeaderText = "Action",
+                        };
+                        LogsTable.EditMode = DataGridViewEditMode.EditOnEnter;
+                        LogsTable.Columns.Add(dataGridViewCheckBoxColumn);
+                    }
                 }
             }
             catch (Exception ex)
@@ -253,6 +279,46 @@ namespace FGScanner
             }
 
             progress?.Report(100);
+        }
+
+        private void LogsTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void LogsTable_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            List<int> selectedIds = new List<int>();
+            DialogResult result = MessageBox.Show("Are you sure you want to delete the selected items?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result == DialogResult.Yes)
+            {
+                for(int i = 0; i < LogsTable.Rows.Count; i++)
+                {
+                    DataGridViewCheckBoxCell chk = (DataGridViewCheckBoxCell)LogsTable.Rows[i].Cells["ActionCheckbox"];
+                    if (chk.Value != null && (bool)chk.Value == true)
+                    {
+                        int id = Convert.ToInt32(LogsTable.Rows[i].Cells["ID"].Value);
+                        var repo = new TransactionRepo();
+                        repo.DeleteTransaction(id);
+                        selectedIds.Add(id);
+                    }
+                }
+
+                if (selectedIds.Count > 0)
+                {
+                    MessageBox.Show($"{selectedIds.Count} item(s) deleted successfully.", "Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Loadtransactionlogs();
+                }
+                else
+                {
+                    MessageBox.Show("No items selected for deletion.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
         }
     }
 }

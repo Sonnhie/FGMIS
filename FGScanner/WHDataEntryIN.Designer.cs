@@ -57,6 +57,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             this.panel2.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LogsTable)).BeginInit();
@@ -68,6 +69,7 @@
             // 
             this.panel2.BackColor = System.Drawing.Color.White;
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.button1);
             this.panel2.Controls.Add(this.statusStrip2);
             this.panel2.Controls.Add(this.statusStrip1);
             this.panel2.Controls.Add(this.label10);
@@ -127,6 +129,8 @@
             this.LogsTable.Name = "LogsTable";
             this.LogsTable.Size = new System.Drawing.Size(700, 595);
             this.LogsTable.TabIndex = 3;
+            this.LogsTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.LogsTable_CellClick);
+            this.LogsTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.LogsTable_CellValueChanged);
             // 
             // groupBox2
             // 
@@ -354,6 +358,17 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Data:";
             // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(1105, 642);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(110, 35);
+            this.button1.TabIndex = 12;
+            this.button1.Text = "Delete Items";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // WHDataEntryIN
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -407,5 +422,6 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.Button button1;
     }
 }

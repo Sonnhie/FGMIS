@@ -192,6 +192,7 @@ namespace FGScanner.Util
                             {
                                 InventoryTransactionModel item = new InventoryTransactionModel
                                 {
+                                    id = Convert.ToInt32(reader["id"]),
                                     TransactionDate = reader["entry_date"] != DBNull.Value ? Convert.ToDateTime(reader["entry_date"]).Date : DateTime.MinValue.Date,
                                     PartNumber = reader["partnumber"]?.ToString() ?? string.Empty,
                                     ProductionDate = reader["prod_date"] != DBNull.Value ? Convert.ToDateTime(reader["prod_date"]).Date : DateTime.MinValue.Date,
@@ -2094,6 +2095,27 @@ namespace FGScanner.Util
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
             return items;
+        }
+
+        public void DeleteTransaction(int id)
+        {
+            try
+            {
+                using(SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string query = "DELETE from transaction_history where id = @id";
+                    using(SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }catch(Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
         }
     }
 }
