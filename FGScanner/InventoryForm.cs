@@ -17,10 +17,11 @@ namespace FGScanner
         private int page = 1;
         private int pageSize = 50;
         private int totalPage = 0;
-
-        public InventoryForm()
+        private string _userid = string.Empty;
+        public InventoryForm(string userid)
         {
             InitializeComponent();
+            _userid = userid;
             InitializeFilter();
             toolStripProgressBar1.Visible = false;
             toolStripStatusLabel1.Visible = false;
@@ -40,7 +41,7 @@ namespace FGScanner
             FilterData(partnumber);
         }
 
-        private void FilterData(string partnumber)
+        public void FilterData(string partnumber)
         {
             try
             {
@@ -61,6 +62,7 @@ namespace FGScanner
                     dt.Columns.Add("PPS", typeof(string));
                     dt.Columns.Add("Location", typeof(string));
                     dt.Columns.Add("Storage location", typeof(string));
+                    dt.Columns.Add("Warehouse Id", typeof(string));
                     dt.Columns.Add("Updated Inventory Date", typeof(string));
                     dt.Columns.Add("Movement Clsasification", typeof(string));
 
@@ -68,7 +70,6 @@ namespace FGScanner
 
                     foreach (var item in data)
                     {
-
                         if (item.Quantity != 0)
                         {
                             dt.Rows.Add
@@ -82,13 +83,13 @@ namespace FGScanner
                                 item.PPS,
                                 item.Location,
                                 item.Storage_location,
+                                item.WhId,
                                 item.Updated_date.ToString("MM/dd/yyyy"),
                                 item.Status
                             );
                         }
                     }
                     LogsTable.Columns.Clear();
-                    LogsTable.ReadOnly = true;
                     LogsTable.DataSource = dt;
                     LogsTable.Columns["Part Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Customer"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
@@ -96,10 +97,40 @@ namespace FGScanner
                     LogsTable.Columns["Production Version"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Total Box"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Total Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    LogsTable.Columns["PPS"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Location"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Storage location"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    LogsTable.Columns["Warehouse Id"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Updated Inventory Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Movement Clsasification"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+
+
+                    LogsTable.Columns["Part Number"].ReadOnly = true;
+                    LogsTable.Columns["Customer"].ReadOnly = true;
+                    LogsTable.Columns["Production Date"].ReadOnly = true;
+                    LogsTable.Columns["Production Version"].ReadOnly = true;
+                    LogsTable.Columns["Total Box"].ReadOnly =  true;
+                    LogsTable.Columns["Total Quantity"].ReadOnly = true;
+                    LogsTable.Columns["PPS"].ReadOnly = true;
+                    LogsTable.Columns["Location"].ReadOnly = true;
+                    LogsTable.Columns["Storage location"].ReadOnly = true;
+                    LogsTable.Columns["Warehouse Id"].ReadOnly = true;
+                    LogsTable.Columns["Updated Inventory Date"].ReadOnly = true;
+                    LogsTable.Columns["Movement Clsasification"].ReadOnly = true;
+
+                    if (_userid.Contains("N. Marquez"))
+                    {
+                        DataGridViewButtonColumn dataGridViewButtonColumn = new DataGridViewButtonColumn
+                        {
+                            Name = "ActionButton",
+                            HeaderText = "Action",
+                            Text = "Edit Stock",
+                            UseColumnTextForButtonValue = true
+                        };
+
+                        LogsTable.EditMode = DataGridViewEditMode.EditOnEnter;
+                        LogsTable.Columns.Add(dataGridViewButtonColumn);
+                    }
                 }
 
             }
@@ -246,6 +277,34 @@ namespace FGScanner
                 }
             }
             total_sum.Text = $"Total Quantity: {total:N0}";
+        }
+
+        private void LogsTable_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && LogsTable.Columns[e.ColumnIndex].Name == "ActionButton")
+            {
+                DataGridViewRow selectedRow = LogsTable.Rows[e.RowIndex];
+                string partnumber = selectedRow.Cells["Part Number"].Value.ToString();
+                string location = selectedRow.Cells["Location"].Value.ToString();
+                string customer = selectedRow.Cells["Customer"].Value.ToString();
+                string productionVersion = selectedRow.Cells["Production Version"].Value.ToString();
+                string dateString = Convert.ToString(selectedRow.Cells["Production Date"].Value);
+
+                // If the date is invalid or blank, show an error and exit this block of code
+                if (!DateTime.TryParse(dateString, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime ProductionDate))
+                {
+                    MessageBox.Show("The selected row does not contain a valid Production Date.", "Invalid Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                int box = Convert.ToInt32(selectedRow.Cells["Total Box"].Value);
+                int quantity = Convert.ToInt32(selectedRow.Cells["Total Quantity"].Value);
+                int PPS = Convert.ToInt32(selectedRow.Cells["PPS"].Value);
+                string whId = selectedRow.Cells["Warehouse Id"].Value.ToString();
+
+                StockEdit stockEdit = new StockEdit(PPS ,partnumber, location, productionVersion, ProductionDate, box, quantity, customer, whId, _userid);
+                stockEdit.ShowDialog();
+                InitializeFilter();
+            }
         }
     }
 }

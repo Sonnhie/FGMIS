@@ -63,7 +63,7 @@ namespace FGScanner.Util
                 }
             }
         }
-       
+
         public async Task InsertSingleTransaction(InventoryTransactionModel item, SqlConnection conn, SqlTransaction tx)
         {
             string sql = @"INSERT INTO transaction_history
@@ -91,7 +91,7 @@ namespace FGScanner.Util
                 await cmd.ExecuteNonQueryAsync();
             }
         }
-        
+
         public async Task InsertShipmentTransaction(InventoryTransactionModel item, SqlConnection conn, SqlTransaction tx)
         {
             string sql = @"INSERT INTO Shipment_table
@@ -139,7 +139,7 @@ namespace FGScanner.Util
                 await cmd.ExecuteNonQueryAsync();
             }
         }
-        
+
         public int CheckStock(string partnumber, DateTime prodDate, string location)
         {
             int result = 0;
@@ -157,7 +157,7 @@ namespace FGScanner.Util
                         cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = partnumber;
                         cmd.Parameters.Add("@location", SqlDbType.NVarChar).Value = location;
                         cmd.Parameters.Add("@prod_date", SqlDbType.DateTime).Value = prodDate;
-                        result = Convert.ToInt32(cmd.ExecuteScalar());  
+                        result = Convert.ToInt32(cmd.ExecuteScalar());
                     }
                 }
             }
@@ -168,7 +168,7 @@ namespace FGScanner.Util
 
             return result;
         }
-        
+
         public List<InventoryTransactionModel> GetTransactionHistory()
         {
             List<InventoryTransactionModel> Inventory = new List<InventoryTransactionModel>();
@@ -217,7 +217,7 @@ namespace FGScanner.Util
             }
             return Inventory;
         }
-        
+
         public List<string> GetRackLocations(string whname)
         {
             List<string> list = new List<string>();
@@ -249,7 +249,7 @@ namespace FGScanner.Util
             }
             return list;
         }
-        
+
         public List<string> GetStorageLocations()
         {
             List<string> list = new List<string>();
@@ -278,7 +278,7 @@ namespace FGScanner.Util
             }
             return list;
         }
-       
+
         public string GetCustomer(string partnumber)
         {
             string customer = string.Empty;
@@ -309,29 +309,29 @@ namespace FGScanner.Util
             }
             return customer;
         }
-        
+
         public int GetLatestTransactionId()
         {
             int latestId = 0;
             try
             {
-               using (SqlConnection conn = _Connection.Getconnection())
-               {
-                   conn.Open();
-                   string sql = "SELECT ISNULL(MAX(transaction_id), 0) FROM transaction_history";
-                   using (SqlCommand cmd = new SqlCommand(sql, conn))
-                   {
-                       latestId = Convert.ToInt32(cmd.ExecuteScalar());
-                   }
-               }
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = "SELECT ISNULL(MAX(transaction_id), 0) FROM transaction_history";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        latestId = Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
             }
             catch (Exception ex)
             {
-               MessageBox.Show("Error: " + ex.Message, "SQL Error");
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
             return latestId;
         }
-       
+
         public int GetLatestReturnId()
         {
             int latestId = 0;
@@ -353,11 +353,11 @@ namespace FGScanner.Util
             }
             return latestId;
         }
-        
+
         public List<RackCount> GetTotalItemPerRack(string WHid)
         {
             List<RackCount> counts = new List<RackCount>();
-            
+
             try
             {
                 using (SqlConnection conn = _Connection.Getconnection())
@@ -365,13 +365,13 @@ namespace FGScanner.Util
                     conn.Open();
                     string sql = @"SELECT location, SUM(quantity) AS item FROM actual_inventory WHERE WhId = @whid GROUP BY location";
 
-                    using (SqlCommand cmd = new SqlCommand(sql,conn))
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.Add("@whid", SqlDbType.NVarChar).Value = WHid;
 
                         using (SqlDataReader rd = cmd.ExecuteReader())
                         {
-                           while (rd.Read())
+                            while (rd.Read())
                             {
                                 counts.Add(new RackCount
                                 {
@@ -400,14 +400,14 @@ namespace FGScanner.Util
                     conn.Open();
                     string query = "SELECT DISTINCT customer from actual_inventory where location = @loc and WhId = @whid";
 
-                    using(SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@loc", SqlDbType.NVarChar).Value = location;
                         cmd.Parameters.AddWithValue("@whid", SqlDbType.NVarChar).Value = whid;
 
-                        using(SqlDataReader rd = cmd.ExecuteReader())
+                        using (SqlDataReader rd = cmd.ExecuteReader())
                         {
-                            if(rd.Read())
+                            if (rd.Read())
                             {
                                 customer = rd["customer"].ToString() ?? string.Empty;
                             }
@@ -453,7 +453,7 @@ namespace FGScanner.Util
         public List<InventoryTransactionModel> GetItemByLocation(string location, string whId)
         {
             List<InventoryTransactionModel> Items = new List<InventoryTransactionModel>();
-            
+
             try
             {
                 using (SqlConnection conn = _Connection.Getconnection())
@@ -501,27 +501,28 @@ namespace FGScanner.Util
                         }
                     }
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
 
             return Items;
         }
-             
+
         public int GetNextShipmentId()
         {
             int result = 0;
             try
             {
-                using(SqlConnection conn = _Connection.Getconnection())
+                using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
-                    
+
                     using (SqlCommand cmd = new SqlCommand("GetNextShipmentId", conn))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        result =  (int)(cmd.ExecuteScalar());
+                        result = (int)(cmd.ExecuteScalar());
                     }
                 }
             }
@@ -576,10 +577,10 @@ namespace FGScanner.Util
                                    partnumber, CAST(prod_date AS DATE) AS prod_date, SUM(quantity) AS TotalQuantity, 
                                    COUNT(partnumber) AS TotalBox FROM Return_table 
                                    where transaction_id = @id GROUP BY partnumber, CAST(prod_date AS DATE), transaction_id, customer, storage_location, ToStorageLocation, remarks";
-                    using(SqlCommand cmd = new SqlCommand(sql, conn))
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.Add("@id", SqlDbType.NVarChar).Value = transaction_id;
-                        
+
                         using (SqlDataReader read = cmd.ExecuteReader())
                         {
                             while (read.Read())
@@ -601,7 +602,8 @@ namespace FGScanner.Util
                         }
                     }
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
@@ -616,7 +618,7 @@ namespace FGScanner.Util
                 string sql = "SELECT control_number, customer_id, partnumber, CAST(prod_date AS DATE) AS prod_date, SUM(quantity) AS TotalQuantity, COUNT(partnumber) AS TotalBox FROM transaction_history where control_number = @id GROUP BY partnumber, CAST(prod_date AS DATE), control_number, customer_id";
                 using (SqlConnection conn = _Connection.Getconnection())
                 {
-                    using(SqlCommand cmd = new SqlCommand(sql, conn))
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.Add("@id", SqlDbType.NVarChar).Value = shipmenID;
                         conn.Open();
@@ -685,31 +687,31 @@ namespace FGScanner.Util
 
         public List<InventoryTransactionModel> GetFilteredData(string partnumber, int page, int size)
         {
-            List<InventoryTransactionModel> items = new List<InventoryTransactionModel> ();
+            List<InventoryTransactionModel> items = new List<InventoryTransactionModel>();
 
             try
             {
                 using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
-                    string query = @"SELECT partnumber,customer,prod_date,prod_ver,location,quantity,total_box,storage_location,updated_date,movement_classification 
+                    string query = @"SELECT partnumber,customer,prod_date,WhId,prod_ver,location,quantity,total_box,storage_location,updated_date,movement_classification 
                                     FROM actual_inventory
                                     WHERE 1=1";
 
                     if (!string.IsNullOrEmpty(partnumber))
                         query += " AND partnumber LIKE '%' + @partnumber + '%'";
 
-                        query += " GROUP BY partnumber, prod_ver, customer,quantity, total_box, location, prod_date, storage_location, movement_classification, updated_date";
-                        query += " HAVING SUM(quantity) > 0";
-                        query += " ORDER BY partnumber ASC OFFSET (@offset - 1) * @size ROWS FETCH NEXT @size ROWS ONLY";
+                    query += " GROUP BY partnumber, prod_ver, customer,quantity, total_box, location, prod_date,WhId, storage_location, movement_classification, updated_date";
+                    query += " HAVING SUM(quantity) > 0";
+                    query += " ORDER BY partnumber ASC OFFSET (@offset - 1) * @size ROWS FETCH NEXT @size ROWS ONLY";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         if (!string.IsNullOrEmpty(partnumber))
                             cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = partnumber;
-                        
-                            cmd.Parameters.Add("@offset", SqlDbType.Int).Value = page;
-                            cmd.Parameters.Add("@size", SqlDbType.Int).Value = size;
+
+                        cmd.Parameters.Add("@offset", SqlDbType.Int).Value = page;
+                        cmd.Parameters.Add("@size", SqlDbType.Int).Value = size;
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -734,19 +736,21 @@ namespace FGScanner.Util
                                     PPS = PPS,
                                     Status = reader["movement_classification"]?.ToString(),
                                     Updated_date = reader["updated_date"] != DBNull.Value ? Convert.ToDateTime(reader["updated_date"]).Date : DateTime.MinValue.Date,
+                                    WhId = reader["WhId"]?.ToString() ?? string.Empty
                                 };
                                 items.Add(item);
                             }
                         }
                     }
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
             return items;
         }
-        
+
         public int GetTotalRows(string partnumber)
         {
             int count = 0;
@@ -761,7 +765,7 @@ namespace FGScanner.Util
                     if (!string.IsNullOrEmpty(partnumber))
                         query += " AND partnumber LIKE '%' + @partnumber + '%' ";
 
-                    using (SqlCommand cmd = new SqlCommand(query,conn))
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         if (!string.IsNullOrEmpty(partnumber))
                             cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = partnumber;
@@ -769,13 +773,14 @@ namespace FGScanner.Util
                         count = (int)cmd.ExecuteScalar();
                     }
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
             return count;
         }
-       
+
         public List<chartmodel> GetCustomerOrder(int Month, int year)
         {
             List<chartmodel> data = new List<chartmodel>();
@@ -792,7 +797,7 @@ namespace FGScanner.Util
                         cmd.Parameters.Add("@month", SqlDbType.Int).Value = Month;
                         cmd.Parameters.Add("@year", SqlDbType.Int).Value = year;
 
-                        
+
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -806,7 +811,7 @@ namespace FGScanner.Util
                             conn.Close();
                         }
                     }
-                } 
+                }
             }
             catch (Exception ex)
             {
@@ -814,7 +819,7 @@ namespace FGScanner.Util
             }
             return data;
         }
-        
+
         public List<int> GetYear()
         {
             List<int> year = new List<int>();
@@ -825,9 +830,9 @@ namespace FGScanner.Util
                 {
                     conn.Open();
                     string sql = "SELECT DISTINCT YEAR(entry_date) AS YEAR FROM transaction_history ORDER BY YEAR(entry_date) DESC";
-                    using (SqlCommand cmd = new SqlCommand(sql,conn))
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
-                        using(SqlDataReader reader = cmd.ExecuteReader())
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
@@ -837,13 +842,13 @@ namespace FGScanner.Util
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
             return year;
         }
-        
+
         public List<MonthlyInventorySummary> GetMonthlyInventory(int year)
         {
             List<MonthlyInventorySummary> list = new List<MonthlyInventorySummary>();
@@ -866,7 +871,7 @@ namespace FGScanner.Util
                     GROUP BY m.MonthNumber
                     ORDER BY m.MonthNumber";
 
-                    using (SqlCommand cmd = new SqlCommand(query,conn))
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.Add("@year", SqlDbType.Int).Value = year;
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -898,7 +903,7 @@ namespace FGScanner.Util
             }
             return list;
         }
-        
+
         public List<CustomerStock> GetCurrentCustomerStock()
         {
             List<CustomerStock> customer = new List<CustomerStock>();
@@ -916,7 +921,7 @@ namespace FGScanner.Util
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            while(reader.Read())
+                            while (reader.Read())
                             {
                                 customer.Add(new CustomerStock
                                 {
@@ -928,13 +933,13 @@ namespace FGScanner.Util
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
             return customer;
         }
-       
+
         public List<MonthlyShipment> GetShipment(int year)
         {
             List<MonthlyShipment> Shipment = new List<MonthlyShipment>();
@@ -973,7 +978,7 @@ namespace FGScanner.Util
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
@@ -1001,13 +1006,14 @@ namespace FGScanner.Util
                         }
                     }
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
             return id;
         }
-        
+
         public Dictionary<string, int> GetLatestId()
         {
             Dictionary<string, int> RackIDs = new Dictionary<string, int>();
@@ -1017,7 +1023,7 @@ namespace FGScanner.Util
                 {
                     conn.Open();
                     string query = "SELECT location, ISNULL(MAX(id),0) AS latestID FROM transaction_history GROUP BY location";
-                    using(SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         using (SqlDataReader read = cmd.ExecuteReader())
                         {
@@ -1030,13 +1036,14 @@ namespace FGScanner.Util
                         }
                     }
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
             return RackIDs;
         }
-        
+
         public List<SlowMovingItem> GetSlowMovingItems(string partnumber = null)
         {
             List<SlowMovingItem> items = new List<SlowMovingItem>();
@@ -1059,7 +1066,7 @@ namespace FGScanner.Util
                               HAVING
                               SUM(quantity) > 0";
 
-                    using (SqlCommand cmd = new SqlCommand(sql,conn))
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         if (!string.IsNullOrEmpty(partnumber))
                             cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = partnumber;
@@ -1093,25 +1100,26 @@ namespace FGScanner.Util
             }
             return items;
         }
-       
+
         public void RunMovementClassification()
         {
             try
             {
-                using(SqlConnection conn = _Connection.Getconnection())
+                using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
-                    using(SqlCommand cmd = new SqlCommand("EXEC sp_UpdateInventoryClassification", conn))
+                    using (SqlCommand cmd = new SqlCommand("EXEC sp_UpdateInventoryClassification", conn))
                     {
                         cmd.ExecuteNonQuery();
                     }
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
         }
-       
+
         public DataTable GetInventoryData()
         {
             DataTable items = new DataTable();
@@ -1128,7 +1136,7 @@ namespace FGScanner.Util
                     query += " GROUP BY partnumber, prod_ver, customer,quantity, total_box, location, prod_date, storage_location, movement_classification, updated_date";
                     query += " HAVING SUM(quantity) > 0";
 
-                    using(SqlDataAdapter dt = new SqlDataAdapter(query, conn))
+                    using (SqlDataAdapter dt = new SqlDataAdapter(query, conn))
                     {
                         dt.Fill(items);
                     }
@@ -1155,7 +1163,7 @@ namespace FGScanner.Util
                                   WHERE movement_classification = 'SLOW' GROUP BY location, partnumber, customer, prod_date, storage_location, movement_classification, total_box, quantity, last_out_date    
                                   HAVING
                                   SUM(quantity) > 0";
-                    using(SqlDataAdapter dt = new SqlDataAdapter(sql, conn))
+                    using (SqlDataAdapter dt = new SqlDataAdapter(sql, conn))
                     {
                         dt.Fill(items);
                     }
@@ -1191,12 +1199,12 @@ namespace FGScanner.Util
                                     AND quantity > 0
                                     ORDER BY PickOrder";
 
-                    using(SqlCommand cmd = new SqlCommand(sql, conn))
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = partnumber;
                         cmd.Parameters.Add("@whid", SqlDbType.NVarChar).Value = WHId;
 
-                        using(SqlDataReader reader = cmd.ExecuteReader())
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
@@ -1385,7 +1393,7 @@ namespace FGScanner.Util
 
             return WHReturn;
         }
-       
+
         public int GetTotalReturnTableRows(string docnum, string location, DateTime from, DateTime to)
         {
             int count = 0;
@@ -1820,8 +1828,8 @@ namespace FGScanner.Util
                             {
                                 int month = reader["MonthNumber"] != DBNull.Value ? Convert.ToInt32(reader["MonthNumber"]) : 0;
                                 int totalShip = reader["TotalShipped"] != DBNull.Value ? Convert.ToInt32(reader["TotalShipped"]) : 0;
-                              
-                                
+
+
 
                                 list.Add(new MonthlyShipment
                                 {
@@ -1927,7 +1935,7 @@ namespace FGScanner.Util
 
             try
             {
-                using(SqlConnection conn = _Connection.Getconnection())
+                using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
                     string sql = @"DECLARE @BeginningBalance INT = (
@@ -1989,13 +1997,13 @@ namespace FGScanner.Util
                                                 FROM DailyTransaction
 
                                                 ORDER BY TransactionDay";
-                    using(SqlCommand cmd = new SqlCommand(sql, conn))
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.Add("@PartNumber", SqlDbType.NVarChar).Value = partnumber;
                         cmd.Parameters.Add("@StartDate", SqlDbType.DateTime).Value = startdate;
                         cmd.Parameters.Add("@EndDate", SqlDbType.DateTime).Value = enddate;
 
-                        using(SqlDataReader reader = cmd.ExecuteReader())
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             bool firstRow = true;
 
@@ -2003,7 +2011,7 @@ namespace FGScanner.Util
                             {
                                 if (firstRow)
                                 {
-                                    info =  new StockInfo
+                                    info = new StockInfo
                                     {
                                         PartNumber = partnumber ?? string.Empty,
                                         PartName = GetPartname(partnumber) ?? string.Empty,
@@ -2033,7 +2041,8 @@ namespace FGScanner.Util
                         }
                     }
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
@@ -2101,18 +2110,164 @@ namespace FGScanner.Util
         {
             try
             {
-                using(SqlConnection conn = _Connection.Getconnection())
+                using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
                     string query = "DELETE from transaction_history where id = @id";
-                    using(SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
                         cmd.ExecuteNonQuery();
                         conn.Close();
                     }
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+        }
+
+        public List<ProductModel> GetProduct(string search, int page, int size)
+        {
+            List<ProductModel> products = new List<ProductModel>();
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = @"SELECT id, partnumber, partname, customer_id, PPS FROM product WHERE 1 = 1";
+
+                    if (!string.IsNullOrWhiteSpace(search))
+                    {
+                        sql += " AND (partnumber LIKE @search OR partname LIKE @search OR customer_id LIKE @search)";
+                    }
+
+                    sql += " ORDER BY partnumber ASC OFFSET @offset ROWS FETCH NEXT @size ROWS ONLY";
+
+                    int offset = (page - 1) * size;
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        if (!string.IsNullOrWhiteSpace(search))
+                        {
+                            cmd.Parameters.Add("@search", SqlDbType.NVarChar).Value = "%" + search + "%";
+                        }
+
+                        cmd.Parameters.Add("@offset", SqlDbType.Int).Value = offset;
+                        cmd.Parameters.Add("@size", SqlDbType.Int).Value = size;
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                products.Add(new ProductModel
+                                {
+                                    Id = reader["id"] != DBNull.Value ? Convert.ToInt32(reader["id"]) : 0,
+                                    PartNumber = reader["partnumber"].ToString() ?? string.Empty,
+                                    PartName = reader["partname"].ToString() ?? string.Empty,
+                                    CustomerId = reader["customer_id"].ToString() ?? string.Empty,
+                                    PPS = reader["PPS"] != DBNull.Value ? Convert.ToInt32(reader["PPS"]) : 0
+                                });
+                            }
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return products;
+        }
+
+        public int GetTotalProductRows(string search)
+        {
+            int count = 0;
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = @"SELECT COUNT(*) FROM product WHERE 1=1";
+
+                    if (!string.IsNullOrWhiteSpace(search))
+                    {
+                        sql += " AND (partnumber LIKE @search OR partname LIKE @search OR customer_id LIKE @search)";
+                    }
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        if (!string.IsNullOrWhiteSpace(search))
+                        {
+                            cmd.Parameters.Add("@search", SqlDbType.NVarChar).Value = "%" + search + "%";
+                        }
+
+                        object result = cmd.ExecuteScalar();
+                        count = result != null && result != DBNull.Value
+                            ? Convert.ToInt32(result)
+                            : 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return count;
+        }
+
+        public void DeleteProduct(int id)
+        {
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string query = "DELETE from product where id = @id";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+        }
+
+        public void AddProduct(ProductModel product)
+        {
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string query = "INSERT INTO product (partnumber, partname, customer_id, PPS) VALUES (@partnumber, @partname, @customer_id, @PPS)";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = product.PartNumber;
+                        cmd.Parameters.Add("@partname", SqlDbType.NVarChar).Value = product.PartName;
+                        cmd.Parameters.Add("@customer_id", SqlDbType.NVarChar).Value = product.CustomerId;
+                        cmd.Parameters.Add("@PPS", SqlDbType.Int).Value = product.PPS;
+                        
+                        int result = cmd.ExecuteNonQuery();
+                        if(result > 0)
+                        {
+                            MessageBox.Show("Product added successfully.", "Success");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to add product.", "Error");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }

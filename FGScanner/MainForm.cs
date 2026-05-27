@@ -114,7 +114,7 @@ namespace FGScanner
 
         private void stockListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            InventoryForm inventory = new InventoryForm();
+            InventoryForm inventory = new InventoryForm(_userid);
             DisplayForm(inventory);
         }
 
@@ -197,6 +197,12 @@ namespace FGScanner
         private void dataEntryToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void masterListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Product product = new Product(_userid);
+            DisplayForm(product);
         }
     }
 }

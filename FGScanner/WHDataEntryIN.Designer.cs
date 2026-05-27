@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.ClockTimer = new System.Windows.Forms.Timer(this.components);
             this.panel2 = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.statusStrip2 = new System.Windows.Forms.StatusStrip();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
@@ -57,7 +58,6 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
             this.panel2.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LogsTable)).BeginInit();
@@ -81,6 +81,17 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1245, 760);
             this.panel2.TabIndex = 2;
+            // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(1105, 642);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(110, 35);
+            this.button1.TabIndex = 12;
+            this.button1.Text = "Delete Items";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // statusStrip2
             // 
@@ -263,7 +274,7 @@
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(40, 31);
+            this.groupBox1.Location = new System.Drawing.Point(40, 30);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(460, 242);
             this.groupBox1.TabIndex = 0;
@@ -357,17 +368,6 @@
             this.label1.Size = new System.Drawing.Size(38, 17);
             this.label1.TabIndex = 0;
             this.label1.Text = "Data:";
-            // 
-            // button1
-            // 
-            this.button1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(1105, 642);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(110, 35);
-            this.button1.TabIndex = 12;
-            this.button1.Text = "Delete Items";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // WHDataEntryIN
             // 

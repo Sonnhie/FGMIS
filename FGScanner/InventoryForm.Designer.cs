@@ -82,6 +82,7 @@
             this.LogsTable.RowHeadersWidth = 51;
             this.LogsTable.Size = new System.Drawing.Size(1169, 566);
             this.LogsTable.TabIndex = 2;
+            this.LogsTable.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.LogsTable_CellContentClick);
             this.LogsTable.SelectionChanged += new System.EventHandler(this.LogsTable_SelectionChanged);
             // 
             // TxtPartnumber

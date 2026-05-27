@@ -366,6 +366,18 @@
     <Compile Include="PackingList.Designer.cs">
       <DependentUpon>PackingList.cs</DependentUpon>
     </Compile>
+    <Compile Include="Product.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Product.Designer.cs">
+      <DependentUpon>Product.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProductMasterlist.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProductMasterlist.Designer.cs">
+      <DependentUpon>ProductMasterlist.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Report.cs">
@@ -391,6 +403,12 @@
     </Compile>
     <Compile Include="StockCard.Designer.cs">
       <DependentUpon>StockCard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StockEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StockEdit.Designer.cs">
+      <DependentUpon>StockEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="Util\AuditLogsRepo.cs" />
     <Compile Include="Util\db_connection.cs" />
@@ -458,6 +476,12 @@
     <EmbeddedResource Include="PackingList.resx">
       <DependentUpon>PackingList.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Product.resx">
+      <DependentUpon>Product.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProductMasterlist.resx">
+      <DependentUpon>ProductMasterlist.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -478,6 +502,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="StockCard.resx">
       <DependentUpon>StockCard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StockEdit.resx">
+      <DependentUpon>StockEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewer.resx">
       <DependentUpon>Viewer.cs</DependentUpon>

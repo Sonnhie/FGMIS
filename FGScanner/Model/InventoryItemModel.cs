@@ -22,5 +22,13 @@ namespace FGScanner.Model
         public string ProductionVer { get; set; }
     }
 
+    public class ProductModel
+    {
+        public int Id { get; set; }
+        public string PartNumber { get; set; }
+        public string PartName { get; set; }
+        public string CustomerId { get; set; }
+        public int PPS { get; set; }
+    }
 
 }
