@@ -385,6 +385,7 @@
             // 
             // DPILogsTable
             // 
+            this.DPILogsTable.AllowUserToAddRows = false;
             this.DPILogsTable.BackgroundColor = System.Drawing.Color.White;
             this.DPILogsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.DPILogsTable.Location = new System.Drawing.Point(517, 57);

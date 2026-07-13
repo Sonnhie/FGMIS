@@ -28,350 +28,348 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.menuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.logoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.inventoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dataEntryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.iNToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.oUTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cHANGELOCATIONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.warehouseReturnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.rackViewerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.warehouseToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.ecozoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.stockListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.slowMovingListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.iNOUTLedgerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.repoertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.inventorySummaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.documentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.packingListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.warehouseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.TimeLbl = new System.Windows.Forms.Label();
-            this.DateLbl = new System.Windows.Forms.Label();
-            this.LblUser = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.masterListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuStrip1.SuspendLayout();
-            this.panel2.SuspendLayout();
-            this.SuspendLayout();
+            menuStrip1 = new System.Windows.Forms.MenuStrip();
+            menuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            logoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            inventoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            dataEntryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            transferLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            bPPSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            incomingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            outgoingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            warehouseReturnToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            rackViewerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            warehouseToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            ecozoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            stockListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            slowMovingListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            iNOUTLedgerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            masterListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            repoertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            inventorySummaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            documentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            packingListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            warehouseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            panel2 = new System.Windows.Forms.Panel();
+            TimeLbl = new System.Windows.Forms.Label();
+            DateLbl = new System.Windows.Forms.Label();
+            LblUser = new System.Windows.Forms.Label();
+            label4 = new System.Windows.Forms.Label();
+            label3 = new System.Windows.Forms.Label();
+            label2 = new System.Windows.Forms.Label();
+            label1 = new System.Windows.Forms.Label();
+            timer1 = new System.Windows.Forms.Timer(components);
+            panel1 = new System.Windows.Forms.Panel();
+            menuStrip1.SuspendLayout();
+            panel2.SuspendLayout();
+            SuspendLayout();
             // 
             // menuStrip1
             // 
-            this.menuStrip1.BackColor = System.Drawing.Color.White;
-            this.menuStrip1.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuToolStripMenuItem,
-            this.inventoryToolStripMenuItem,
-            this.repoertToolStripMenuItem,
-            this.documentsToolStripMenuItem});
-            this.menuStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
-            this.menuStrip1.Location = new System.Drawing.Point(0, 36);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(1245, 23);
-            this.menuStrip1.TabIndex = 0;
-            this.menuStrip1.Text = "menuStrip1";
-            this.menuStrip1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.menuStrip1_MouseDown);
+            menuStrip1.BackColor = System.Drawing.Color.White;
+            menuStrip1.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { menuToolStripMenuItem, inventoryToolStripMenuItem, repoertToolStripMenuItem, documentsToolStripMenuItem });
+            menuStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
+            menuStrip1.Location = new System.Drawing.Point(0, 42);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
+            menuStrip1.Size = new System.Drawing.Size(1452, 23);
+            menuStrip1.TabIndex = 0;
+            menuStrip1.Text = "menuStrip1";
+            menuStrip1.MouseDown += menuStrip1_MouseDown;
             // 
             // menuToolStripMenuItem
             // 
-            this.menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.logoutToolStripMenuItem});
-            this.menuToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
-            this.menuToolStripMenuItem.Name = "menuToolStripMenuItem";
-            this.menuToolStripMenuItem.Size = new System.Drawing.Size(50, 19);
-            this.menuToolStripMenuItem.Text = "Menu";
+            menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { logoutToolStripMenuItem });
+            menuToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
+            menuToolStripMenuItem.Name = "menuToolStripMenuItem";
+            menuToolStripMenuItem.Size = new System.Drawing.Size(50, 19);
+            menuToolStripMenuItem.Text = "Menu";
             // 
             // logoutToolStripMenuItem
             // 
-            this.logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
-            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
-            this.logoutToolStripMenuItem.Text = "Logout";
-            this.logoutToolStripMenuItem.Click += new System.EventHandler(this.logoutToolStripMenuItem_Click);
+            logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
+            logoutToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            logoutToolStripMenuItem.Text = "Logout";
+            logoutToolStripMenuItem.Click += logoutToolStripMenuItem_Click;
             // 
             // inventoryToolStripMenuItem
             // 
-            this.inventoryToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.dataEntryToolStripMenuItem,
-            this.rackViewerToolStripMenuItem,
-            this.stockListToolStripMenuItem,
-            this.slowMovingListToolStripMenuItem,
-            this.iNOUTLedgerToolStripMenuItem,
-            this.masterListToolStripMenuItem});
-            this.inventoryToolStripMenuItem.Name = "inventoryToolStripMenuItem";
-            this.inventoryToolStripMenuItem.Size = new System.Drawing.Size(70, 19);
-            this.inventoryToolStripMenuItem.Text = "Inventory";
+            inventoryToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { dataEntryToolStripMenuItem, rackViewerToolStripMenuItem, stockListToolStripMenuItem, slowMovingListToolStripMenuItem, iNOUTLedgerToolStripMenuItem, masterListToolStripMenuItem });
+            inventoryToolStripMenuItem.Name = "inventoryToolStripMenuItem";
+            inventoryToolStripMenuItem.Size = new System.Drawing.Size(70, 19);
+            inventoryToolStripMenuItem.Text = "Inventory";
             // 
             // dataEntryToolStripMenuItem
             // 
-            this.dataEntryToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.iNToolStripMenuItem,
-            this.oUTToolStripMenuItem,
-            this.cHANGELOCATIONToolStripMenuItem,
-            this.warehouseReturnToolStripMenuItem});
-            this.dataEntryToolStripMenuItem.Name = "dataEntryToolStripMenuItem";
-            this.dataEntryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.dataEntryToolStripMenuItem.Text = "Data Entry";
-            this.dataEntryToolStripMenuItem.Click += new System.EventHandler(this.dataEntryToolStripMenuItem_Click);
+            dataEntryToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { transferLocationToolStripMenuItem, bPPSToolStripMenuItem, incomingToolStripMenuItem, outgoingToolStripMenuItem, warehouseReturnToolStripMenuItem1 });
+            dataEntryToolStripMenuItem.Name = "dataEntryToolStripMenuItem";
+            dataEntryToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            dataEntryToolStripMenuItem.Text = "Data Entry";
+            dataEntryToolStripMenuItem.Click += dataEntryToolStripMenuItem_Click;
             // 
-            // iNToolStripMenuItem
+            // transferLocationToolStripMenuItem
             // 
-            this.iNToolStripMenuItem.Name = "iNToolStripMenuItem";
-            this.iNToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.iNToolStripMenuItem.Text = "IN";
-            this.iNToolStripMenuItem.Click += new System.EventHandler(this.iNToolStripMenuItem_Click);
+            transferLocationToolStripMenuItem.Name = "transferLocationToolStripMenuItem";
+            transferLocationToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            transferLocationToolStripMenuItem.Text = "Transfer Location";
+            transferLocationToolStripMenuItem.Click += transferLocationToolStripMenuItem_Click;
             // 
-            // oUTToolStripMenuItem
+            // bPPSToolStripMenuItem
             // 
-            this.oUTToolStripMenuItem.Name = "oUTToolStripMenuItem";
-            this.oUTToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.oUTToolStripMenuItem.Text = "OUT";
-            this.oUTToolStripMenuItem.Click += new System.EventHandler(this.oUTToolStripMenuItem_Click);
+            bPPSToolStripMenuItem.Name = "bPPSToolStripMenuItem";
+            bPPSToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            bPPSToolStripMenuItem.Text = "BPPS";
+            bPPSToolStripMenuItem.Click += bPPSToolStripMenuItem_Click;
             // 
-            // cHANGELOCATIONToolStripMenuItem
+            // incomingToolStripMenuItem
             // 
-            this.cHANGELOCATIONToolStripMenuItem.Name = "cHANGELOCATIONToolStripMenuItem";
-            this.cHANGELOCATIONToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.cHANGELOCATIONToolStripMenuItem.Text = "CHANGE LOCATION";
-            this.cHANGELOCATIONToolStripMenuItem.Click += new System.EventHandler(this.cHANGELOCATIONToolStripMenuItem_Click);
+            incomingToolStripMenuItem.Name = "incomingToolStripMenuItem";
+            incomingToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            incomingToolStripMenuItem.Text = "Incoming";
+            incomingToolStripMenuItem.Click += incomingToolStripMenuItem_Click;
             // 
-            // warehouseReturnToolStripMenuItem
+            // outgoingToolStripMenuItem
             // 
-            this.warehouseReturnToolStripMenuItem.Name = "warehouseReturnToolStripMenuItem";
-            this.warehouseReturnToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.warehouseReturnToolStripMenuItem.Text = "Warehouse Return";
-            this.warehouseReturnToolStripMenuItem.Click += new System.EventHandler(this.warehouseReturnToolStripMenuItem_Click);
+            outgoingToolStripMenuItem.Name = "outgoingToolStripMenuItem";
+            outgoingToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            outgoingToolStripMenuItem.Text = "Outgoing";
+            outgoingToolStripMenuItem.Click += outgoingToolStripMenuItem_Click;
+            // 
+            // warehouseReturnToolStripMenuItem1
+            // 
+            warehouseReturnToolStripMenuItem1.Name = "warehouseReturnToolStripMenuItem1";
+            warehouseReturnToolStripMenuItem1.Size = new System.Drawing.Size(172, 22);
+            warehouseReturnToolStripMenuItem1.Text = "Warehouse Return";
+            warehouseReturnToolStripMenuItem1.Click += warehouseReturnToolStripMenuItem1_Click;
             // 
             // rackViewerToolStripMenuItem
             // 
-            this.rackViewerToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.warehouseToolStripMenuItem1,
-            this.ecozoneToolStripMenuItem});
-            this.rackViewerToolStripMenuItem.Name = "rackViewerToolStripMenuItem";
-            this.rackViewerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.rackViewerToolStripMenuItem.Text = "Rack Viewer";
-            this.rackViewerToolStripMenuItem.Click += new System.EventHandler(this.rackViewerToolStripMenuItem_Click);
+            rackViewerToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { warehouseToolStripMenuItem1, ecozoneToolStripMenuItem });
+            rackViewerToolStripMenuItem.Name = "rackViewerToolStripMenuItem";
+            rackViewerToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            rackViewerToolStripMenuItem.Text = "Rack Viewer";
+            rackViewerToolStripMenuItem.Click += rackViewerToolStripMenuItem_Click;
             // 
             // warehouseToolStripMenuItem1
             // 
-            this.warehouseToolStripMenuItem1.Name = "warehouseToolStripMenuItem1";
-            this.warehouseToolStripMenuItem1.Size = new System.Drawing.Size(134, 22);
-            this.warehouseToolStripMenuItem1.Text = "Warehouse";
-            this.warehouseToolStripMenuItem1.Click += new System.EventHandler(this.warehouseToolStripMenuItem1_Click);
+            warehouseToolStripMenuItem1.Name = "warehouseToolStripMenuItem1";
+            warehouseToolStripMenuItem1.Size = new System.Drawing.Size(134, 22);
+            warehouseToolStripMenuItem1.Text = "Warehouse";
+            warehouseToolStripMenuItem1.Click += warehouseToolStripMenuItem1_Click;
             // 
             // ecozoneToolStripMenuItem
             // 
-            this.ecozoneToolStripMenuItem.Name = "ecozoneToolStripMenuItem";
-            this.ecozoneToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-            this.ecozoneToolStripMenuItem.Text = "Ecozone";
-            this.ecozoneToolStripMenuItem.Click += new System.EventHandler(this.ecozoneToolStripMenuItem_Click);
+            ecozoneToolStripMenuItem.Name = "ecozoneToolStripMenuItem";
+            ecozoneToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            ecozoneToolStripMenuItem.Text = "Ecozone";
+            ecozoneToolStripMenuItem.Click += ecozoneToolStripMenuItem_Click;
             // 
             // stockListToolStripMenuItem
             // 
-            this.stockListToolStripMenuItem.Name = "stockListToolStripMenuItem";
-            this.stockListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.stockListToolStripMenuItem.Text = "Stock List";
-            this.stockListToolStripMenuItem.Click += new System.EventHandler(this.stockListToolStripMenuItem_Click);
+            stockListToolStripMenuItem.Name = "stockListToolStripMenuItem";
+            stockListToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            stockListToolStripMenuItem.Text = "Stock List";
+            stockListToolStripMenuItem.Click += stockListToolStripMenuItem_Click;
             // 
             // slowMovingListToolStripMenuItem
             // 
-            this.slowMovingListToolStripMenuItem.Name = "slowMovingListToolStripMenuItem";
-            this.slowMovingListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.slowMovingListToolStripMenuItem.Text = "Slow Moving List";
-            this.slowMovingListToolStripMenuItem.Click += new System.EventHandler(this.slowMovingListToolStripMenuItem_Click);
+            slowMovingListToolStripMenuItem.Name = "slowMovingListToolStripMenuItem";
+            slowMovingListToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            slowMovingListToolStripMenuItem.Text = "Slow Moving List";
+            slowMovingListToolStripMenuItem.Click += slowMovingListToolStripMenuItem_Click;
             // 
             // iNOUTLedgerToolStripMenuItem
             // 
-            this.iNOUTLedgerToolStripMenuItem.Name = "iNOUTLedgerToolStripMenuItem";
-            this.iNOUTLedgerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.iNOUTLedgerToolStripMenuItem.Text = "IN & OUT Ledger";
-            this.iNOUTLedgerToolStripMenuItem.Click += new System.EventHandler(this.iNOUTLedgerToolStripMenuItem_Click);
-            // 
-            // repoertToolStripMenuItem
-            // 
-            this.repoertToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.inventorySummaryToolStripMenuItem});
-            this.repoertToolStripMenuItem.Name = "repoertToolStripMenuItem";
-            this.repoertToolStripMenuItem.Size = new System.Drawing.Size(59, 19);
-            this.repoertToolStripMenuItem.Text = "Reports";
-            // 
-            // inventorySummaryToolStripMenuItem
-            // 
-            this.inventorySummaryToolStripMenuItem.Name = "inventorySummaryToolStripMenuItem";
-            this.inventorySummaryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.inventorySummaryToolStripMenuItem.Text = "Inventory Summary";
-            this.inventorySummaryToolStripMenuItem.Click += new System.EventHandler(this.inventorySummaryToolStripMenuItem_Click);
-            // 
-            // documentsToolStripMenuItem
-            // 
-            this.documentsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.packingListToolStripMenuItem,
-            this.warehouseToolStripMenuItem});
-            this.documentsToolStripMenuItem.Name = "documentsToolStripMenuItem";
-            this.documentsToolStripMenuItem.Size = new System.Drawing.Size(81, 19);
-            this.documentsToolStripMenuItem.Text = "Documents";
-            // 
-            // packingListToolStripMenuItem
-            // 
-            this.packingListToolStripMenuItem.Name = "packingListToolStripMenuItem";
-            this.packingListToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
-            this.packingListToolStripMenuItem.Text = "Packing List";
-            this.packingListToolStripMenuItem.Click += new System.EventHandler(this.packingListToolStripMenuItem_Click);
-            // 
-            // warehouseToolStripMenuItem
-            // 
-            this.warehouseToolStripMenuItem.Name = "warehouseToolStripMenuItem";
-            this.warehouseToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
-            this.warehouseToolStripMenuItem.Text = "Warehouse Return Slip";
-            this.warehouseToolStripMenuItem.Click += new System.EventHandler(this.warehouseToolStripMenuItem_Click);
-            // 
-            // panel2
-            // 
-            this.panel2.BackColor = System.Drawing.Color.RoyalBlue;
-            this.panel2.Controls.Add(this.TimeLbl);
-            this.panel2.Controls.Add(this.DateLbl);
-            this.panel2.Controls.Add(this.LblUser);
-            this.panel2.Controls.Add(this.label4);
-            this.panel2.Controls.Add(this.label3);
-            this.panel2.Controls.Add(this.label2);
-            this.panel2.Controls.Add(this.label1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1245, 36);
-            this.panel2.TabIndex = 2;
-            this.panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel2_MouseDown);
-            // 
-            // TimeLbl
-            // 
-            this.TimeLbl.AutoSize = true;
-            this.TimeLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TimeLbl.ForeColor = System.Drawing.Color.White;
-            this.TimeLbl.Location = new System.Drawing.Point(814, 11);
-            this.TimeLbl.Name = "TimeLbl";
-            this.TimeLbl.Size = new System.Drawing.Size(23, 17);
-            this.TimeLbl.TabIndex = 7;
-            this.TimeLbl.Text = "---";
-            // 
-            // DateLbl
-            // 
-            this.DateLbl.AutoSize = true;
-            this.DateLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DateLbl.ForeColor = System.Drawing.Color.White;
-            this.DateLbl.Location = new System.Drawing.Point(644, 11);
-            this.DateLbl.Name = "DateLbl";
-            this.DateLbl.Size = new System.Drawing.Size(23, 17);
-            this.DateLbl.TabIndex = 6;
-            this.DateLbl.Text = "---";
-            // 
-            // LblUser
-            // 
-            this.LblUser.AutoSize = true;
-            this.LblUser.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblUser.ForeColor = System.Drawing.Color.White;
-            this.LblUser.Location = new System.Drawing.Point(472, 11);
-            this.LblUser.Name = "LblUser";
-            this.LblUser.Size = new System.Drawing.Size(23, 17);
-            this.LblUser.TabIndex = 5;
-            this.LblUser.Text = "---";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.ForeColor = System.Drawing.Color.White;
-            this.label4.Location = new System.Drawing.Point(762, 11);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(39, 17);
-            this.label4.TabIndex = 4;
-            this.label4.Text = "Time:";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.ForeColor = System.Drawing.Color.White;
-            this.label3.Location = new System.Drawing.Point(593, 11);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(38, 17);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "Date:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.White;
-            this.label2.Location = new System.Drawing.Point(416, 10);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(38, 17);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "User:";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(12, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 20);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "FGIMS";
-            // 
-            // timer1
-            // 
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // panel1
-            // 
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 59);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1245, 724);
-            this.panel1.TabIndex = 3;
+            iNOUTLedgerToolStripMenuItem.Name = "iNOUTLedgerToolStripMenuItem";
+            iNOUTLedgerToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            iNOUTLedgerToolStripMenuItem.Text = "IN & OUT Ledger";
+            iNOUTLedgerToolStripMenuItem.Click += iNOUTLedgerToolStripMenuItem_Click;
             // 
             // masterListToolStripMenuItem
             // 
-            this.masterListToolStripMenuItem.Name = "masterListToolStripMenuItem";
-            this.masterListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.masterListToolStripMenuItem.Text = "Master List";
-            this.masterListToolStripMenuItem.Click += new System.EventHandler(this.masterListToolStripMenuItem_Click);
+            masterListToolStripMenuItem.Name = "masterListToolStripMenuItem";
+            masterListToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            masterListToolStripMenuItem.Text = "Master List";
+            masterListToolStripMenuItem.Click += masterListToolStripMenuItem_Click;
+            // 
+            // repoertToolStripMenuItem
+            // 
+            repoertToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { inventorySummaryToolStripMenuItem });
+            repoertToolStripMenuItem.Name = "repoertToolStripMenuItem";
+            repoertToolStripMenuItem.Size = new System.Drawing.Size(59, 19);
+            repoertToolStripMenuItem.Text = "Reports";
+            // 
+            // inventorySummaryToolStripMenuItem
+            // 
+            inventorySummaryToolStripMenuItem.Name = "inventorySummaryToolStripMenuItem";
+            inventorySummaryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            inventorySummaryToolStripMenuItem.Text = "Inventory Summary";
+            inventorySummaryToolStripMenuItem.Click += inventorySummaryToolStripMenuItem_Click;
+            // 
+            // documentsToolStripMenuItem
+            // 
+            documentsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { packingListToolStripMenuItem, warehouseToolStripMenuItem });
+            documentsToolStripMenuItem.Name = "documentsToolStripMenuItem";
+            documentsToolStripMenuItem.Size = new System.Drawing.Size(81, 19);
+            documentsToolStripMenuItem.Text = "Documents";
+            // 
+            // packingListToolStripMenuItem
+            // 
+            packingListToolStripMenuItem.Name = "packingListToolStripMenuItem";
+            packingListToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            packingListToolStripMenuItem.Text = "Packing List";
+            packingListToolStripMenuItem.Click += packingListToolStripMenuItem_Click;
+            // 
+            // warehouseToolStripMenuItem
+            // 
+            warehouseToolStripMenuItem.Name = "warehouseToolStripMenuItem";
+            warehouseToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            warehouseToolStripMenuItem.Text = "Warehouse Return Slip";
+            warehouseToolStripMenuItem.Click += warehouseToolStripMenuItem_Click;
+            // 
+            // panel2
+            // 
+            panel2.BackColor = System.Drawing.Color.RoyalBlue;
+            panel2.Controls.Add(TimeLbl);
+            panel2.Controls.Add(DateLbl);
+            panel2.Controls.Add(LblUser);
+            panel2.Controls.Add(label4);
+            panel2.Controls.Add(label3);
+            panel2.Controls.Add(label2);
+            panel2.Controls.Add(label1);
+            panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            panel2.Location = new System.Drawing.Point(0, 0);
+            panel2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            panel2.Name = "panel2";
+            panel2.Size = new System.Drawing.Size(1452, 42);
+            panel2.TabIndex = 2;
+            panel2.MouseDown += panel2_MouseDown;
+            // 
+            // TimeLbl
+            // 
+            TimeLbl.AutoSize = true;
+            TimeLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            TimeLbl.ForeColor = System.Drawing.Color.White;
+            TimeLbl.Location = new System.Drawing.Point(950, 13);
+            TimeLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            TimeLbl.Name = "TimeLbl";
+            TimeLbl.Size = new System.Drawing.Size(23, 17);
+            TimeLbl.TabIndex = 7;
+            TimeLbl.Text = "---";
+            // 
+            // DateLbl
+            // 
+            DateLbl.AutoSize = true;
+            DateLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            DateLbl.ForeColor = System.Drawing.Color.White;
+            DateLbl.Location = new System.Drawing.Point(751, 13);
+            DateLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            DateLbl.Name = "DateLbl";
+            DateLbl.Size = new System.Drawing.Size(23, 17);
+            DateLbl.TabIndex = 6;
+            DateLbl.Text = "---";
+            // 
+            // LblUser
+            // 
+            LblUser.AutoSize = true;
+            LblUser.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            LblUser.ForeColor = System.Drawing.Color.White;
+            LblUser.Location = new System.Drawing.Point(551, 13);
+            LblUser.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            LblUser.Name = "LblUser";
+            LblUser.Size = new System.Drawing.Size(23, 17);
+            LblUser.TabIndex = 5;
+            LblUser.Text = "---";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label4.ForeColor = System.Drawing.Color.White;
+            label4.Location = new System.Drawing.Point(889, 13);
+            label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(39, 17);
+            label4.TabIndex = 4;
+            label4.Text = "Time:";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label3.ForeColor = System.Drawing.Color.White;
+            label3.Location = new System.Drawing.Point(692, 13);
+            label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(38, 17);
+            label3.TabIndex = 3;
+            label3.Text = "Date:";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label2.ForeColor = System.Drawing.Color.White;
+            label2.Location = new System.Drawing.Point(485, 12);
+            label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(38, 17);
+            label2.TabIndex = 2;
+            label2.Text = "User:";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            label1.ForeColor = System.Drawing.Color.White;
+            label1.Location = new System.Drawing.Point(14, 10);
+            label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(53, 20);
+            label1.TabIndex = 0;
+            label1.Text = "FGIMS";
+            // 
+            // timer1
+            // 
+            timer1.Tick += timer1_Tick;
+            // 
+            // panel1
+            // 
+            panel1.AutoSize = true;
+            panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            panel1.Location = new System.Drawing.Point(0, 65);
+            panel1.Margin = new System.Windows.Forms.Padding(2);
+            panel1.Name = "panel1";
+            panel1.Size = new System.Drawing.Size(1452, 838);
+            panel1.TabIndex = 3;
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1245, 783);
-            this.ControlBox = false;
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.menuStrip1);
-            this.Controls.Add(this.panel2);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MainMenuStrip = this.menuStrip1;
-            this.Name = "MainForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "FGMIS";
-            this.Load += new System.EventHandler(this.MainForm_Load);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(1452, 903);
+            ControlBox = false;
+            Controls.Add(panel1);
+            Controls.Add(menuStrip1);
+            Controls.Add(panel2);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            MainMenuStrip = menuStrip1;
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Name = "MainForm";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            Text = "FGMIS";
+            Load += MainForm_Load;
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -384,15 +382,11 @@
         private System.Windows.Forms.ToolStripMenuItem repoertToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem documentsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem dataEntryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem iNToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem oUTToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rackViewerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem inventorySummaryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem packingListToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem warehouseToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem stockListToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem cHANGELOCATIONToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem warehouseReturnToolStripMenuItem;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label4;
@@ -408,5 +402,10 @@
         private System.Windows.Forms.ToolStripMenuItem ecozoneToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem iNOUTLedgerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem masterListToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem transferLocationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem bPPSToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem incomingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem outgoingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem warehouseReturnToolStripMenuItem1;
     }
 }

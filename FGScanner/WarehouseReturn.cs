@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
@@ -15,19 +15,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FGScanner.Database;
 
 namespace FGScanner
 {
     public partial class WarehouseReturn : Form
     {
-        private readonly db_connection _Connection;
+        private readonly Util.db_connection _Connection;
         private readonly string user_id;
         private List<TransferSlipData> data = new List<TransferSlipData>();
         private HashSet<string> warnedPartNumbers = new HashSet<string>();
         public WarehouseReturn(string user)
         {
             InitializeComponent();
-            _Connection = new db_connection();
+            _Connection = new Util.db_connection();
             user_id = user;
             toolStripStatusLabel1.Visible = false;
         }
@@ -72,7 +73,7 @@ namespace FGScanner
             }
 
             int currentScannedQty = ShippingItems
-                        .Where(x => x.PartNumber == itemModel.PartNumber)
+                        .Where(x => x.PartNumber == itemModel.PartNumber && x.ProductionDate == itemModel.ProductionDate)
                         .Sum(x => x.Quantity);
             var newTotal = currentScannedQty + itemModel.Quantity;
             int stockAvailable = Insert.CheckStock(itemModel.PartNumber, itemModel.ProductionDate, location);
@@ -121,9 +122,20 @@ namespace FGScanner
 
         private void UpdateReturnlogs()
         {
+            var data = ShippingItems
+             .GroupBy(x => new { x.ProductionDate, x.PartNumber, x.TransactionId })
+             .Select(g => new
+             {
+                 TransactionID = g.Key.TransactionId,
+                 Partnumber = g.Key.PartNumber,
+                 LotDate = g.Key.ProductionDate,
+                 Box = g.Count(),
+                 Quantity = g.Sum(x => x.Quantity),
+                 PostingDate = g.FirstOrDefault()?.TransactionDate
+             }).ToList();
             BindingSource source = new BindingSource
             {
-                DataSource = ShippingItems
+                DataSource = data
             };
 
             returnlogs.DataSource = source;
@@ -503,10 +515,13 @@ namespace FGScanner
             printDocument1.PrintPage -= new PrintPageEventHandler(printDocument1_PrintPage);
             printDocument1.PrintPage += new PrintPageEventHandler(printDocument1_PrintPage);
 
-            PrintPreviewDialog printPreviewDialog = new PrintPreviewDialog();
-            printPreviewDialog.Document = printDocument1;
-            printPreviewDialog.Width = 800;
-            printPreviewDialog.Height = 800;
+            PrintPreviewDialog printPreviewDialog = new()
+            {
+                Document = printDocument1,
+                Width = 800,
+                Height = 800
+            };
+
             printPreviewDialog.PrintPreviewControl.Columns = 1;
             printPreviewDialog.ShowDialog();
         }
@@ -600,7 +615,7 @@ namespace FGScanner
                 for (int row = startRow; row <= rowCount; row++)
                 {
                     current++;
-                    qrcodedata = ws.Cells[row, 1].Value.ToString();
+                    qrcodedata = ws.Cells[row, 1].Value.ToString().ToUpper();
                     location = ws.Cells[row, 2].Value.ToString();
                     if (qrcodedata != null)
                     {
@@ -664,6 +679,12 @@ namespace FGScanner
                     }
                 }
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ShippingItems.Clear();
+            UpdateReturnlogs();
         }
     }
 }

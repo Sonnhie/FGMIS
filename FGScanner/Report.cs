@@ -82,7 +82,7 @@ namespace FGScanner
 
            List<MonthlyInventorySummary> monthlyInventorySummaries = new List<MonthlyInventorySummary>();
            for (int i = 0; i < orderedData.Count; i++)
-            {
+           {
                 int Current = orderedData[i].EndingStock;
                 int Previous = i == 0 ? 0 : orderedData[i - 1].EndingStock;
                 int Change = Current - Previous;
@@ -95,7 +95,7 @@ namespace FGScanner
                     ChangePercent = Previous == 0 ? 0 : (Change * 100.0 / Previous),
                     Change = Change
                 });
-            }
+           }
 
            var CurrentMonthData = monthlyInventorySummaries.FirstOrDefault(d => d.Month == month);
            monthstock_lbl.Text = CurrentMonthData != null ? CurrentMonthData.EndingStock.ToString("N0") : "0";
@@ -231,6 +231,7 @@ namespace FGScanner
                                 );
                         }
                     }
+
                     SlowmovingTable.Columns.Clear();
                     SlowmovingTable.ReadOnly = true;
                     SlowmovingTable.DataSource = dt;

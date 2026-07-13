@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FGScanner.Forms.DataEntry;
+using FGScanner.Forms.Reports;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -33,17 +35,14 @@ namespace FGScanner
             this.usergroup = usergroup;
             LblUser.Text = userid;
             AccessControlFeatures(usergroup);
-            //MessageBox.Show("user:" + _userid);
+
         }
 
         private void AccessControlFeatures(int usergroup)
         {
             if (usergroup != 2)
             {
-                iNToolStripMenuItem.Enabled = false;
-                oUTToolStripMenuItem.Enabled = false;
-                cHANGELOCATIONToolStripMenuItem.Enabled = false;
-                warehouseReturnToolStripMenuItem.Enabled = false;
+     
                 rackViewerToolStripMenuItem.Enabled = false;
                 warehouseToolStripMenuItem.Enabled = false;
                 packingListToolStripMenuItem.Enabled = false;
@@ -64,35 +63,30 @@ namespace FGScanner
         {
             panel1.Controls.Clear();
             forms.TopLevel = false;
+            forms.FormBorderStyle = FormBorderStyle.None;
             forms.Dock = DockStyle.Fill;
+            
             panel1.Controls.Add(forms);
             forms.Show();
         }
 
         private void LoadDashboard()
         {
-            Report report = new Report();
-            DisplayForm(report);
+            //Report report = new Report();
+            //DisplayForm(report);
         }
 
         private void iNToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _TransactionType = "IN";
-            WHDataEntryIN DataEntryIn = new WHDataEntryIN(_TransactionType,_userid);
-            DisplayForm(DataEntryIn);
+            //_TransactionType = "IN";
+            //WHDataEntryIN DataEntryIn = new WHDataEntryIN(_TransactionType, _userid);
+            //DisplayForm(DataEntryIn);
         }
 
         private void menuStrip1_MouseDown(object sender, MouseEventArgs e)
         {
             ReleaseCapture();
             SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
-        }
-
-        private void oUTToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            _TransactionType = "OUT";
-            WH_OUT DataEntryOut = new WH_OUT(_TransactionType, _userid);
-            DisplayForm(DataEntryOut);
         }
 
         private void rackViewerToolStripMenuItem_Click(object sender, EventArgs e)
@@ -118,16 +112,11 @@ namespace FGScanner
             DisplayForm(inventory);
         }
 
-        private void cHANGELOCATIONToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ChangeLocation changeLocation = new ChangeLocation(_userid);
-            DisplayForm(changeLocation);
-        }
 
         private void inventorySummaryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Report report = new Report();
-            DisplayForm(report);
+            //Report report = new Report();
+            //DisplayForm(report);
         }
 
         private void panel2_MouseDown(object sender, MouseEventArgs e)
@@ -136,11 +125,6 @@ namespace FGScanner
             SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
         }
 
-        private void warehouseReturnToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            WarehouseReturn wr = new WarehouseReturn(_userid);
-            DisplayForm(wr);
-        }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -161,7 +145,7 @@ namespace FGScanner
         private void warehouseToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             string warehouse = "Warehouse";
-            var form = Viewer.GetInstance(warehouse,_userid);
+            var form = Viewer.GetInstance(warehouse, _userid);
 
             form.Show();
             form.BringToFront();
@@ -178,14 +162,17 @@ namespace FGScanner
 
         private void warehouseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WHRForm wr = new WHRForm();
-            DisplayForm(wr);
+            WithdrawalSlips ws = new WithdrawalSlips(_userid);
+            DisplayForm(ws);
         }
 
         private void packingListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PackingList packingList = new PackingList();
-            DisplayForm(packingList);
+            //PackingList packingList = new PackingList();
+            //DisplayForm(packingList);
+
+            Shipment shipment = new Shipment(_userid);
+            DisplayForm(shipment);
         }
 
         private void iNOUTLedgerToolStripMenuItem_Click(object sender, EventArgs e)
@@ -203,6 +190,36 @@ namespace FGScanner
         {
             Product product = new Product(_userid);
             DisplayForm(product);
+        }
+
+        private void transferLocationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TransferLocation transferLocation = new TransferLocation(_userid);
+            DisplayForm(transferLocation);
+        }
+
+        private void bPPSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BPPSEntry bpps = new BPPSEntry(_userid);
+            DisplayForm(bpps);
+        }
+
+        private void incomingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FGEntry fGEntry = new FGEntry(_userid);
+            DisplayForm(fGEntry);
+        }
+
+        private void outgoingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Outgoing outgoing = new Outgoing(_userid);
+            DisplayForm(outgoing);
+        }
+
+        private void warehouseReturnToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Return @return = new Return(_userid);
+            DisplayForm(@return);
         }
     }
 }

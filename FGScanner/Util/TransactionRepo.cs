@@ -5,13 +5,12 @@ using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Security;
-using System.Web.UI.WebControls.WebParts;
+
 using System.Windows.Forms;
 using static Microsoft.IO.RecyclableMemoryStreamManager;
 
@@ -250,6 +249,70 @@ namespace FGScanner.Util
             return list;
         }
 
+        public List<string> GetRackPartnumbers(string location, string whid)
+        {
+            List<string> list = new List<string>();
+
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = "SELECT DISTINCT partnumber FROM actual_inventory where location = @loc AND WhId = @whid ORDER BY partnumber";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.Add("@loc", SqlDbType.NVarChar).Value = location;
+                        cmd.Parameters.Add("@whid", SqlDbType.NVarChar).Value = whid;
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                list.Add(reader["partnumber"].ToString());
+                            };
+                            
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return list;
+        }
+
+        public string GetPPS(string partnumber)
+        {
+            string customer = string.Empty;
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = "SELECT DISTINCT PPS FROM product WHERE partnumber = @partnumber";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = partnumber;
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                customer = reader["PPS"]?.ToString() ?? string.Empty;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return customer;
+        }
+
         public List<string> GetStorageLocations()
         {
             List<string> list = new List<string>();
@@ -436,15 +499,13 @@ namespace FGScanner.Util
                        FROM actual_inventory
                        WHERE location = @rack AND WhId = @whid";
 
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@rack", rack);
-                    cmd.Parameters.Add("@whid", SqlDbType.NVarChar).Value = whid;
+                using SqlCommand cmd = new(sql, conn);
+                cmd.Parameters.AddWithValue("@rack", rack);
+                cmd.Parameters.Add("@whid", SqlDbType.NVarChar).Value = whid;
 
-                    var result = cmd.ExecuteScalar();
+                var result = cmd.ExecuteScalar();
 
-                    count = result == DBNull.Value ? 0 : Convert.ToInt32(result);
-                }
+                count = result == DBNull.Value ? 0 : Convert.ToInt32(result);
             }
 
             return count;
@@ -452,7 +513,7 @@ namespace FGScanner.Util
 
         public List<InventoryTransactionModel> GetItemByLocation(string location, string whId)
         {
-            List<InventoryTransactionModel> Items = new List<InventoryTransactionModel>();
+            List<InventoryTransactionModel> Items = [];
 
             try
             {
@@ -1234,72 +1295,64 @@ namespace FGScanner.Util
 
             try
             {
-                using (SqlConnection conn = _Connection.Getconnection())
-                {
-                    conn.Open();
+                using SqlConnection conn = _Connection.Getconnection();
+                conn.Open();
 
-                    // 1. ONE efficient query to get all parts and their rows for this rack
-                    string sql = @"
+                // 1. ONE efficient query to get all parts and their rows for this rack
+                string sql = @"
                         SELECT storage_location, partnumber, prod_date, total_box, quantity, location 
                         FROM actual_inventory 
                         WHERE location = @location AND WhId = @whid
                         ORDER BY partnumber, prod_date";
 
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                using SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.Add("@location", SqlDbType.NVarChar).Value = location;
+                cmd.Parameters.Add("@whid", SqlDbType.NVarChar).Value = whid;
+
+                using SqlDataReader reader = cmd.ExecuteReader();
+                Dictionary<string, InventoryCardData> cardsByPart = new();
+
+                while (reader.Read())
+                {
+                    string currentPartNo = reader["partnumber"].ToString() ?? string.Empty;
+
+                    // 2. If we haven't seen this Part Number yet, create a new Card for it!
+                    if (!cardsByPart.TryGetValue(currentPartNo, out InventoryCardData card))
                     {
-                        cmd.Parameters.Add("@location", SqlDbType.NVarChar).Value = location;
-                        cmd.Parameters.Add("@whid", SqlDbType.NVarChar).Value = whid;
-
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        card = new InventoryCardData
                         {
-                            Dictionary<string, InventoryCardData> cardsByPart = new Dictionary<string, InventoryCardData>();
-
-                            while (reader.Read())
-                            {
-                                string currentPartNo = reader["partnumber"].ToString() ?? string.Empty;
-
-                                // 2. If we haven't seen this Part Number yet, create a new Card for it!
-                                if (!cardsByPart.ContainsKey(currentPartNo))
-                                {
-                                    cardsByPart[currentPartNo] = new InventoryCardData
-                                    {
-                                        PartNo = currentPartNo,
-                                        ErpLocation = reader["storage_location"].ToString() ?? string.Empty,
-                                        MonthYear = DateTime.Now.ToString("yyyy MMMM").ToUpper(),
-                                        GrandTotalBoxes = 0,
-                                        GrandTotalQuantity = 0,
-                                        location = reader["location"].ToString() ?? string.Empty,
-                                        Rows = new List<InventoryRow>() // Make sure the list is initialized
-                                    };
-                                }
-
-                                // 3. Grab the card we are currently building
-                                InventoryCardData card = cardsByPart[currentPartNo];
-
-                                // 4. Safely parse the row data
-                                DateTime prodDate = reader["prod_date"] != DBNull.Value ? Convert.ToDateTime(reader["prod_date"]) : DateTime.MinValue;
-                                int boxes = reader["total_box"] != DBNull.Value ? Convert.ToInt32(reader["total_box"]) : 0;
-                                int qty = reader["quantity"] != DBNull.Value ? Convert.ToInt32(reader["quantity"]) : 0;
-
-                                InventoryRow row = new InventoryRow
-                                {
-                                    LotNo = prodDate.ToString("MM-dd-yy"),
-                                    Boxes = boxes,
-                                    Quantity = qty / boxes
-                                };
-
-                                card.Rows.Add(row);
-
-                                card.GrandTotalBoxes += row.Boxes;
-                                card.GrandTotalQuantity += row.TotalQty;
-                                int PPS = qty / boxes;
-                                card.PPS = PPS;
-                            }
-
-                            allCards = cardsByPart.Values.ToList();
-                        }
+                            PartNo = currentPartNo,
+                            ErpLocation = reader["storage_location"].ToString() ?? string.Empty,
+                            MonthYear = DateTime.Now.ToString("yyyy MMMM").ToUpper(),
+                            GrandTotalBoxes = 0,
+                            GrandTotalQuantity = 0,
+                            location = reader["location"].ToString() ?? string.Empty,
+                            Rows = new List<InventoryRow>() // Make sure the list is initialized
+                        };
+                        cardsByPart[currentPartNo] = card;
                     }
+
+                    // 4. Safely parse the row data
+                    DateTime prodDate = reader["prod_date"] != DBNull.Value ? Convert.ToDateTime(reader["prod_date"]) : DateTime.MinValue;
+                    int boxes = reader["total_box"] != DBNull.Value ? Convert.ToInt32(reader["total_box"]) : 0;
+                    int qty = reader["quantity"] != DBNull.Value ? Convert.ToInt32(reader["quantity"]) : 0;
+
+                    InventoryRow row = new InventoryRow
+                    {
+                        LotNo = prodDate.ToString("MM-dd-yy"),
+                        Boxes = boxes,
+                        Quantity = qty / boxes
+                    };
+
+                    card.Rows.Add(row);
+
+                    card.GrandTotalBoxes += row.Boxes;
+                    card.GrandTotalQuantity += row.TotalQty;
+                    int PPS = qty / boxes;
+                    card.PPS = PPS;
                 }
+
+                allCards = cardsByPart.Values.ToList();
             }
             catch (Exception ex)
             {
@@ -1938,65 +1991,149 @@ namespace FGScanner.Util
                 using (SqlConnection conn = _Connection.Getconnection())
                 {
                     conn.Open();
+                    //string sql = @"DECLARE @BeginningBalance INT = (
+                    //                    SELECT 
+                    //                    ISNULL(SUM(
+                    //                    CASE 
+                    //                        WHEN transaction_type = 'IN' THEN Quantity
+                    //                        WHEN transaction_type = 'OUT' THEN Quantity
+                    //                        ELSE 0
+                    //                    END
+                    //                    ),0) FROM transaction_history WHERE PartNumber = @PartNumber AND entry_date < @StartDate);
+
+                    //                    WITH DailyTransaction AS (
+                    //                            SELECT 
+                    //                                CAST(entry_date AS DATE) AS TransactionDay,
+                    //                                PartNumber,
+                    //                                in_charge,
+                    //                                SUM(CASE 
+                    //                                        WHEN transaction_type = 'IN' 
+                    //                                        THEN Quantity 
+                    //                                        ELSE 0 
+                    //                                END) AS TotalIN,
+
+                    //                            SUM(CASE 
+                    //                                WHEN (
+                    //                                    (control_number LIKE 'AS-%') OR 
+                    //                                    (control_number LIKE 'SHIPID-%') OR 
+                    //                                    (remarks LIKE 'Transfer%') OR 
+                    //                                    (remarks = 'Manual Deduction - Excess Scan') OR 
+                    //                                    (remarks = 'Manual Deduction - Damaged Goods') OR 
+                    //                                    (remarks = 'Quality Control Testing - OUT') OR
+                    //                                    (remarks = 'Manual Deduction - Cycle Count Adjustment')
+                    //                                ) AND transaction_type = 'OUT' 
+                    //                                THEN Quantity 
+                    //                                ELSE 0 
+                    //                            END) AS TotalOUT,
+                    //                            MAX(CASE 
+                    //                               WHEN control_number LIKE 'AS-%' AND transaction_type = 'OUT' THEN remarks + ' Return - OUT'
+                    //                               WHEN control_number LIKE 'SHIPID-%' AND transaction_type = 'OUT' THEN 'DELIVERY - OUT'
+                    //                               WHEN remarks LIKE 'Transfer%' AND transaction_type = 'OUT' THEN remarks
+                    //                               WHEN remarks = 'Manual Deduction - Excess Scan' AND transaction_type = 'OUT' THEN 'Manual Deduction - Excess Scan'
+                    //                               WHEN remarks = 'Manual Deduction - Damaged Goods' AND transaction_type = 'OUT' THEN 'Manual Deduction - Damaged Goods'
+                    //                               WHEN remarks = 'Quality Control Testing - OUT' AND transaction_type = 'OUT' THEN 'Quality Control Testing - OUT'
+                    //                               WHEN remarks = 'Manual Deduction - Cycle Count Adjustment' AND transaction_type = 'OUT' THEN 'Manual Deduction - Cycle Count Adjustment'
+                    //                               ELSE ''
+                    //                            END) AS Remarks
+
+                    //                            FROM transaction_history
+
+                    //                            WHERE PartNumber = @PartNumber
+                    //                            AND entry_date >= @StartDate
+                    //                            AND entry_date < DATEADD(DAY, 1, @EndDate)
+
+                    //                            GROUP BY 
+                    //                                CAST(entry_date AS DATE),
+                    //                                PartNumber, in_charge, transaction_type)
+
+                    //                            SELECT
+                    //                                TransactionDay,
+                    //                                TotalIN,
+                    //                                TotalOUT,
+                    //                                in_charge,
+                    //                                Remarks,    
+                    //                                @BeginningBalance +
+                    //                                SUM(TotalIN - TotalOUT)
+                    //                                OVER (
+                    //                                    ORDER BY TransactionDay
+                    //                                ) AS RunningBalance,
+                    //                                @BeginningBalance AS BeginningBalance
+
+                    //                            FROM DailyTransaction
+
+                    //                            ORDER BY TransactionDay";
                     string sql = @"DECLARE @BeginningBalance INT = (
-                                        SELECT 
-                                        ISNULL(SUM(
-                                        CASE 
-                                            WHEN transaction_type = 'IN' THEN Quantity
-                                            WHEN transaction_type = 'OUT' THEN Quantity
-                                            ELSE 0
-                                        END
-                                        ),0) FROM transaction_history WHERE PartNumber = @PartNumber AND entry_date < @StartDate);
+                    SELECT 
+                    ISNULL(SUM(
+                    CASE 
+                        WHEN transaction_type = 'IN' THEN Quantity
+                        WHEN transaction_type = 'OUT' THEN -Quantity -- Fixed: Must subtract OUT quantities
+                        ELSE 0
+                    END
+                    ),0) FROM transaction_history WHERE PartNumber = @PartNumber AND entry_date < @StartDate);
 
-                                        WITH DailyTransaction AS (
-                                                SELECT 
-                                                    CAST(entry_date AS DATE) AS TransactionDay,
-                                                    PartNumber,
-                                                    in_charge,
-                                                    SUM(CASE 
-                                                            WHEN transaction_type = 'IN' 
-                                                            THEN Quantity 
-                                                            ELSE 0 
-                                                        END) AS TotalIN,
+                    WITH DailyTransaction AS (
+                            SELECT 
+                                CAST(entry_date AS DATE) AS TransactionDay,
+                                MAX(entry_date) AS ExactTime, -- Added to serve as a chronological tie-breaker
+                                PartNumber,
+                                in_charge,
+                                SUM(CASE 
+                                        WHEN transaction_type = 'IN' 
+                                        THEN Quantity 
+                                        ELSE 0 
+                                END) AS TotalIN,
 
-                                                    SUM(CASE 
-                                                            WHEN transaction_type = 'OUT' 
-                                                            THEN Quantity 
-                                                            ELSE 0 
-                                                        END) AS TotalOUT,
-                                                CASE 
-                                                   WHEN control_number LIKE 'AS-%' AND transaction_type = 'OUT' THEN 'Return - OUT'
-                                                   WHEN control_number LIKE 'SHIPID-%' AND transaction_type = 'OUT' THEN 'DELIVERY - OUT'
-                                                   WHEN control_number = '' AND transaction_type = 'OUT' THEN 'TRANSFER LOCATION - OUT'
-                                                   ELSE ''
-                                                END AS Remarks
+                            SUM(CASE 
+                                WHEN (
+                                    (control_number LIKE 'AS-%') OR 
+                                    (control_number LIKE 'SHIPID-%') OR 
+                                    (remarks LIKE 'Transfer%') OR 
+                                    (remarks = 'Manual Deduction - Excess Scan') OR 
+                                    (remarks = 'Manual Deduction - Damaged Goods') OR 
+                                    (remarks = 'Quality Control Testing - OUT') OR
+                                    (remarks = 'Manual Deduction - Cycle Count Adjustment')
+                                ) AND transaction_type = 'OUT' 
+                                THEN Quantity 
+                                ELSE 0 
+                            END) AS TotalOUT,
+                            MAX(CASE 
+                               WHEN control_number LIKE 'AS-%' AND transaction_type = 'OUT' THEN remarks + ' Return - OUT'
+                               WHEN control_number LIKE 'SHIPID%' AND transaction_type = 'OUT' THEN 'DELIVERY - OUT'
+                               WHEN remarks LIKE 'Transfer%' AND transaction_type = 'OUT' THEN remarks
+                               WHEN remarks = 'Manual Deduction - Excess Scan' AND transaction_type = 'OUT' THEN 'Manual Deduction - Excess Scan'
+                               WHEN remarks = 'Manual Deduction - Damaged Goods' AND transaction_type = 'OUT' THEN 'Manual Deduction - Damaged Goods'
+                               WHEN remarks = 'Quality Control Testing - OUT' AND transaction_type = 'OUT' THEN 'Quality Control Testing - OUT'
+                               WHEN remarks = 'Manual Deduction - Cycle Count Adjustment' AND transaction_type = 'OUT' THEN 'Manual Deduction - Cycle Count Adjustment'
+                               ELSE ''
+                            END) AS Remarks
 
-                                                FROM transaction_history
+                            FROM transaction_history
 
-                                                WHERE PartNumber = @PartNumber
-                                                AND entry_date >= @StartDate
-                                                AND entry_date < DATEADD(DAY, 1, @EndDate)
+                            WHERE PartNumber = @PartNumber
+                            AND entry_date >= @StartDate
+                            AND entry_date < DATEADD(DAY, 1, @EndDate)
 
-                                                GROUP BY 
-                                                    CAST(entry_date AS DATE),
-                                                    PartNumber, in_charge, transaction_type, control_number)
+                            GROUP BY 
+                                CAST(entry_date AS DATE),
+                                PartNumber, in_charge, transaction_type, Remarks)
 
-                                                SELECT
-                                                    TransactionDay,
-                                                    TotalIN,
-                                                    TotalOUT,
-                                                    in_charge,
-                                                    Remarks,    
-                                                    @BeginningBalance +
-                                                    SUM(TotalIN - TotalOUT)
-                                                    OVER (
-                                                        ORDER BY TransactionDay
-                                                    ) AS RunningBalance,
-                                                    @BeginningBalance AS BeginningBalance
+                            SELECT
+                                TransactionDay,
+                                TotalIN,
+                                TotalOUT,
+                                in_charge,
+                                Remarks,    
+                                @BeginningBalance +
+                                SUM(TotalIN - TotalOUT)
+                                OVER (
+                                    ORDER BY TransactionDay, ExactTime ASC -- Fixed: x  Uses ExactTime to break daily ties
+                                ) AS RunningBalance,
+                                @BeginningBalance AS BeginningBalance
 
-                                                FROM DailyTransaction
+                            FROM DailyTransaction
 
-                                                ORDER BY TransactionDay";
+                            ORDER BY TransactionDay, ExactTime ASC";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.Add("@PartNumber", SqlDbType.NVarChar).Value = partnumber;
@@ -2254,9 +2391,9 @@ namespace FGScanner.Util
                         cmd.Parameters.Add("@partname", SqlDbType.NVarChar).Value = product.PartName;
                         cmd.Parameters.Add("@customer_id", SqlDbType.NVarChar).Value = product.CustomerId;
                         cmd.Parameters.Add("@PPS", SqlDbType.Int).Value = product.PPS;
-                        
+
                         int result = cmd.ExecuteNonQuery();
-                        if(result > 0)
+                        if (result > 0)
                         {
                             MessageBox.Show("Product added successfully.", "Success");
                         }
@@ -2272,6 +2409,60 @@ namespace FGScanner.Util
                 MessageBox.Show("Error: " + ex.Message, "SQL Error");
             }
         }
+
+        public bool CheckProductExist(string partnumber)
+        {
+            bool exists = false;
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = @"SELECT COUNT(*) FROM product WHERE partnumber = @partnumber";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = partnumber;
+                        object result = cmd.ExecuteScalar();
+                        int count = result != null && result != DBNull.Value
+                            ? Convert.ToInt32(result)
+                            : 0;
+                        exists = count > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return exists;
+        }
+
+        public bool CheckProductPPS(string partnumber, int pps)
+        {
+            bool isMatch = false;
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+                    string sql = @"SELECT PPS FROM product WHERE partnumber = @partnumber";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.Add("@partnumber", SqlDbType.NVarChar).Value = partnumber;
+                        object result = cmd.ExecuteScalar();
+                        int existingPPS = result != null && result != DBNull.Value
+                            ? Convert.ToInt32(result)
+                            : 0;
+                        isMatch = existingPPS == pps;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+            return isMatch;
+        } 
     }
 }
  

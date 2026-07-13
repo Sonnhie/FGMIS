@@ -31,8 +31,8 @@
             this.components = new System.ComponentModel.Container();
             this.ClockTimer = new System.Windows.Forms.Timer(this.components);
             this.panel2 = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
-            this.statusStrip2 = new System.Windows.Forms.StatusStrip();
+            this.clear_btn = new System.Windows.Forms.Button();
+            this.save_data_btn = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -58,6 +58,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.total_box_lbl = new System.Windows.Forms.Label();
+            this.total_sum = new System.Windows.Forms.Label();
             this.panel2.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LogsTable)).BeginInit();
@@ -69,8 +71,10 @@
             // 
             this.panel2.BackColor = System.Drawing.Color.White;
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.button1);
-            this.panel2.Controls.Add(this.statusStrip2);
+            this.panel2.Controls.Add(this.total_box_lbl);
+            this.panel2.Controls.Add(this.total_sum);
+            this.panel2.Controls.Add(this.clear_btn);
+            this.panel2.Controls.Add(this.save_data_btn);
             this.panel2.Controls.Add(this.statusStrip1);
             this.panel2.Controls.Add(this.label10);
             this.panel2.Controls.Add(this.LogsTable);
@@ -82,24 +86,27 @@
             this.panel2.Size = new System.Drawing.Size(1245, 760);
             this.panel2.TabIndex = 2;
             // 
-            // button1
+            // clear_btn
             // 
-            this.button1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(1105, 642);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(110, 35);
-            this.button1.TabIndex = 12;
-            this.button1.Text = "Delete Items";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.clear_btn.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.clear_btn.Location = new System.Drawing.Point(1105, 642);
+            this.clear_btn.Name = "clear_btn";
+            this.clear_btn.Size = new System.Drawing.Size(110, 35);
+            this.clear_btn.TabIndex = 14;
+            this.clear_btn.Text = "Clear Data";
+            this.clear_btn.UseVisualStyleBackColor = true;
+            this.clear_btn.Click += new System.EventHandler(this.clear_btn_Click);
             // 
-            // statusStrip2
+            // save_data_btn
             // 
-            this.statusStrip2.Location = new System.Drawing.Point(0, 714);
-            this.statusStrip2.Name = "statusStrip2";
-            this.statusStrip2.Size = new System.Drawing.Size(1243, 22);
-            this.statusStrip2.TabIndex = 7;
-            this.statusStrip2.Text = "statusStrip2";
+            this.save_data_btn.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.save_data_btn.Location = new System.Drawing.Point(989, 642);
+            this.save_data_btn.Name = "save_data_btn";
+            this.save_data_btn.Size = new System.Drawing.Size(110, 35);
+            this.save_data_btn.TabIndex = 13;
+            this.save_data_btn.Text = "Save Data";
+            this.save_data_btn.UseVisualStyleBackColor = true;
+            this.save_data_btn.Click += new System.EventHandler(this.save_data_btn_Click);
             // 
             // statusStrip1
             // 
@@ -142,6 +149,7 @@
             this.LogsTable.TabIndex = 3;
             this.LogsTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.LogsTable_CellClick);
             this.LogsTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.LogsTable_CellValueChanged);
+            this.LogsTable.SelectionChanged += new System.EventHandler(this.LogsTable_SelectionChanged);
             // 
             // groupBox2
             // 
@@ -369,6 +377,26 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Data:";
             // 
+            // total_box_lbl
+            // 
+            this.total_box_lbl.AutoSize = true;
+            this.total_box_lbl.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.total_box_lbl.Location = new System.Drawing.Point(511, 642);
+            this.total_box_lbl.Name = "total_box_lbl";
+            this.total_box_lbl.Size = new System.Drawing.Size(67, 17);
+            this.total_box_lbl.TabIndex = 25;
+            this.total_box_lbl.Text = "Total Box:";
+            // 
+            // total_sum
+            // 
+            this.total_sum.AutoSize = true;
+            this.total_sum.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.total_sum.Location = new System.Drawing.Point(701, 642);
+            this.total_sum.Name = "total_sum";
+            this.total_sum.Size = new System.Drawing.Size(97, 17);
+            this.total_sum.TabIndex = 24;
+            this.total_sum.Text = "Total Quantity:";
+            // 
             // WHDataEntryIN
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -418,10 +446,12 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.DataGridView LogsTable;
         private System.Windows.Forms.Button UploadScanDataBtn;
-        private System.Windows.Forms.StatusStrip statusStrip2;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button save_data_btn;
+        private System.Windows.Forms.Button clear_btn;
+        private System.Windows.Forms.Label total_box_lbl;
+        private System.Windows.Forms.Label total_sum;
     }
 }

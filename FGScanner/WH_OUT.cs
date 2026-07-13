@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -14,25 +14,29 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Util;
+
 using System.Windows.Forms;
+using FGScanner.Database;
 
 namespace FGScanner
 {
     public partial class WH_OUT : Form
     {
         private readonly string _TransactionType = string.Empty;
-        private readonly db_connection _Connection;
+        private readonly Util.db_connection _Connection;
         private readonly BindingList<ScannedModel> ShippingItems = new BindingList<ScannedModel>();
         private readonly BindingList<DPIList> DPIItems = new BindingList<DPIList>();
         private Dictionary<string, DPIList> DPIDict = new Dictionary<string, DPIList>();
         private string _userid = string.Empty;
         private HashSet<string> warnedPartNumbers = new HashSet<string>();
+        // Place these at the top of your class, outside the method
+        private HashSet<string> warnedDpiParts = new HashSet<string>();
+        private HashSet<string> warnedStockKeys = new HashSet<string>();
         public WH_OUT(string TransactionType, string user)
         {
             InitializeComponent();
             _TransactionType = TransactionType;
-            _Connection = new db_connection();
+            _Connection = new Util.db_connection();
             progressBar.Visible = false;
             toolStripStatusLabel1.Text = "";
             Loadreference();
@@ -61,7 +65,6 @@ namespace FGScanner
             var Process = new ScannerUtility();
             var Insert = new TransactionRepo();
 
-           
             if (string.IsNullOrEmpty(QRCode)) return false;
             if (!Process.ProcessQRData(QRCode, out var itemModel, out var error))
             {
@@ -77,7 +80,6 @@ namespace FGScanner
 
             if (DPIDict == null || !DPIDict.TryGetValue(itemModel.PartNumber, out var reference))
             {
-                
                 string fallbackPart = "";
                 if (itemModel.PartNumber.Contains("-"))
                 {
@@ -85,7 +87,6 @@ namespace FGScanner
                     fallbackPart = itemModel.PartNumber.Substring(0, lastDash);
                 }
 
-            
                 if (string.IsNullOrEmpty(fallbackPart) || !DPIDict.TryGetValue(fallbackPart, out reference))
                 {
                     MessageBox.Show($"Part Number {itemModel.PartNumber} not found in DPI list.", "DPI Error");
@@ -93,31 +94,48 @@ namespace FGScanner
                 }
             }
 
+            // --- CALCULATIONS ---
 
-            // Calculations
-            var currentScannedQty = ShippingItems.Where(x => x.PartNumber == itemModel.PartNumber).Sum(x => x.Quantity);
-            var newTotal = currentScannedQty + itemModel.Quantity;
+            // 1. Total scanned for the WHOLE Part Number (Used for DPI Validation)
+            var totalScannedPartQty = ShippingItems
+                .Where(x => x.PartNumber == itemModel.PartNumber)
+                .Sum(x => x.Quantity);
+
+            // 2. Total scanned for this specific Batch/Date (Used for Stock Validation)
+            var totalScannedBatchQty = ShippingItems
+                .Where(x => x.PartNumber == itemModel.PartNumber && x.ProductionDate == itemModel.ProductionDate)
+                .Sum(x => x.Quantity);
+
+            var newDpiTotal = totalScannedPartQty + itemModel.Quantity;
+            var newStockTotal = totalScannedBatchQty + itemModel.Quantity;
+
             int stockCount = Insert.CheckStock(itemModel.PartNumber, itemModel.ProductionDate, location);
 
-            // --- VALIDATION 1: DPI Excel Reference ---
-            if (newTotal > reference.Quantity)
+            // --- VALIDATION 1: DPI Excel Reference (Uses whole Part Number total) ---
+            if (newDpiTotal > reference.Quantity)
             {
-                MessageBox.Show($"Exceeds DPI! Allowed: {reference.Quantity}, Scanned: {newTotal}", "DPI Error");
-                return false;
+                if (!warnedDpiParts.Contains(itemModel.PartNumber))
+                {
+                    MessageBox.Show($"Exceeds DPI! Allowed: {reference.Quantity}, Scanned: {newDpiTotal}", "DPI Error");
+                    warnedDpiParts.Add(itemModel.PartNumber);
+                }
+                return false; // Blocks the insert
             }
 
-            // --- VALIDATION 2: Physical Stock ---
-            if (newTotal > stockCount)
+            // --- VALIDATION 2: Physical Stock (Uses specific Batch/Date total) ---
+            string stockKey = $"{itemModel.PartNumber}_{itemModel.ProductionDate}";
+
+            if (newStockTotal > stockCount)
             {
-                if (!warnedPartNumbers.Contains(itemModel.PartNumber))
+                if (!warnedStockKeys.Contains(stockKey))
                 {
                     MessageBox.Show(
                         $"Stock Overflow for {itemModel.PartNumber}!\n" +
-                        $"Available: {stockCount}\nScanned: {currentScannedQty}\nIncoming: {itemModel.Quantity}",
+                        $"Available: {stockCount}\nScanned (This Batch): {totalScannedBatchQty}\nIncoming: {itemModel.Quantity}",
                         "Stock Warning");
-                    warnedPartNumbers.Add(itemModel.PartNumber);
+                    warnedStockKeys.Add(stockKey);
                 }
-                return false;
+                return false; // Blocks the insert
             }
 
             // --- ALL CHECKS PASSED: INSERT DATA ---
@@ -145,12 +163,22 @@ namespace FGScanner
             UpdateShiplogs();
             return true;
         }
-
         private void UpdateShiplogs()
         {
+            var data = ShippingItems
+                       .GroupBy(x => new { x.ProductionDate, x.PartNumber, x.TransactionId })
+                       .Select(g => new
+                       {
+                           TransactionID = g.Key.TransactionId,
+                           Partnumber = g.Key.PartNumber,
+                           LotDate = g.Key.ProductionDate,
+                           Box = g.Count(),
+                           Quantity = g.Sum(x => x.Quantity),
+                           PostingDate = g.FirstOrDefault()?.TransactionDate
+                       }).ToList();
             BindingSource bs = new BindingSource
             {
-                DataSource = ShippingItems
+                DataSource = data
             };
             logstable.DataSource = bs;
         }
@@ -327,7 +355,11 @@ namespace FGScanner
         private void button2_Click_1(object sender, EventArgs e)
         {
             ShippingItems.Clear();
+            warnedDpiParts.Clear();
+            warnedPartNumbers.Clear();
+            warnedStockKeys.Clear();
             logstable.Refresh();
+            logstable.DataSource = null;
         }
 
         private async void btnSave_Click_1(object sender, EventArgs e)
@@ -469,12 +501,22 @@ namespace FGScanner
                 for (int row = startRow; row <= rowCount; row++)
                 {
                     current++;
+                    var part = ws.Cells[row, 1].Value?.ToString() ?? "";
+
+                    int quantity = 0;
+                    int.TryParse(ws.Cells[row, 2].Value?.ToString(), out quantity);
+
+                    int pps = 0;
+                    int.TryParse(ws.Cells[row, 3].Value?.ToString(), out pps);
+
+                    int box = 0;
+                    int.TryParse(ws.Cells[row, 4].Value?.ToString(), out box);
                     DPIItems.Add(new DPIList
                     {
-                        Partnumber = ws.Cells[row, 1].Value.ToString(),
-                        Quantity = Convert.ToInt32(ws.Cells[row, 2].Value),
-                        PPS = Convert.ToInt32(ws.Cells[row, 3].Value),
-                        Box = Convert.ToInt32(ws.Cells[row, 4].Value)
+                        Partnumber = part,
+                        Quantity = quantity,
+                        PPS = pps,
+                        Box = box
                     });
 
                     int percent = (int)((double)current / totalRows * 100);
@@ -550,6 +592,9 @@ namespace FGScanner
         {
             DPIItems.Clear();
             DPIDict?.Clear();
+            warnedDpiParts.Clear();
+            warnedPartNumbers.Clear();
+            warnedStockKeys.Clear();
             DPILogsTable.DataSource = null;
             DPILogsTable.Refresh();
         }
@@ -560,6 +605,12 @@ namespace FGScanner
             if (string.IsNullOrWhiteSpace(CmbWHid.Text))
             {
                 MessageBox.Show("Select warehouse first.");
+                return;
+            }
+
+            if(DPIDict == null || DPIDict.Count == 0)
+            {
+                MessageBox.Show("Upload DPI reference first.");
                 return;
             }
 
@@ -624,7 +675,7 @@ namespace FGScanner
                     for (int row = startRow; row <= rowCount; row++)
                     {
                         current++;
-                        qrcodedata = ws.Cells[row, 1].Value.ToString();
+                        qrcodedata = ws.Cells[row, 1].Value.ToString().ToUpper();
                         location = ws.Cells[row, 2].Value.ToString().ToUpper();
                         if (qrcodedata != null)
                         {

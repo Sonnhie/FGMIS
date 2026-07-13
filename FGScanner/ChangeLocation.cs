@@ -1,6 +1,8 @@
-﻿using FGScanner.Model;
+﻿using FGScanner.Database;
+using FGScanner.Model;
 using FGScanner.Util;
 using OfficeOpenXml;
+using OfficeOpenXml.Interfaces.SensitivityLabels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,292 +19,263 @@ namespace FGScanner
 {
     public partial class ChangeLocation : Form
     {
-        private readonly db_connection _Connection;
+        private readonly Database.db_connection _Connection;
         private string _userid = string.Empty;
         private HashSet<string> warnedPartNumbers = new HashSet<string>();
         public ChangeLocation(string userid)
         {
             InitializeComponent();
-            _Connection = new db_connection();
+            _Connection = new Database.db_connection();
             _userid = userid;
+            LoadRackLocations();
         }
 
-        private readonly BindingList<ScannedModel> ShippingItems = new BindingList<ScannedModel>();
-        private bool OnScanProcess(string QRCode, string from, string to)
+        public void LoadRackLocations()
         {
-            var Process = new ScannerUtility();
-            var Insert = new TransactionRepo();
-
-            if (string.IsNullOrEmpty(QRCode))
-            {
-                MessageBox.Show("QR Code Error or empty!");
-                return false;
-            }
-
-            if (!Process.ProcessQRData(QRCode, out var itemModel, out var error))
-            {
-                MessageBox.Show(error, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(itemModel.PartNumber))
-            {
-                MessageBox.Show(error, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-                return false;
-            }
-
-            // 1. CALCULATE TOTAL QUANTITY: Sum the 'Quantity' property of items already in the list
-            int currentScannedQty = ShippingItems
-                                    .Where(x => x.PartNumber == itemModel.PartNumber)
-                                    .Sum(x => x.Quantity);
-            var newTotal = currentScannedQty + itemModel.Quantity;
-            int stockAvailable = Insert.CheckStock(itemModel.PartNumber, itemModel.ProductionDate, from);
-
-            if (newTotal > stockAvailable)
-            {
-                if (!warnedPartNumbers.Contains(itemModel.PartNumber))
-                {
-                    MessageBox.Show(
-                    $"Stock Overflow for {itemModel.PartNumber}!\n" +
-                    $"Available: {stockAvailable}\nScanned: {currentScannedQty}\nIncoming: {itemModel.Quantity}",
-                    "Stock Warning");
-
-                    warnedPartNumbers.Add(itemModel.PartNumber);
-                }
-                return false;
-            }
-
-            ShippingItems.Add(new ScannedModel
-            {
-                TransactionDate = DateTime.Now,
-                Customer = Insert.GetCustomer(itemModel.PartNumber),
-                PartNumber = itemModel.PartNumber,
-                ProductionDate = itemModel.ProductionDate,
-                ProductionVersion = itemModel.ProductionVer,
-                Quantity = itemModel.Quantity, // Use the actual quantity from the QR
-                TransactionType = "OUT",
-                Location = from.ToUpper(),
-                New_Location = to,
-                Storage_location = cmbfrom.Text,
-                Remarks = "",
-                TransactionId = "",
-                user = _userid
-            });
-
-            UpdateShiplogs();
-            return true;
+            var List = new TransactionRepo();
+            var data = List.GetRackLocations(wh_id.Text);
+            curr_loc.DataSource = data;
+            curr_loc.SelectedIndex = -1;
         }
 
-
-        private async Task ProcessUpload(FileInfo fileInfo, IProgress<int> progress)
+        public void LoadNewRackLocations()
         {
-            if (string.IsNullOrWhiteSpace(CmbWHid.Text))
+            var List = new TransactionRepo();
+            var data = List.GetRackLocations(wh_id.Text);
+            
+            nex_loc.DataSource = data;
+            nex_loc.SelectedIndex = -1;
+        }
+
+        public void LoadPartnumbers()
+        {
+            string curr = curr_loc.Text.Trim();
+            string next = wh_id.Text.Trim();
+
+            var List = new TransactionRepo();
+            var data = List.GetRackPartnumbers(curr, next);
+          //  MessageBox.Show($"Searching for Loc: '{curr}', WH: '{next}'. Found {data.Count} items."); // Remove this after testing!
+
+            part_number.DataSource = data;
+            part_number.SelectedIndex = -1;
+        }
+
+        //public void LoadPPS()
+        //{
+        //    string part_num = part_number.Text.Trim();
+
+        //    var List = new TransactionRepo();
+        //    var data = List.GetPPS(part_num);
+        //    //  MessageBox.Show($"Searching for Loc: '{curr}', WH: '{next}'. Found {data.Count} items."); // Remove this after testing!
+
+        //    qty_text.Text = data;
+        //}
+
+        public void Loadtransactionlogs()
+        {
+            string location = curr_loc.Text;
+            string whId = wh_id.Text;
+
+            try
             {
-                MessageBox.Show("Select warehouse first.");
-                return;
-            }
+                var Method = new TransactionRepo();
+                var Datas = Method.GetItemByLocation(location, whId);
+                var totalBox = Datas
+                               .Sum(d => d.Box);
 
-            ExcelPackage.License.SetNonCommercialPersonal("NIDEC");
+                var totalQty = Datas
+                               .Sum(d => d.Quantity);
+                total_box_lbl.Text = $"Total Box: {totalBox:N0}";
+                total_sum.Text = $"Total Qty: {totalQty:N0}";
 
-            using (ExcelPackage package = new ExcelPackage(fileInfo))
-            {
-                ExcelWorksheet ws = package.Workbook.Worksheets[0];
-
-                int startRow = 1;
-                int rowCount = ws.Dimension.Rows;
-                int totalRows = rowCount - startRow + 1;
-
-                int current = 0;
-                string qrcodedata = null;
-                string fromlocation = null;
-                string tolocation = null;
-
-                for (int row = startRow; row <= rowCount; row++)
+                if (Datas != null)
                 {
-                    current++;
-                    qrcodedata = ws.Cells[row, 1].Value.ToString();
-                    fromlocation = ws.Cells[row, 2].Value.ToString().ToUpper();
-                    tolocation = ws.Cells[row, 3].Value.ToString().ToUpper();
-                    if (qrcodedata != null)
+                    DataTable dt = new DataTable();
+                    dt.Columns.Add("Part Number", typeof(string));
+                    dt.Columns.Add("Quantity", typeof(string));
+                    dt.Columns.Add("Total Box", typeof(string));
+                    dt.Columns.Add("Production Date", typeof(string));
+                    dt.Columns.Add("Production Version", typeof(string));
+                    dt.Columns.Add("Customer", typeof(string));
+
+                    foreach (var Data in Datas)
                     {
-                        OnScanProcess(qrcodedata, fromlocation, tolocation);
-                    }
-
-                    int percent = (int)((double)current / totalRows * 100);
-                    percent = Math.Min(percent, 100);
-                    if (current % 10 == 0)
-                        progress?.Report(percent);
-                    progress?.Report(percent);
-                }
-                await Task.Delay(100);
-            }
-
-            progress?.Report(100);
-        }
-
-        private void UpdateShiplogs()
-        {
-            BindingSource bs = new BindingSource
-            {
-                DataSource = ShippingItems
-            };
-            logstable.DataSource = bs;
-        }
-
-
-        private async Task<bool> PullOutItem()
-        {
-            if (ShippingItems.Count == 0)
-            {
-                MessageBox.Show("No items to pullout!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            var Repo = new TransactionRepo();
-
-            using (SqlConnection con = _Connection.Getconnection())
-            {
-                await con.OpenAsync();
-                using (SqlTransaction tx = con.BeginTransaction())
-                {
-                    try
-                    {
-                        foreach (var item in ShippingItems)
+                        if (Data.Quantity != 0)
                         {
-                            await Repo.InsertSingleTransaction(new InventoryTransactionModel
-                            {
-                                TransactionId = item.TransactionId,
-                                PartNumber = item.PartNumber,
-                                ProductionDate = item.ProductionDate,
-                                Customer = item.Customer,
-                                Quantity = item.Quantity,
-                                TransactionType = item.TransactionType,
-                                TransactionDate = item.TransactionDate,
-                                ProductionVersion = item.ProductionVersion,
-                                Location = item.Location,
-                                Remarks = item.Remarks,
-                                Storage_location = item.Storage_location,
-                                WhId = CmbWHid.Text,
-                                User = _userid
-                            }, con, tx);
-
-                            await Repo.InsertSingleTransaction(new InventoryTransactionModel
-                            {
-                                TransactionId = item.TransactionId,
-                                PartNumber = item.PartNumber,
-                                ProductionDate = item.ProductionDate,
-                                Customer = item.Customer,
-                                Quantity = item.Quantity,
-                                TransactionType = "IN",
-                                TransactionDate = item.TransactionDate,
-                                ProductionVersion = item.ProductionVersion,
-                                Location = item.New_Location,
-                                Remarks = item.Remarks,
-                                Storage_location = item.Storage_location,
-                                WhId= CmbWHid.Text,
-                                User = _userid
-                            }, con, tx);
+                            dt.Rows.Add
+                            (
+                              Data.PartNumber,
+                              Data.Quantity,
+                              Data.Box,
+                              Data.ProductionDate.ToString("MM/dd/yyyy"),
+                              Data.ProductionVersion,
+                              Data.Customer
+                            );
                         }
-                        //Repo.RunMovementClassification();
-                        tx.Commit();
-                        MessageBox.Show("Transfer Completed successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return true;
                     }
-                    catch (Exception ex)
-                    {
-                        tx.Rollback();
-                        MessageBox.Show($"Error Transfering items: {ex.Message}", "Transfer items Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return false;
-                    }
+
+
+                    logstable.Columns.Clear();
+                    logstable.ReadOnly = true;
+                    logstable.DataSource = dt;
+
+                    logstable.Columns["Part Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    logstable.Columns["Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    logstable.Columns["Total Box"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    logstable.Columns["Total Box"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    logstable.Columns["Production Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    logstable.Columns["Production Version"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
             }
         }
 
-        private async void UploadScanDataBtn_Click(object sender, EventArgs e)
+        private void btnSave_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(CmbWHid.Text))
+            string location = curr_loc.Text.Trim();
+            string whId = wh_id.Text.Trim();
+            string new_location = nex_loc.Text.Trim();
+            string selectedPart = part_number.Text.Trim();
+            DateTime Prod_date = prod_lot.Value.Date;
+
+            // 1. Safe parsing of numeric inputs
+            if (!int.TryParse(box_qty.Text, out int boxes) || boxes <= 0)
             {
-                MessageBox.Show("Select warehouse first.");
+                MessageBox.Show("Please enter a valid number of boxes.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            if (!int.TryParse(qty_text.Text, out int PPS) || PPS <= 0)
             {
-                openFileDialog.Filter = "Excel Files|*.xlsx;*.xls";
-                openFileDialog.Title = "Select an Excel File";
+                MessageBox.Show("Please enter a valid Pieces Per Box (PPS).", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
+            // 2. Validate empty textboxes
+            if (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(whId) || string.IsNullOrWhiteSpace(new_location))
+            {
+                MessageBox.Show("Please fill in all location fields.", "Missing Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var Method = new TransactionRepo();
+            var Datas = Method.GetItemByLocation(location, whId);
+
+            if (Datas == null || !Datas.Any())
+            {
+                MessageBox.Show("No items found at this location.", "Empty Location", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+
+            // Find the specific part the user selected
+            var targetItem = Datas.FirstOrDefault(d => d.PartNumber == selectedPart);
+            var targetdate = Datas.FirstOrDefault(d => d.ProductionDate == Prod_date);
+
+            if (targetItem == null)
+            {
+                MessageBox.Show($"Part {selectedPart} is not currently in location {location}.", "Part Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if(targetdate == null)
+            {
+                MessageBox.Show($"Part {selectedPart} with production date of {Prod_date} is not currently in location {location}.", "Production Date Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var result = MessageBox.Show($"Transfer {boxes} boxes of {selectedPart} to {new_location}?", "Confirm Transfer", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+
+            if (result == DialogResult.OK)
+            {
+                try
                 {
-                    string filepath = openFileDialog.FileName;
+                    // 3. Loop and execute the transfer
+                    for (int i = 0; i < boxes; i++)
+                    {
+                        // OUT transaction
+                        Method.InsertTransaction(new InventoryTransactionModel
+                        {
+                            PartNumber = targetItem.PartNumber,
+                            ProductionDate = targetdate.ProductionDate,
+                            ProductionVersion = targetItem.ProductionVersion,
+                            Customer = targetItem.Customer,
+                            Quantity = PPS,
+                            TransactionType = "OUT",
+                            Location = location.ToUpper(),
+                            TransactionDate = DateTime.Now,
+                            Remarks = $"Transfer Location from {location} to {new_location}",
+                            Storage_location = "9151",
+                            WhId = whId,
+                            User = _userid
+                        });
 
-                    FileInfo fileInfo = new FileInfo(filepath);
+                        // IN transaction
+                        Method.InsertTransaction(new InventoryTransactionModel
+                        {
+                            PartNumber = targetItem.PartNumber,
+                            ProductionDate = targetdate.ProductionDate,
+                            ProductionVersion = targetItem.ProductionVersion,
+                            Customer = targetItem.Customer,
+                            Quantity = PPS,
+                            TransactionType = "IN",
+                            Location = new_location.ToUpper(),
+                            TransactionDate = DateTime.Now,
+                            Remarks = $"Transfer Location from {location} to {new_location}",
+                            Storage_location = "9151",
+                            WhId = whId,
+                            User = _userid
+                        });
+                    }
 
-                    var progress = new Progress<int>(value =>
-                    {
-                        progressBar.Value = value;
-                        toolStripStatusLabel1.Text = $"Processing... {value}%";
-                    });
-
-                    try
-                    {
-                        progressBar.Visible = true;
-                        toolStripStatusLabel1.Text = "Processing...";
-                        await ProcessUpload(fileInfo, progress);
-                    }
-                    catch (Exception ex)
-                    {
-                        toolStripStatusLabel1.Text = "Processing failed!";
-                        toolStripStatusLabel1.ForeColor = Color.Red;
-                        MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    finally
-                    {
-                        progressBar.Visible = false;
-                        toolStripStatusLabel1.Text = "Processing completed!";
-                    }
-                    toolStripStatusLabel1.Visible = false;
+                    MessageBox.Show($"{boxes} boxes successfully transferred to {new_location}.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Database Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-        }
-
-        private void logstable_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private async void btnSave_Click(object sender, EventArgs e)
-        {
-            await PullOutItem();
         }
 
         private void logstable_SelectionChanged(object sender, EventArgs e)
         {
-            if (logstable.SelectedRows.Count == 1)
+
+        }
+        private void curr_loc_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Loadtransactionlogs();
+            LoadPartnumbers();
+        }
+
+        private void wh_id_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadRackLocations();
+            LoadNewRackLocations();
+            LoadPartnumbers();
+        }
+
+        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
             {
-                DataGridViewRow r = logstable.SelectedRows[0];
-
-                string partnumber = r.Cells["PartNumber"].Value?.ToString();
-                string productiondate =Convert.ToDateTime(r.Cells["ProductionDate"].Value).ToString("dd-MM-yyyy");
-                string prodver = r.Cells["ProductionVersion"].Value?.ToString();
-                string quantity = r.Cells["Quantity"].Value?.ToString() ?? string.Empty;
-                string customer = r.Cells["Customer"].Value?.ToString() ?? string.Empty;
-                string from = r.Cells["Location"].Value?.ToString() ?? string.Empty;
-                string to = r.Cells["New_Location"].Value?.ToString() ?? string.Empty;
-
-                LblPartNumber.Text = partnumber;
-                LblProDate.Text = productiondate;
-                LblCustomer.Text = customer;
-                LblProVer.Text = prodver;
-                LblQuantity.Text = quantity;
-                fromlbl.Text = from;
-                toLbl.Text = to;
+                e.Handled = true;
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void textBox1_KeyPress_1(object sender, KeyPressEventArgs e)
         {
-            ShippingItems.Clear();
-            UpdateShiplogs();
+
+        }
+
+        private void part_number_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var Method = new TransactionRepo();
+            var Datas = Method.GetPPS(part_number.Text);
+
+            qty_text.Text = Datas.ToString();
         }
     }
 }

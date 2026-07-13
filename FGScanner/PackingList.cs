@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Util;
 using System.Windows.Forms;
 
 namespace FGScanner
