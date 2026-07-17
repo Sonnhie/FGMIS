@@ -14,9 +14,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace FGScanner.Forms.Reports
 {
-    public partial class WithdrawalSlips : Form
+    public partial class ReturnListControl : UserControl
     {
         private readonly TransactionService _service;
         private readonly Queries _queries;
@@ -27,7 +28,7 @@ namespace FGScanner.Forms.Reports
         private string controlnumber;
         private PrintDocumentDTO _documentToPrint;
 
-        public WithdrawalSlips(string userid)
+        public ReturnListControl(string userid)
         {
             InitializeComponent();
             _userid = userid;
@@ -38,35 +39,6 @@ namespace FGScanner.Forms.Reports
             _printService = new(_queries);
             GenerateSlipbutton.Enabled = false;
             CancelReturnButton.Enabled = false;
-        }
-
-        private async void SearchButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string location = TransferTocomboBox.Text;
-              //  string warehouseid = warehouseComboBox.Text;
-                DateTime? startDate = StartDate.Value.Date;
-                DateTime? endDate = EndDate.Value.Date;
-
-                if (location == null)
-                {
-                    MessageBox.Show("Please select storage location.");
-                    return;
-                }
-
-                var result = await _service.GetReturnList(location, startDate, endDate);
-                if (result == null)
-                {
-                    MessageBox.Show("No Data found.");
-                    return;
-                }
-                LoadReturnTable(result);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
-            }
         }
 
         private void LoadReturnTable(List<Return> data)
@@ -131,7 +103,6 @@ namespace FGScanner.Forms.Reports
                 MessageBox.Show($"Error loading inventory: {ex.Message}");
             }
         }
-
         private async Task LoadReturnItemTable(string controlnumber)
         {
             try

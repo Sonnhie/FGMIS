@@ -349,8 +349,7 @@
             // 
             // WarehouseReturn
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             Controls.Add(statusStrip1);
             Controls.Add(ReturnTable);
             Controls.Add(groupBox3);

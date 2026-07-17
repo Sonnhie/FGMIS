@@ -19,7 +19,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace FGScanner.Forms.Reports
 {
-    public partial class Shipment : Form
+    public partial class ShipmentReport : UserControl
     {
         private readonly TransactionService _service;
         private readonly Queries _queries;
@@ -27,7 +27,8 @@ namespace FGScanner.Forms.Reports
         private readonly ExcelService _excelService;
         private string _userid;
         private string controlnumber;
-        public Shipment(string userid)
+
+        public ShipmentReport(string userid)
         {
             InitializeComponent();
             _userid = userid;
@@ -37,32 +38,6 @@ namespace FGScanner.Forms.Reports
             _excelService = new(_queries);
             toolStripProgressBar1.Visible = false;
             toolStripStatusLabel1.Visible = false;
-        }
-
-        private async void FilterButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string shipmentID = ShipmentID.Text;
-                DateTime? startDate = StartDate.Value.Date;
-                DateTime? endDate = EndDate.Value.Date;
-
-
-                var result = await _service.GetShipmentList(shipmentID, startDate, endDate);
-
-
-                if (result == null)
-                {
-                    MessageBox.Show("No Data found.");
-                    return;
-                }
-
-                LoadShipmentTable(result);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
-            }
         }
 
         private void LoadShipmentTable(List<FGScanner.Models.Transaction> data)
@@ -120,7 +95,6 @@ namespace FGScanner.Forms.Reports
                 MessageBox.Show($"Error loading inventory: {ex.Message}");
             }
         }
-
         private async Task LoadShipmentItemTable(string controlnumber)
         {
             try
@@ -174,30 +148,29 @@ namespace FGScanner.Forms.Reports
             }
         }
 
-        private async void ShipmentTable_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private async void FilterButton_Click(object sender, EventArgs e)
         {
-            if (e.RowIndex >= 0 && ShipmentTable.Columns[e.ColumnIndex].Name == "Actionbuttons")
+            try
             {
-                DataGridViewRow selectedRow = ShipmentTable.Rows[e.RowIndex];
+                string shipmentID = ShipmentID.Text;
+                DateTime? startDate = StartDate.Value.Date;
+                DateTime? endDate = EndDate.Value.Date;
 
-                if (selectedRow == null)
+
+                var result = await _service.GetShipmentList(shipmentID, startDate, endDate);
+
+
+                if (result == null)
                 {
-                    MessageBox.Show("Empty row data.");
+                    MessageBox.Show("No Data found.");
                     return;
                 }
 
-                controlnumber = selectedRow.Cells["Shipment Control Number"].Value.ToString();
-                string ShipmentDate = selectedRow.Cells["Shipment Date"].Value.ToString();
-                string remarks = selectedRow.Cells["Remarks"].Value.ToString();
-
-                if (remarks == "Cancelled Shipment")
-                {
-                    CancelShipmentButton.Enabled = false;
-                }
-
-                ShipmentDateLabel.Text = ShipmentDate;
-                ShipmentIDLabel.Text = controlnumber;
-                await LoadShipmentItemTable(controlnumber);
+                LoadShipmentTable(result);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
             }
         }
 
@@ -275,9 +248,36 @@ namespace FGScanner.Forms.Reports
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+
+        private async void ShipmentTable_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && ShipmentTable.Columns[e.ColumnIndex].Name == "Actionbuttons")
+            {
+                DataGridViewRow selectedRow = ShipmentTable.Rows[e.RowIndex];
+
+                if (selectedRow == null)
+                {
+                    MessageBox.Show("Empty row data.");
+                    return;
+                }
+
+                controlnumber = selectedRow.Cells["Shipment Control Number"].Value.ToString();
+                string ShipmentDate = selectedRow.Cells["Shipment Date"].Value.ToString();
+                string remarks = selectedRow.Cells["Remarks"].Value.ToString();
+
+                if (remarks == "Cancelled Shipment")
+                {
+                    CancelShipmentButton.Enabled = false;
+                }
+
+                ShipmentDateLabel.Text = ShipmentDate;
+                ShipmentIDLabel.Text = controlnumber;
+                await LoadShipmentItemTable(controlnumber);
             }
         }
     }

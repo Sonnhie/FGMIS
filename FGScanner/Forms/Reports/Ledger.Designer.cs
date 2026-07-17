@@ -1,13 +1,13 @@
-﻿namespace FGScanner
+﻿namespace FGScanner.Forms.Reports
 {
-    partial class StockCard
+    partial class Ledger
     {
-        /// <summary>
+        /// <summary> 
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
+        /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -20,10 +20,10 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+        #region Component Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
+        /// <summary> 
+        /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -40,23 +40,23 @@
             label3 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
-            StockCardtable = new System.Windows.Forms.DataGridView();
-            total_sum = new System.Windows.Forms.Label();
-            BtnExport = new System.Windows.Forms.Button();
-            label4 = new System.Windows.Forms.Label();
             groupBox2 = new System.Windows.Forms.GroupBox();
             endstocklbl = new System.Windows.Forms.Label();
             customerlbl = new System.Windows.Forms.Label();
             partnamelbl = new System.Windows.Forms.Label();
             partnumberlbl = new System.Windows.Forms.Label();
             label6 = new System.Windows.Forms.Label();
+            total_sum = new System.Windows.Forms.Label();
             label5 = new System.Windows.Forms.Label();
+            label4 = new System.Windows.Forms.Label();
+            BtnExport = new System.Windows.Forms.Button();
+            StockCardtable = new System.Windows.Forms.DataGridView();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
             toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)StockCardtable).BeginInit();
             groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)StockCardtable).BeginInit();
             statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -74,10 +74,10 @@
             groupBox1.Controls.Add(label2);
             groupBox1.Controls.Add(label1);
             groupBox1.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox1.Location = new System.Drawing.Point(36, 22);
+            groupBox1.Location = new System.Drawing.Point(20, 17);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(516, 161);
-            groupBox1.TabIndex = 2;
+            groupBox1.Size = new System.Drawing.Size(517, 161);
+            groupBox1.TabIndex = 3;
             groupBox1.TabStop = false;
             groupBox1.Text = "Filters";
             // 
@@ -97,9 +97,9 @@
             warehouseidcmb.FormattingEnabled = true;
             warehouseidcmb.Items.AddRange(new object[] { "WH1", "WH2" });
             warehouseidcmb.Location = new System.Drawing.Point(335, 119);
-            warehouseidcmb.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            warehouseidcmb.Margin = new System.Windows.Forms.Padding(1, 3, 1, 3);
             warehouseidcmb.Name = "warehouseidcmb";
-            warehouseidcmb.Size = new System.Drawing.Size(135, 26);
+            warehouseidcmb.Size = new System.Drawing.Size(136, 26);
             warehouseidcmb.TabIndex = 16;
             // 
             // label7
@@ -117,16 +117,16 @@
             ProdVerComboButton.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             ProdVerComboButton.FormattingEnabled = true;
             ProdVerComboButton.Items.AddRange(new object[] { "SA1", "ABE", "SBE", "SBA", "ABA", "PK1" });
-            ProdVerComboButton.Location = new System.Drawing.Point(107, 119);
-            ProdVerComboButton.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            ProdVerComboButton.Location = new System.Drawing.Point(106, 119);
+            ProdVerComboButton.Margin = new System.Windows.Forms.Padding(1, 3, 1, 3);
             ProdVerComboButton.Name = "ProdVerComboButton";
-            ProdVerComboButton.Size = new System.Drawing.Size(135, 26);
+            ProdVerComboButton.Size = new System.Drawing.Size(136, 26);
             ProdVerComboButton.TabIndex = 14;
             // 
             // SearchBtn
             // 
             SearchBtn.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            SearchBtn.Location = new System.Drawing.Point(415, 29);
+            SearchBtn.Location = new System.Drawing.Point(402, 33);
             SearchBtn.Name = "SearchBtn";
             SearchBtn.Size = new System.Drawing.Size(69, 27);
             SearchBtn.TabIndex = 13;
@@ -151,7 +151,7 @@
             PostingDate1.CustomFormat = "yyyy-MM-dd";
             PostingDate1.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F);
             PostingDate1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            PostingDate1.Location = new System.Drawing.Point(107, 75);
+            PostingDate1.Location = new System.Drawing.Point(106, 75);
             PostingDate1.Name = "PostingDate1";
             PostingDate1.Size = new System.Drawing.Size(85, 27);
             PostingDate1.TabIndex = 6;
@@ -194,49 +194,6 @@
             label1.TabIndex = 0;
             label1.Text = "Part Number:";
             // 
-            // StockCardtable
-            // 
-            StockCardtable.AllowUserToAddRows = false;
-            StockCardtable.AllowUserToDeleteRows = false;
-            StockCardtable.BackgroundColor = System.Drawing.Color.White;
-            StockCardtable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            StockCardtable.Location = new System.Drawing.Point(39, 233);
-            StockCardtable.Name = "StockCardtable";
-            StockCardtable.ReadOnly = true;
-            StockCardtable.Size = new System.Drawing.Size(1146, 382);
-            StockCardtable.TabIndex = 3;
-            // 
-            // total_sum
-            // 
-            total_sum.AutoSize = true;
-            total_sum.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            total_sum.Location = new System.Drawing.Point(367, 33);
-            total_sum.Name = "total_sum";
-            total_sum.Size = new System.Drawing.Size(110, 17);
-            total_sum.TabIndex = 13;
-            total_sum.Text = "Beginning Stock:";
-            // 
-            // BtnExport
-            // 
-            BtnExport.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            BtnExport.Location = new System.Drawing.Point(1094, 189);
-            BtnExport.Name = "BtnExport";
-            BtnExport.Size = new System.Drawing.Size(91, 31);
-            BtnExport.TabIndex = 12;
-            BtnExport.Text = "Export Csv";
-            BtnExport.UseVisualStyleBackColor = true;
-            BtnExport.Click += BtnExport_Click;
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            label4.Location = new System.Drawing.Point(24, 33);
-            label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(91, 17);
-            label4.TabIndex = 14;
-            label4.Text = "Part Number:";
-            // 
             // groupBox2
             // 
             groupBox2.Controls.Add(endstocklbl);
@@ -248,10 +205,10 @@
             groupBox2.Controls.Add(label5);
             groupBox2.Controls.Add(label4);
             groupBox2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox2.Location = new System.Drawing.Point(558, 22);
+            groupBox2.Location = new System.Drawing.Point(553, 17);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new System.Drawing.Size(627, 161);
-            groupBox2.TabIndex = 15;
+            groupBox2.Size = new System.Drawing.Size(551, 161);
+            groupBox2.TabIndex = 16;
             groupBox2.TabStop = false;
             groupBox2.Text = "Stock Information";
             // 
@@ -259,7 +216,7 @@
             // 
             endstocklbl.AutoSize = true;
             endstocklbl.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            endstocklbl.Location = new System.Drawing.Point(474, 33);
+            endstocklbl.Location = new System.Drawing.Point(475, 33);
             endstocklbl.Name = "endstocklbl";
             endstocklbl.Size = new System.Drawing.Size(0, 15);
             endstocklbl.TabIndex = 21;
@@ -301,6 +258,16 @@
             label6.TabIndex = 16;
             label6.Text = "Part Name:";
             // 
+            // total_sum
+            // 
+            total_sum.AutoSize = true;
+            total_sum.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            total_sum.Location = new System.Drawing.Point(367, 33);
+            total_sum.Name = "total_sum";
+            total_sum.Size = new System.Drawing.Size(110, 17);
+            total_sum.TabIndex = 13;
+            total_sum.Text = "Beginning Stock:";
+            // 
             // label5
             // 
             label5.AutoSize = true;
@@ -311,82 +278,111 @@
             label5.TabIndex = 15;
             label5.Text = "Customer:";
             // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            label4.Location = new System.Drawing.Point(24, 33);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(91, 17);
+            label4.TabIndex = 14;
+            label4.Text = "Part Number:";
+            // 
+            // BtnExport
+            // 
+            BtnExport.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            BtnExport.Location = new System.Drawing.Point(1013, 184);
+            BtnExport.Name = "BtnExport";
+            BtnExport.Size = new System.Drawing.Size(91, 31);
+            BtnExport.TabIndex = 17;
+            BtnExport.Text = "Export Csv";
+            BtnExport.UseVisualStyleBackColor = true;
+            BtnExport.Click += BtnExport_Click;
+            // 
+            // StockCardtable
+            // 
+            StockCardtable.AllowUserToAddRows = false;
+            StockCardtable.AllowUserToDeleteRows = false;
+            StockCardtable.BackgroundColor = System.Drawing.Color.White;
+            StockCardtable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            StockCardtable.Location = new System.Drawing.Point(20, 221);
+            StockCardtable.Name = "StockCardtable";
+            StockCardtable.ReadOnly = true;
+            StockCardtable.Size = new System.Drawing.Size(1084, 382);
+            StockCardtable.TabIndex = 18;
+            // 
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1 });
-            statusStrip1.Location = new System.Drawing.Point(0, 714);
+            statusStrip1.Location = new System.Drawing.Point(0, 634);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 11, 0);
-            statusStrip1.Size = new System.Drawing.Size(1224, 23);
-            statusStrip1.TabIndex = 16;
+            statusStrip1.Size = new System.Drawing.Size(1127, 22);
+            statusStrip1.TabIndex = 19;
             statusStrip1.Text = "statusStrip1";
             // 
             // toolStripProgressBar1
             // 
             toolStripProgressBar1.Name = "toolStripProgressBar1";
             toolStripProgressBar1.Size = new System.Drawing.Size(84, 17);
+            toolStripProgressBar1.Visible = false;
             // 
             // toolStripStatusLabel1
             // 
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            toolStripStatusLabel1.Size = new System.Drawing.Size(118, 18);
+            toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
             toolStripStatusLabel1.Text = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Visible = false;
             // 
-            // StockCard
+            // Ledger
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(5F, 14F);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            AutoScroll = true;
-            AutoSize = true;
-            ClientSize = new System.Drawing.Size(1224, 737);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             Controls.Add(statusStrip1);
-            Controls.Add(groupBox2);
-            Controls.Add(BtnExport);
             Controls.Add(StockCardtable);
+            Controls.Add(BtnExport);
+            Controls.Add(groupBox2);
             Controls.Add(groupBox1);
-            Font = new System.Drawing.Font("Bahnschrift Condensed", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            Name = "StockCard";
-            Text = "StockCard";
+            Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            Name = "Ledger";
+            Size = new System.Drawing.Size(1127, 656);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)StockCardtable).EndInit();
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)StockCardtable).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
-
         }
 
         #endregion
 
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ComboBox warehouseidcmb;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.ComboBox ProdVerComboButton;
+        private System.Windows.Forms.Button SearchBtn;
         private System.Windows.Forms.DateTimePicker PostingDate2;
         private System.Windows.Forms.DateTimePicker PostingDate1;
         private System.Windows.Forms.TextBox PartnumberTextbox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.DataGridView StockCardtable;
-        private System.Windows.Forms.Label total_sum;
-        private System.Windows.Forms.Button BtnExport;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label endstocklbl;
         private System.Windows.Forms.Label customerlbl;
         private System.Windows.Forms.Label partnamelbl;
         private System.Windows.Forms.Label partnumberlbl;
-        private System.Windows.Forms.Button SearchBtn;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label total_sum;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button BtnExport;
+        private System.Windows.Forms.DataGridView StockCardtable;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.ComboBox ProdVerComboButton;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.ComboBox warehouseidcmb;
     }
 }

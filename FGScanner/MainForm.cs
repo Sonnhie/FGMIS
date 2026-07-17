@@ -1,4 +1,5 @@
 ﻿using FGScanner.Forms.DataEntry;
+using FGScanner.Forms.Master;
 using FGScanner.Forms.Reports;
 using System;
 using System.Collections.Generic;
@@ -103,8 +104,8 @@ namespace FGScanner
 
         private void stockListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            InventoryForm inventory = new InventoryForm(_userid);
-            DisplayForm(inventory);
+            InventoryControl inventoryControl = new(_userid);
+            DisplayUsercontrol(inventoryControl);
         }
 
 
@@ -133,8 +134,8 @@ namespace FGScanner
 
         private void slowMovingListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Slowmoving form = new();
-            DisplayForm(form);
+            SlowMovingControl slowMovingControl = new();
+            DisplayUsercontrol(slowMovingControl);
         }
 
         private void warehouseToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -157,26 +158,26 @@ namespace FGScanner
 
         private void warehouseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WithdrawalSlips ws = new(_userid);
-            DisplayForm(ws);
+            ReturnListControl returnListControl = new(_userid);
+            DisplayUsercontrol(returnListControl);
         }
 
         private void packingListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Shipment shipment = new(_userid);
-            DisplayForm(shipment);
+            ShipmentReport shipmentReport = new(_userid);
+            DisplayUsercontrol(shipmentReport);
         }
 
         private void iNOUTLedgerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StockCard stockCard = new();
-            DisplayForm(stockCard);
+            Ledger ledger = new();
+            DisplayUsercontrol(ledger);
         }
 
         private void masterListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Product product = new(_userid);
-            DisplayForm(product);
+            MasterList masterList = new(_userid);
+            DisplayUsercontrol(masterList);
         }
 
         private void transferLocationToolStripMenuItem_Click(object sender, EventArgs e)

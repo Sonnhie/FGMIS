@@ -239,14 +239,13 @@
             RackTable.Size = new System.Drawing.Size(1078, 388);
             RackTable.TabIndex = 3;
             // 
-            // ChangeLocation
+            // ChangeLocations
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             Controls.Add(RackTable);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
-            Name = "ChangeLocation";
+            Name = "ChangeLocations";
             Size = new System.Drawing.Size(1127, 656);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();

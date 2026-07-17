@@ -13,9 +13,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FGScanner
+
+namespace FGScanner.Forms.Reports
 {
-    public partial class Slowmoving : Form
+    public partial class SlowMovingControl : UserControl
     {
         private readonly Queries _queries;
         private readonly Dbcontext _dbContext;
@@ -24,7 +25,7 @@ namespace FGScanner
         private int pageSize = 50;
         private int totalPage = 0;
 
-        public Slowmoving()
+        public SlowMovingControl()
         {
             InitializeComponent();
             toolStripProgressBar1.Visible = false;
@@ -34,12 +35,6 @@ namespace FGScanner
             _queries = new(_dbContext);
             _excelService = new(_queries);
         }
-
-        private async void Slowmoving_Load(object sender, EventArgs e)
-        {
-            await FilterData();
-        }
-
         public async Task FilterData()
         {
             try
@@ -104,6 +99,44 @@ namespace FGScanner
             catch (Exception ex)
             {
                 MessageBox.Show("Error:" + ex.Message);
+            }
+        }
+
+        private async void SlowMovingControl_Load(object sender, EventArgs e)
+        {
+            await FilterData();
+        }
+
+        private async void SearchButton_Click(object sender, EventArgs e)
+        {
+            await FilterData();
+        }
+
+        private async void BtnNext_Click(object sender, EventArgs e)
+        {
+            if (page < totalPage)
+            {
+                page++;
+                BtnPrev.Enabled = true;
+                await FilterData();
+            }
+            else
+            {
+                BtnNext.Enabled = false;
+            }
+        }
+
+        private async void BtnPrev_Click(object sender, EventArgs e)
+        {
+            if (page < totalPage)
+            {
+                page++;
+                BtnPrev.Enabled = true;
+                await FilterData();
+            }
+            else
+            {
+                BtnNext.Enabled = false;
             }
         }
 
@@ -180,39 +213,6 @@ namespace FGScanner
                     toolStripProgressBar1.Visible = false;
                     toolStripStatusLabel1.Text = "";
                 }
-            }
-        }
-
-        private async void SearchButton_Click(object sender, EventArgs e)
-        {
-            await FilterData();
-        }
-
-        private async void BtnNext_Click(object sender, EventArgs e)
-        {
-            if (page < totalPage)
-            {
-                page++;
-                BtnPrev.Enabled = true;
-                await FilterData();
-            }
-            else
-            {
-                BtnNext.Enabled = false;
-            }
-        }
-
-        private async void BtnPrev_Click(object sender, EventArgs e)
-        {
-            if (page > 1)
-            {
-                page--;
-                await FilterData();
-                BtnNext.Enabled = true;
-            }
-            else
-            {
-                BtnPrev.Enabled = false;
             }
         }
     }

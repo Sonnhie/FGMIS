@@ -2,6 +2,8 @@
 using FGScanner.Repositories;
 using FGScanner.Services;
 using FGScanner.Util;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,9 +14,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FGScanner
+namespace FGScanner.Forms.Master
 {
-    public partial class Product : Form
+    public partial class MasterList : UserControl
     {
         private int page = 1;
         private int pageSize = 50;
@@ -24,7 +26,7 @@ namespace FGScanner
         private readonly Dbcontext _dbContext;
         private readonly ExcelService _excelService;
 
-        public Product(string userid)
+        public MasterList(string userid)
         {
             InitializeComponent();
             this._userid = userid;
@@ -32,13 +34,6 @@ namespace FGScanner
             _queries = new(_dbContext);
             _excelService = new(_queries);
             TxtPartnumber.CharacterCasing = CharacterCasing.Upper;
-        }
-
-        private async void addbtn_Click(object sender, EventArgs e)
-        {
-            ProductMasterlist productMasterlist = new ProductMasterlist();
-            productMasterlist.ShowDialog();
-            await LoadProducts();
         }
 
         public async Task LoadProducts()
@@ -117,34 +112,16 @@ namespace FGScanner
             }
         }
 
-        private void deletebtn_Click(object sender, EventArgs e)
+        private async void MasterList_Load(object sender, EventArgs e)
         {
-            //List<int> selectedIds = new();
-            //DialogResult result = MessageBox.Show("Are you sure you want to delete the selected items?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            //if (result == DialogResult.Yes)
-            //{
-            //    for (int i = 0; i < LogsTable.Rows.Count; i++)
-            //    {
-            //        DataGridViewCheckBoxCell chk = (DataGridViewCheckBoxCell)LogsTable.Rows[i].Cells["ActionCheckbox"];
-            //        if (chk.Value != null && (bool)chk.Value == true)
-            //        {
-            //            int id = Convert.ToInt32(LogsTable.Rows[i].Cells["ID"].Value);
-            //            var repo = new TransactionRepo();
-            //            repo.DeleteProduct(id);
-            //            selectedIds.Add(id);
-            //        }
-            //    }
+            await LoadProducts();
+        }
 
-            //    if (selectedIds.Count > 0)
-            //    {
-            //        MessageBox.Show($"{selectedIds.Count} item(s) deleted successfully.", "Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //        LoadProducts();
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("No items selected for deletion.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //    }
-            //}
+        private async void addbtn_Click(object sender, EventArgs e)
+        {
+            ProductMasterlist productMasterlist = new ProductMasterlist();
+            productMasterlist.ShowDialog();
+            await LoadProducts();
         }
 
         private async void BtnNext_Click(object sender, EventArgs e)
@@ -173,11 +150,6 @@ namespace FGScanner
             {
                 BtnPrev.Enabled = false;
             }
-        }
-
-        private async void Product_Load(object sender, EventArgs e)
-        {
-            await LoadProducts();
         }
     }
 }

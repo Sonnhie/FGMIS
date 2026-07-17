@@ -701,11 +701,11 @@ namespace FGScanner.Repositories
                                {
                                    LotNo = row.ProdDate.ToString("MM-dd-yy"),
                                    Boxes = row.TotalBox,
-                                   Quantity = row.Quantity
+                                   Quantity = GetProductPPS(row.Partnumber)
                                }).ToList();
 
                                int totalBox = cardRows.Sum(x => x.Boxes);
-                               int totalQuantity = cardRows.Sum(x => x.Quantity);
+                               int totalQuantity = cardRows.Sum(x => x.TotalQty);
                                int pps = GetProductPPS(group.Key);
                                int id = GetProductID(group.Key);
 

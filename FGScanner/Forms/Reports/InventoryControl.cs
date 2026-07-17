@@ -4,6 +4,7 @@ using FGScanner.Models;
 using FGScanner.Repositories;
 using FGScanner.Services;
 using FGScanner.Util;
+using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,11 +17,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
-namespace FGScanner
+
+namespace FGScanner.Forms.Reports
 {
-
-
-    public partial class InventoryForm : Form
+    public partial class InventoryControl : UserControl
     {
         private readonly Queries _queries;
         private readonly Dbcontext _dbContext;
@@ -31,7 +31,7 @@ namespace FGScanner
         private string _userid = string.Empty;
         private string _partnumber = string.Empty;
 
-        public InventoryForm(string userid)
+        public InventoryControl(string userid)
         {
             InitializeComponent();
             _userid = userid;
@@ -144,6 +144,52 @@ namespace FGScanner
             }
         }
 
+        private async void SearchButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                await FilterData(TxtPartnumber.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+
+        private async void InventoryControl_Load(object sender, EventArgs e)
+        {
+            await FilterData(TxtPartnumber.Text);
+        }
+
+        private async void BtnNext_Click(object sender, EventArgs e)
+        {
+            if (page < totalPage)
+            {
+                page++;
+                BtnPrev.Enabled = true;
+                await FilterData(TxtPartnumber.Text);
+            }
+            else
+            {
+                BtnNext.Enabled = false;
+            }
+        }
+
+        private async void BtnPrev_Click(object sender, EventArgs e)
+        {
+            if (page > 1)
+            {
+                page--;
+                await FilterData(TxtPartnumber.Text);
+                BtnNext.Enabled = true;
+            }
+            else
+            {
+                BtnPrev.Enabled = false;
+            }
+        }
+
         private async void BtnExport_Click(object sender, EventArgs e)
         {
             DateTime today = DateTime.Today;
@@ -180,8 +226,8 @@ namespace FGScanner
                     });
 
 
-                    string[] columnheaders = ["Part Number", "Customer", "Lot Date", "Prod Ver", "Location", 
-                                              "Quantity", "Total Box", "Storage Location", "Updated Inventory Date", 
+                    string[] columnheaders = ["Part Number", "Customer", "Lot Date", "Prod Ver", "Location",
+                                              "Quantity", "Total Box", "Storage Location", "Updated Inventory Date",
                                               "Movement Classification"];
 
 
@@ -222,39 +268,6 @@ namespace FGScanner
                     }
                 }
             }
-        }
-
-        private async void BtnNext_Click(object sender, EventArgs e)
-        {
-            if (page < totalPage)
-            {
-                page++;
-                BtnPrev.Enabled = true;
-                await FilterData(TxtPartnumber.Text);
-            }
-            else
-            {
-                BtnNext.Enabled = false;
-            }
-        }
-
-        private async void BtnPrev_Click(object sender, EventArgs e)
-        {
-            if (page > 1)
-            {
-                page--;
-                await FilterData(TxtPartnumber.Text);
-                BtnNext.Enabled = true;
-            }
-            else
-            {
-                BtnPrev.Enabled = false;
-            }
-        }
-
-        private async void InventoryForm_Load(object sender, EventArgs e)
-        {
-            await FilterData(TxtPartnumber.Text);
         }
 
         private void LogsTable_SelectionChanged(object sender, EventArgs e)
@@ -309,19 +322,6 @@ namespace FGScanner
                 StockEdit stockEdit = new(PPS, partnumber, location, productionVersion, ProductionDate, box, quantity, customer, whId, _userid);
                 stockEdit.ShowDialog();
                 await FilterData(TxtPartnumber.Text);
-            }
-        }
-
-        private async void SearchButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-               
-                await FilterData(TxtPartnumber.Text);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
             }
         }
     }

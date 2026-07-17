@@ -15,15 +15,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FGScanner
+
+namespace FGScanner.Forms.Reports
 {
-    public partial class StockCard : Form
+    public partial class Ledger : UserControl
     {
         private readonly Queries _queries;
         private readonly Dbcontext _dbContext;
         private readonly ExcelService _excelService;
 
-        public StockCard()
+        public Ledger()
         {
             InitializeComponent();
             toolStripProgressBar1.Visible = false;
@@ -44,7 +45,7 @@ namespace FGScanner
                 string prodver = ProdVerComboButton.Text;
 
                 var data = await _queries.GetStockLedger(partnumber, postingDate1, postingDate2, prodver, warehouseid);
-              
+
 
                 if (data == null || data.Ledgers.Count == 0)
                 {
@@ -107,7 +108,7 @@ namespace FGScanner
 
         private async void SearchBtn_Click(object sender, EventArgs e)
         {
-           await LoadData();
+            await LoadData();
         }
 
         private async void BtnExport_Click(object sender, EventArgs e)
