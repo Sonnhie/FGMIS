@@ -15,9 +15,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace FGScanner.Forms.DataEntry
 {
-    public partial class Outgoing : Form
+    public partial class Shipments : UserControl
     {
 
         private readonly TransactionService _service;
@@ -29,7 +30,7 @@ namespace FGScanner.Forms.DataEntry
         private BindingList<DPIList> DPIItems = new BindingList<DPIList>();
         private Dictionary<string, DPIList> DPIDict = new Dictionary<string, DPIList>();
 
-        public Outgoing(string userid)
+        public Shipments(string userid)
         {
             InitializeComponent();
             _userid = userid;
@@ -41,6 +42,12 @@ namespace FGScanner.Forms.DataEntry
             toolStripStatusLabel1.Visible = false;
             UploadItemButton.Enabled = false;
             GeneratePackingListBtn.Enabled = false;
+        }
+
+        private void Shipments_Load(object sender, EventArgs e)
+        {
+            toolStripProgressBar1.Visible = false;
+            toolStripStatusLabel1.Visible = false;
         }
 
         private void ReferenceData()
@@ -60,50 +67,7 @@ namespace FGScanner.Forms.DataEntry
                     Box = x.Sum(m => m.Box)
                 });
         }
-        private async void DPIFileButton_Click(object sender, EventArgs e)
-        {
-            using OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Excel Files|*.xlsx;*.xls";
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                DPIItems.Clear();
-                string filePath = openFileDialog.FileName;
-                DPITextBox.Text = filePath;
-                FileInfo fileinfo = new(filePath);
-                var progress = new Progress<int>(value =>
-                {
-                    toolStripProgressBar1.Value = value;
-                    toolStripStatusLabel1.Text = $"Processing: {value}%";
-                });
-
-                try
-                {
-
-                    toolStripProgressBar1.Visible = true;
-                    toolStripStatusLabel1.Visible = true;
-                    toolStripStatusLabel1.Text = "Processing: 0%";
-                    var result = await _excelService.ProcessDPIUpload(fileinfo, progress);
-                    foreach (var item in result.Items)
-                    {
-                        DPIItems.Add(item);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error processing file: {ex.Message}");
-                }
-                finally
-                {
-                    LoadDPITable();
-                    ReferenceData();
-                    toolStripProgressBar1.Value = 0;
-                    toolStripStatusLabel1.Text = "Ready";
-                    toolStripProgressBar1.Visible = false;
-                    toolStripStatusLabel1.Visible = false;
-                }
-            }
-        }
         private void LoadDPITable()
         {
             try
@@ -169,6 +133,134 @@ namespace FGScanner.Forms.DataEntry
                 MessageBox.Show($"Error loading inventory: {ex.Message}");
             }
         }
+
+        private void LoadInventoryTable()
+        {
+            try
+            {
+                var data = validScan
+                           .GroupBy(item => new { item.PartNumber, item.ProductionDate, item.ProductionVersion, item.CustomerId, item.Location })
+                           .Select(item => new
+                           {
+                               Partnumber = item.Key.PartNumber,
+                               Productiondate = item.Key.ProductionDate,
+                               Productionversion = item.Key.ProductionVersion,
+                               QuantityLabel = item.Sum(x => x.Quantity),
+                               location = item.Key.Location,
+                               TotalBox = item.Count(),
+                               Customerid = item.Key.CustomerId,
+                           })
+                           .ToList();
+                if (data.Count != 0)
+                {
+                    DataTable dt = new DataTable();
+                    dt.Columns.Add("Part Number", typeof(string));
+                    dt.Columns.Add("Production Date", typeof(string));
+                    dt.Columns.Add("Production Version", typeof(string));
+                    dt.Columns.Add("Quantity", typeof(int));
+                    dt.Columns.Add("Box Count", typeof(int));
+                    dt.Columns.Add("Location", typeof(string));
+                    dt.Columns.Add("Customer", typeof(string));
+                    foreach (var item in data)
+                    {
+                        dt.Rows.Add(
+                            item.Partnumber,
+                            item.Productiondate.ToString("MM/dd/yyyy"),
+                            item.Productionversion,
+                            item.QuantityLabel,
+                            item.TotalBox,
+                            item.location,
+                            item.Customerid
+                        );
+                    }
+                    ShipmenTable.Columns.Clear();
+                    ShipmenTable.DataSource = dt;
+
+
+                    int count = data.Count;
+                    int sumQuantity = data.Sum(item => item.QuantityLabel);
+                    int totalBoxCount = data.Sum(item => item.TotalBox);
+                    string customerId = data.FirstOrDefault()?.Customerid ?? string.Empty;
+
+                    PartcountLabel.Text = count.ToString();
+                    QuantityLabel.Text = sumQuantity.ToString();
+                    BoxLabel.Text = totalBoxCount.ToString();
+                    CustomerLabel.Text = customerId;
+                    ShipmentIdLabel.Text = GenerateTransactionNumber();
+
+                    ShipmenTable.ReadOnly = true;
+
+                    ShipmenTable.Columns["Part Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    ShipmenTable.Columns["Production Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    ShipmenTable.Columns["Production Version"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    ShipmenTable.Columns["Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    ShipmenTable.Columns["Box Count"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    ShipmenTable.Columns["Customer"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                }
+                else
+                {
+                    MessageBox.Show("No inventory uploaded.");
+                    ShipmenTable.DataSource = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading inventory: {ex.Message}");
+            }
+        }
+
+        private string GenerateTransactionNumber()
+        {
+            var Method = new TransactionRepo();
+            int seq = Method.GetNextShipmentId();
+            return $"SHIPID-{DateTime.Now:yyyyMMdd}-{seq:D4}";
+        }
+
+        private async void DPIFileButton_Click(object sender, EventArgs e)
+        {
+            using OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Excel Files|*.xlsx;*.xls";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                DPIItems.Clear();
+                string filePath = openFileDialog.FileName;
+                DPITextBox.Text = filePath;
+                FileInfo fileinfo = new(filePath);
+                var progress = new Progress<int>(value =>
+                {
+                    toolStripProgressBar1.Value = value;
+                    toolStripStatusLabel1.Text = $"Processing: {value}%";
+                });
+
+                try
+                {
+
+                    toolStripProgressBar1.Visible = true;
+                    toolStripStatusLabel1.Visible = true;
+                    toolStripStatusLabel1.Text = "Processing: 0%";
+                    var result = await _excelService.ProcessDPIUpload(fileinfo, progress);
+                    foreach (var item in result.Items)
+                    {
+                        DPIItems.Add(item);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error processing file: {ex.Message}");
+                }
+                finally
+                {
+                    LoadDPITable();
+                    ReferenceData();
+                    toolStripProgressBar1.Value = 0;
+                    toolStripStatusLabel1.Text = "Ready";
+                    toolStripProgressBar1.Visible = false;
+                    toolStripStatusLabel1.Visible = false;
+                }
+            }
+        }
+
         private async void SelectFileButton_Click(object sender, EventArgs e)
         {
             string warehouse = WarehouseComboBox.Text;
@@ -271,81 +363,6 @@ namespace FGScanner.Forms.DataEntry
             }
         }
 
-        private void LoadInventoryTable()
-        {
-            try
-            {
-                var data = validScan
-                           .GroupBy(item => new { item.PartNumber, item.ProductionDate, item.ProductionVersion, item.CustomerId, item.Location })
-                           .Select(item => new
-                           {
-                               Partnumber = item.Key.PartNumber,
-                               Productiondate = item.Key.ProductionDate,
-                               Productionversion = item.Key.ProductionVersion,
-                               QuantityLabel = item.Sum(x => x.Quantity),
-                               location = item.Key.Location,
-                               TotalBox = item.Count(),
-                               Customerid = item.Key.CustomerId,
-                           })
-                           .ToList();
-                if (data.Count != 0)
-                {
-                    DataTable dt = new DataTable();
-                    dt.Columns.Add("Part Number", typeof(string));
-                    dt.Columns.Add("Production Date", typeof(string));
-                    dt.Columns.Add("Production Version", typeof(string));
-                    dt.Columns.Add("Quantity", typeof(int));
-                    dt.Columns.Add("Box Count", typeof(int));
-                    dt.Columns.Add("Location", typeof(string));
-                    dt.Columns.Add("Customer", typeof(string));
-                    foreach (var item in data)
-                    {
-                        dt.Rows.Add(
-                            item.Partnumber,
-                            item.Productiondate.ToString("MM/dd/yyyy"),
-                            item.Productionversion,
-                            item.QuantityLabel,
-                            item.TotalBox,
-                            item.location,
-                            item.Customerid
-                        );
-                    }
-                    ShipmenTable.Columns.Clear();
-                    ShipmenTable.DataSource = dt;
-
-
-                    int count = data.Count;
-                    int sumQuantity = data.Sum(item => item.QuantityLabel);
-                    int totalBoxCount = data.Sum(item => item.TotalBox);
-                    string customerId = data.FirstOrDefault()?.Customerid ?? string.Empty;
-
-                    PartcountLabel.Text = count.ToString();
-                    QuantityLabel.Text = sumQuantity.ToString();
-                    BoxLabel.Text = totalBoxCount.ToString();
-                    CustomerLabel.Text = customerId;
-                    ShipmentIdLabel.Text = GenerateTransactionNumber();
-
-                    ShipmenTable.ReadOnly = true;
-
-                    ShipmenTable.Columns["Part Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    ShipmenTable.Columns["Production Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    ShipmenTable.Columns["Production Version"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    ShipmenTable.Columns["Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    ShipmenTable.Columns["Box Count"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    ShipmenTable.Columns["Customer"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                }
-                else
-                {
-                    MessageBox.Show("No inventory uploaded.");
-                    ShipmenTable.DataSource = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading inventory: {ex.Message}");
-            }
-        }
-
         private void DPITable_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
         {
             var row = DPITable.Rows[e.RowIndex];
@@ -399,13 +416,6 @@ namespace FGScanner.Forms.DataEntry
             ShipmenTable.Refresh();
             UploadItemButton.Enabled = false;
             FileTextbox.Text = string.Empty;
-        }
-
-        private string GenerateTransactionNumber()
-        {
-            var Method = new TransactionRepo();
-            int seq = Method.GetNextShipmentId();
-            return $"SHIPID-{DateTime.Now:yyyyMMdd}-{seq:D4}";
         }
 
         private async void UploadItemButton_Click(object sender, EventArgs e)
@@ -522,9 +532,6 @@ namespace FGScanner.Forms.DataEntry
             }
         }
 
-        private void WarehouseComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
 
-        }
     }
 }

@@ -84,7 +84,7 @@
             // 
             // SearchButton
             // 
-            SearchButton.Location = new System.Drawing.Point(145, 211);
+            SearchButton.Location = new System.Drawing.Point(145, 241);
             SearchButton.Name = "SearchButton";
             SearchButton.Size = new System.Drawing.Size(171, 36);
             SearchButton.TabIndex = 17;
@@ -169,7 +169,7 @@
             groupBox2.Margin = new System.Windows.Forms.Padding(4);
             groupBox2.Name = "groupBox2";
             groupBox2.Padding = new System.Windows.Forms.Padding(4);
-            groupBox2.Size = new System.Drawing.Size(469, 325);
+            groupBox2.Size = new System.Drawing.Size(469, 289);
             groupBox2.TabIndex = 1;
             groupBox2.TabStop = false;
             groupBox2.Text = "Return Information";
@@ -177,7 +177,7 @@
             // returnBoxLabel
             // 
             returnBoxLabel.AutoSize = true;
-            returnBoxLabel.Location = new System.Drawing.Point(131, 270);
+            returnBoxLabel.Location = new System.Drawing.Point(131, 236);
             returnBoxLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             returnBoxLabel.Name = "returnBoxLabel";
             returnBoxLabel.Size = new System.Drawing.Size(27, 19);
@@ -187,7 +187,7 @@
             // label19
             // 
             label19.AutoSize = true;
-            label19.Location = new System.Drawing.Point(23, 270);
+            label19.Location = new System.Drawing.Point(23, 236);
             label19.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label19.Name = "label19";
             label19.Size = new System.Drawing.Size(60, 19);
@@ -197,7 +197,7 @@
             // ReturnQuantityLabel
             // 
             ReturnQuantityLabel.AutoSize = true;
-            ReturnQuantityLabel.Location = new System.Drawing.Point(131, 239);
+            ReturnQuantityLabel.Location = new System.Drawing.Point(131, 205);
             ReturnQuantityLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             ReturnQuantityLabel.Name = "ReturnQuantityLabel";
             ReturnQuantityLabel.Size = new System.Drawing.Size(27, 19);
@@ -207,7 +207,7 @@
             // label17
             // 
             label17.AutoSize = true;
-            label17.Location = new System.Drawing.Point(23, 239);
+            label17.Location = new System.Drawing.Point(23, 205);
             label17.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label17.Name = "label17";
             label17.Size = new System.Drawing.Size(85, 19);
@@ -237,7 +237,7 @@
             // ReturnItemLabel
             // 
             ReturnItemLabel.AutoSize = true;
-            ReturnItemLabel.Location = new System.Drawing.Point(131, 208);
+            ReturnItemLabel.Location = new System.Drawing.Point(131, 174);
             ReturnItemLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             ReturnItemLabel.Name = "ReturnItemLabel";
             ReturnItemLabel.Size = new System.Drawing.Size(27, 19);
@@ -247,7 +247,7 @@
             // label13
             // 
             label13.AutoSize = true;
-            label13.Location = new System.Drawing.Point(23, 208);
+            label13.Location = new System.Drawing.Point(23, 174);
             label13.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label13.Name = "label13";
             label13.Size = new System.Drawing.Size(68, 19);
@@ -322,7 +322,7 @@
             ReturnTable.Location = new System.Drawing.Point(534, 39);
             ReturnTable.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             ReturnTable.Name = "ReturnTable";
-            ReturnTable.Size = new System.Drawing.Size(720, 287);
+            ReturnTable.Size = new System.Drawing.Size(567, 287);
             ReturnTable.TabIndex = 5;
             ReturnTable.CellContentClick += ReturnTable_CellContentClick;
             // 
@@ -334,12 +334,12 @@
             ReturnItemTable.Location = new System.Drawing.Point(534, 375);
             ReturnItemTable.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             ReturnItemTable.Name = "ReturnItemTable";
-            ReturnItemTable.Size = new System.Drawing.Size(720, 283);
+            ReturnItemTable.Size = new System.Drawing.Size(567, 259);
             ReturnItemTable.TabIndex = 6;
             // 
             // GenerateSlipbutton
             // 
-            GenerateSlipbutton.Location = new System.Drawing.Point(534, 664);
+            GenerateSlipbutton.Location = new System.Drawing.Point(534, 640);
             GenerateSlipbutton.Name = "GenerateSlipbutton";
             GenerateSlipbutton.Size = new System.Drawing.Size(108, 35);
             GenerateSlipbutton.TabIndex = 7;
@@ -349,7 +349,7 @@
             // 
             // CancelReturnButton
             // 
-            CancelReturnButton.Location = new System.Drawing.Point(648, 664);
+            CancelReturnButton.Location = new System.Drawing.Point(648, 640);
             CancelReturnButton.Name = "CancelReturnButton";
             CancelReturnButton.Size = new System.Drawing.Size(98, 35);
             CancelReturnButton.TabIndex = 8;
@@ -385,7 +385,9 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(6F, 19F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1284, 737);
+            AutoScroll = true;
+            AutoSize = true;
+            ClientSize = new System.Drawing.Size(1140, 737);
             Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(CancelReturnButton);

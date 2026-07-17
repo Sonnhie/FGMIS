@@ -1,13 +1,13 @@
-﻿namespace FGScanner
+﻿namespace FGScanner.Forms.DataEntry
 {
-    partial class TransferLocation
+    partial class ChangeLocations
     {
-        /// <summary>
+        /// <summary> 
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
+        /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -20,10 +20,10 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+        #region Component Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
+        /// <summary> 
+        /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -34,7 +34,7 @@
             currLocationComboBox = new System.Windows.Forms.ComboBox();
             WarehouseComboBox = new System.Windows.Forms.ComboBox();
             label2 = new System.Windows.Forms.Label();
-            SelectFileButton = new System.Windows.Forms.Button();
+            TransferButton = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             groupBox2 = new System.Windows.Forms.GroupBox();
             CustomerLabel = new System.Windows.Forms.Label();
@@ -58,22 +58,22 @@
             groupBox1.Controls.Add(currLocationComboBox);
             groupBox1.Controls.Add(WarehouseComboBox);
             groupBox1.Controls.Add(label2);
-            groupBox1.Controls.Add(SelectFileButton);
+            groupBox1.Controls.Add(TransferButton);
             groupBox1.Controls.Add(label1);
             groupBox1.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox1.Location = new System.Drawing.Point(33, 28);
+            groupBox1.Location = new System.Drawing.Point(18, 20);
             groupBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox1.Size = new System.Drawing.Size(567, 213);
-            groupBox1.TabIndex = 0;
+            groupBox1.TabIndex = 1;
             groupBox1.TabStop = false;
             groupBox1.Text = "Data Entry";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(48, 47);
+            label3.Location = new System.Drawing.Point(47, 47);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(117, 19);
             label3.TabIndex = 7;
@@ -110,26 +110,26 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(48, 150);
+            label2.Location = new System.Drawing.Point(47, 150);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(118, 19);
             label2.TabIndex = 3;
             label2.Text = "Select New Location:";
             // 
-            // SelectFileButton
+            // TransferButton
             // 
-            SelectFileButton.Location = new System.Drawing.Point(441, 142);
-            SelectFileButton.Name = "SelectFileButton";
-            SelectFileButton.Size = new System.Drawing.Size(92, 27);
-            SelectFileButton.TabIndex = 2;
-            SelectFileButton.Text = "Transfer";
-            SelectFileButton.UseVisualStyleBackColor = true;
-            SelectFileButton.Click += SelectFileButton_Click;
+            TransferButton.Location = new System.Drawing.Point(441, 142);
+            TransferButton.Name = "TransferButton";
+            TransferButton.Size = new System.Drawing.Size(92, 27);
+            TransferButton.TabIndex = 2;
+            TransferButton.Text = "Transfer";
+            TransferButton.UseVisualStyleBackColor = true;
+            TransferButton.Click += TransferButton_Click;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(44, 95);
+            label1.Location = new System.Drawing.Point(43, 95);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(122, 19);
             label1.TabIndex = 0;
@@ -147,19 +147,19 @@
             groupBox2.Controls.Add(label6);
             groupBox2.Controls.Add(label5);
             groupBox2.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox2.Location = new System.Drawing.Point(619, 28);
+            groupBox2.Location = new System.Drawing.Point(614, 20);
             groupBox2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox2.Name = "groupBox2";
             groupBox2.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox2.Size = new System.Drawing.Size(482, 213);
-            groupBox2.TabIndex = 1;
+            groupBox2.TabIndex = 2;
             groupBox2.TabStop = false;
             groupBox2.Text = "Rack Information:";
             // 
             // CustomerLabel
             // 
             CustomerLabel.AutoSize = true;
-            CustomerLabel.Location = new System.Drawing.Point(335, 47);
+            CustomerLabel.Location = new System.Drawing.Point(334, 47);
             CustomerLabel.Name = "CustomerLabel";
             CustomerLabel.Size = new System.Drawing.Size(21, 19);
             CustomerLabel.TabIndex = 10;
@@ -168,7 +168,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(261, 47);
+            label4.Location = new System.Drawing.Point(260, 47);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(62, 19);
             label4.TabIndex = 9;
@@ -177,7 +177,7 @@
             // QuantityLabel
             // 
             QuantityLabel.AutoSize = true;
-            QuantityLabel.Location = new System.Drawing.Point(167, 142);
+            QuantityLabel.Location = new System.Drawing.Point(166, 142);
             QuantityLabel.Name = "QuantityLabel";
             QuantityLabel.Size = new System.Drawing.Size(21, 19);
             QuantityLabel.TabIndex = 8;
@@ -186,7 +186,7 @@
             // BoxLabel
             // 
             BoxLabel.AutoSize = true;
-            BoxLabel.Location = new System.Drawing.Point(167, 92);
+            BoxLabel.Location = new System.Drawing.Point(166, 92);
             BoxLabel.Name = "BoxLabel";
             BoxLabel.Size = new System.Drawing.Size(21, 19);
             BoxLabel.TabIndex = 7;
@@ -195,7 +195,7 @@
             // PartcountLabel
             // 
             PartcountLabel.AutoSize = true;
-            PartcountLabel.Location = new System.Drawing.Point(167, 47);
+            PartcountLabel.Location = new System.Drawing.Point(166, 47);
             PartcountLabel.Name = "PartcountLabel";
             PartcountLabel.Size = new System.Drawing.Size(21, 19);
             PartcountLabel.TabIndex = 6;
@@ -204,7 +204,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new System.Drawing.Point(38, 142);
+            label7.Location = new System.Drawing.Point(37, 142);
             label7.Name = "label7";
             label7.Size = new System.Drawing.Size(85, 19);
             label7.TabIndex = 5;
@@ -213,7 +213,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(38, 95);
+            label6.Location = new System.Drawing.Point(37, 95);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(60, 19);
             label6.TabIndex = 4;
@@ -222,7 +222,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(38, 47);
+            label5.Location = new System.Drawing.Point(37, 47);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(113, 19);
             label5.TabIndex = 3;
@@ -234,24 +234,20 @@
             RackTable.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             RackTable.BackgroundColor = System.Drawing.Color.White;
             RackTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            RackTable.Location = new System.Drawing.Point(33, 264);
+            RackTable.Location = new System.Drawing.Point(18, 239);
             RackTable.Name = "RackTable";
-            RackTable.Size = new System.Drawing.Size(1068, 388);
-            RackTable.TabIndex = 2;
+            RackTable.Size = new System.Drawing.Size(1078, 388);
+            RackTable.TabIndex = 3;
             // 
-            // TransferLocation
+            // ChangeLocation
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(5F, 14F);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1140, 737);
             Controls.Add(RackTable);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
-            Font = new System.Drawing.Font("Bahnschrift Condensed", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            Name = "TransferLocation";
-            Text = "TransferLocation";
+            Name = "ChangeLocation";
+            Size = new System.Drawing.Size(1127, 656);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);
@@ -263,9 +259,12 @@
         #endregion
 
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox newLocationComboBox;
+        private System.Windows.Forms.ComboBox currLocationComboBox;
         private System.Windows.Forms.ComboBox WarehouseComboBox;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button SelectFileButton;
+        private System.Windows.Forms.Button TransferButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label CustomerLabel;
@@ -277,8 +276,5 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.DataGridView RackTable;
-        private System.Windows.Forms.ComboBox currLocationComboBox;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.ComboBox newLocationComboBox;
     }
 }

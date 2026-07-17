@@ -76,7 +76,7 @@
             menuStrip1.Location = new System.Drawing.Point(0, 42);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            menuStrip1.Size = new System.Drawing.Size(1452, 23);
+            menuStrip1.Size = new System.Drawing.Size(1127, 23);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             menuStrip1.MouseDown += menuStrip1_MouseDown;
@@ -109,7 +109,6 @@
             dataEntryToolStripMenuItem.Name = "dataEntryToolStripMenuItem";
             dataEntryToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             dataEntryToolStripMenuItem.Text = "Data Entry";
-            dataEntryToolStripMenuItem.Click += dataEntryToolStripMenuItem_Click;
             // 
             // transferLocationToolStripMenuItem
             // 
@@ -152,7 +151,6 @@
             rackViewerToolStripMenuItem.Name = "rackViewerToolStripMenuItem";
             rackViewerToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             rackViewerToolStripMenuItem.Text = "Rack Viewer";
-            rackViewerToolStripMenuItem.Click += rackViewerToolStripMenuItem_Click;
             // 
             // warehouseToolStripMenuItem1
             // 
@@ -245,7 +243,7 @@
             panel2.Location = new System.Drawing.Point(0, 0);
             panel2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             panel2.Name = "panel2";
-            panel2.Size = new System.Drawing.Size(1452, 42);
+            panel2.Size = new System.Drawing.Size(1127, 42);
             panel2.TabIndex = 2;
             panel2.MouseDown += panel2_MouseDown;
             // 
@@ -344,14 +342,14 @@
             panel1.Location = new System.Drawing.Point(0, 65);
             panel1.Margin = new System.Windows.Forms.Padding(2);
             panel1.Name = "panel1";
-            panel1.Size = new System.Drawing.Size(1452, 838);
+            panel1.Size = new System.Drawing.Size(1127, 656);
             panel1.TabIndex = 3;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1452, 903);
+            ClientSize = new System.Drawing.Size(1127, 721);
             ControlBox = false;
             Controls.Add(panel1);
             Controls.Add(menuStrip1);

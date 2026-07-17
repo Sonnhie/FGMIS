@@ -17,7 +17,7 @@ using System.Windows.Forms;
 
 namespace FGScanner.Forms.DataEntry
 {
-    public partial class FGEntry : Form
+    public partial class BPPS : UserControl
     {
         private readonly TransactionService _service;
         private readonly Queries _queries;
@@ -25,8 +25,7 @@ namespace FGScanner.Forms.DataEntry
         private readonly ExcelService _excelService;
         private string _userid;
         private List<ScannedData> validScan = new List<ScannedData>();
-
-        public FGEntry(string userid)
+        public BPPS(string userid)
         {
             InitializeComponent();
             _userid = userid;
@@ -39,6 +38,12 @@ namespace FGScanner.Forms.DataEntry
             UploadItemButton.Enabled = false;
         }
 
+        private void BPPS_Load(object sender, EventArgs e)
+        {
+            toolStripProgressBar1.Visible = false;
+            toolStripStatusLabel1.Visible = false;
+        }
+
         private async void SelectFileButton_Click(object sender, EventArgs e)
         {
             string warehouse = WarehouseComboBox.Text;
@@ -47,43 +52,46 @@ namespace FGScanner.Forms.DataEntry
                 MessageBox.Show("Please select a warehouse.");
                 return;
             }
-            using OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Excel Files|*.xlsx;*.xls";
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
+                openFileDialog.Filter = "Excel Files|*.xlsx;*.xls";
 
-                string filePath = openFileDialog.FileName;
-                FileTextbox.Text = filePath;
-                FileInfo fileinfo = new(filePath);
-                var progress = new Progress<int>(value =>
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    toolStripProgressBar1.Value = value;
-                    toolStripStatusLabel1.Text = $"Processing: {value}%";
-                });
 
-                try
-                {
-                    validScan.Clear();
-                    toolStripProgressBar1.Visible = true;
-                    toolStripStatusLabel1.Visible = true;
-                    toolStripStatusLabel1.Text = "Processing: 0%";
-                    var result = await _excelService.ProcessFGUpload(fileinfo, progress, warehouse);
-                    validScan.AddRange(result.ScanItem);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error processing file: {ex.Message}");
-                }
-                finally
-                {
-                    LoadInventoryTable();
-                    toolStripProgressBar1.Value = 0;
-                    toolStripStatusLabel1.Text = "Ready";
-                    toolStripProgressBar1.Visible = false;
-                    toolStripStatusLabel1.Visible = false;
-                    UploadItemButton.Enabled = true;
+                    string filePath = openFileDialog.FileName;
+                    FileTextbox.Text = filePath;
+                    FileInfo fileinfo = new(filePath);
+                    var progress = new Progress<int>(value =>
+                    {
+                        toolStripProgressBar1.Value = value;
+                        toolStripStatusLabel1.Text = $"Processing: {value}%";
+                    });
 
+                    try
+                    {
+                        validScan.Clear();
+                        toolStripProgressBar1.Visible = true;
+                        toolStripStatusLabel1.Visible = true;
+                        toolStripStatusLabel1.Text = "Processing: 0%";
+                        var result = await _excelService.ProcessBPPSUpload(fileinfo, progress, warehouse);
+                        validScan.AddRange(result.ScanItem);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error processing file: {ex.Message}");
+                    }
+                    finally
+                    {
+                        LoadInventoryTable();
+                        toolStripProgressBar1.Value = 0;
+                        toolStripStatusLabel1.Text = "Ready";
+                        toolStripProgressBar1.Visible = false;
+                        toolStripStatusLabel1.Visible = false;
+                        UploadItemButton.Enabled = true;
+
+                    }
                 }
             }
         }
@@ -180,10 +188,8 @@ namespace FGScanner.Forms.DataEntry
                 }
 
                 var result = MessageBox.Show($"Are you sure you want to save {validScan.Count} transactions?", "Confirm Save", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                string transactionType = "IN";
                 if (result == DialogResult.Yes)
                 {
-
                     List<string> rackList = [];
                     List<string> errorUpload = [];
 
@@ -205,7 +211,8 @@ namespace FGScanner.Forms.DataEntry
                         return;
                     }
 
-                    var (isSuccess, Message) = await _service.InsertFG(validScan, warehouse, transactionType, _userid);
+
+                    var (isSuccess, Message) = await _service.InsertBPPS(validScan, warehouse, _userid);
                     if (isSuccess)
                     {
                         MessageBox.Show(Message);
@@ -228,9 +235,9 @@ namespace FGScanner.Forms.DataEntry
         private void ClearButton_Click(object sender, EventArgs e)
         {
             validScan.Clear();
-            RackTable.DataSource = null;
             LoadInventoryTable();
-            RackTable.Refresh();
+            FileTextbox.Text = "";
+            UploadItemButton.Enabled = false;
         }
     }
 }

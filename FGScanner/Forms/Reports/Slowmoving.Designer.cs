@@ -177,6 +177,8 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(5F, 16F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScroll = true;
+            AutoSize = true;
             ClientSize = new System.Drawing.Size(1140, 737);
             Controls.Add(total_box_lbl);
             Controls.Add(total_sum);

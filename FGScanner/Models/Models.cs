@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FGScanner.Models
 {
-    [Table("transaction_history_clean")]
+    [Table("transaction_history")]
     public class Transaction
     {
         [Key]
@@ -158,7 +158,7 @@ namespace FGScanner.Models
         public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
 
-    [Table("actual_inventory_clean")]
+    [Table("actual_inventory")]
     public class ActualInventory
     {
         [Key]
@@ -179,7 +179,7 @@ namespace FGScanner.Models
         [Column("total_box")]
         public int TotalBox { get; set; }
         [Column("remarks")]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
         [Column("WhId")]
         public string WhId { get; set; }
         [Column("storage_location")]
@@ -383,4 +383,43 @@ namespace FGScanner.Models
         // (Do not initialize it with 'new', let the code that creates it assign it)
         public StockCardHeader Header { get; set; }
     }
+
+    public class MonthlyInventorySummary
+    {
+        public int Month { get; set; }
+        public int In { get; set; }
+        public int Out { get; set; }
+        public int EndingStock { get; set; }
+        public int Change { get; set; }
+        public double ChangePercent { get; set; }
+    }
+
+    public class MonthlyStockSummary
+    {
+        public string Month { get; set; }
+        public int Stock { get; set; }
+    }
+
+    public class CustomerStock
+    {
+        public string Customer { get; set; }
+        public int Stock { get; set; }
+    }
+
+    public class MonthlyShipments
+    {
+        public int Month { get; set; }
+        public int Out { get; set; }
+        public int Change { get; set; }
+        public double ChangePercent { get; set; }
+    }
+
+    public class MonthlyReturns
+    {
+        public int Month { get; set; }
+        public int Out { get; set; }
+        public int Change { get; set; }
+        public double ChangePercent { get; set; }
+    }
+
 }

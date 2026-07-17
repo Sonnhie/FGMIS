@@ -1,13 +1,13 @@
 ﻿namespace FGScanner.Forms.DataEntry
 {
-    partial class Return
+    partial class WarehouseReturn
     {
-        /// <summary>
+        /// <summary> 
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
+        /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -20,10 +20,10 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+        #region Component Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
+        /// <summary> 
+        /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -80,12 +80,12 @@
             groupBox1.Controls.Add(SelectFileButton);
             groupBox1.Controls.Add(label1);
             groupBox1.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox1.Location = new System.Drawing.Point(34, 24);
+            groupBox1.Location = new System.Drawing.Point(12, 13);
             groupBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            groupBox1.Size = new System.Drawing.Size(643, 350);
-            groupBox1.TabIndex = 6;
+            groupBox1.Size = new System.Drawing.Size(622, 350);
+            groupBox1.TabIndex = 7;
             groupBox1.TabStop = false;
             groupBox1.Text = "Data Entry";
             // 
@@ -101,7 +101,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(46, 133);
+            label6.Location = new System.Drawing.Point(45, 133);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(115, 19);
             label6.TabIndex = 16;
@@ -109,16 +109,16 @@
             // 
             // RemarkTextbox
             // 
-            RemarkTextbox.Location = new System.Drawing.Point(172, 174);
+            RemarkTextbox.Location = new System.Drawing.Point(171, 173);
             RemarkTextbox.Name = "RemarkTextbox";
-            RemarkTextbox.Size = new System.Drawing.Size(310, 66);
+            RemarkTextbox.Size = new System.Drawing.Size(418, 66);
             RemarkTextbox.TabIndex = 15;
             RemarkTextbox.Text = "";
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(102, 173);
+            label4.Location = new System.Drawing.Point(101, 173);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(59, 19);
             label4.TabIndex = 14;
@@ -132,12 +132,12 @@
             GenerateReturnSlipBtn.TabIndex = 13;
             GenerateReturnSlipBtn.Text = "Generate";
             GenerateReturnSlipBtn.UseVisualStyleBackColor = true;
-            GenerateReturnSlipBtn.Click += GenerateReturnSlipBtn_ClickAsync;
+            GenerateReturnSlipBtn.Click += GenerateReturnSlipBtn_Click;
             // 
             // label11
             // 
             label11.AutoSize = true;
-            label11.Location = new System.Drawing.Point(90, 304);
+            label11.Location = new System.Drawing.Point(89, 304);
             label11.Name = "label11";
             label11.Size = new System.Drawing.Size(71, 19);
             label11.TabIndex = 12;
@@ -145,7 +145,7 @@
             // 
             // ClearButton
             // 
-            ClearButton.Location = new System.Drawing.Point(539, 87);
+            ClearButton.Location = new System.Drawing.Point(441, 128);
             ClearButton.Name = "ClearButton";
             ClearButton.Size = new System.Drawing.Size(92, 27);
             ClearButton.TabIndex = 11;
@@ -166,7 +166,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(113, 263);
+            label2.Location = new System.Drawing.Point(112, 263);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(48, 19);
             label2.TabIndex = 9;
@@ -184,7 +184,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(44, 47);
+            label3.Location = new System.Drawing.Point(43, 47);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(117, 19);
             label3.TabIndex = 7;
@@ -212,7 +212,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(91, 96);
+            label1.Location = new System.Drawing.Point(90, 96);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(70, 19);
             label1.TabIndex = 0;
@@ -229,19 +229,19 @@
             groupBox3.Controls.Add(label5);
             groupBox3.Controls.Add(label8);
             groupBox3.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox3.Location = new System.Drawing.Point(695, 24);
+            groupBox3.Location = new System.Drawing.Point(659, 25);
             groupBox3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox3.Name = "groupBox3";
             groupBox3.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            groupBox3.Size = new System.Drawing.Size(480, 350);
-            groupBox3.TabIndex = 8;
+            groupBox3.Size = new System.Drawing.Size(442, 338);
+            groupBox3.TabIndex = 9;
             groupBox3.TabStop = false;
             groupBox3.Text = "Information:";
             // 
             // ReturnIdLabel
             // 
             ReturnIdLabel.AutoSize = true;
-            ReturnIdLabel.Location = new System.Drawing.Point(173, 148);
+            ReturnIdLabel.Location = new System.Drawing.Point(154, 107);
             ReturnIdLabel.Name = "ReturnIdLabel";
             ReturnIdLabel.Size = new System.Drawing.Size(21, 19);
             ReturnIdLabel.TabIndex = 22;
@@ -250,7 +250,7 @@
             // label21
             // 
             label21.AutoSize = true;
-            label21.Location = new System.Drawing.Point(45, 148);
+            label21.Location = new System.Drawing.Point(26, 107);
             label21.Name = "label21";
             label21.Size = new System.Drawing.Size(60, 19);
             label21.TabIndex = 21;
@@ -259,7 +259,7 @@
             // QuantityLabel
             // 
             QuantityLabel.AutoSize = true;
-            QuantityLabel.Location = new System.Drawing.Point(420, 90);
+            QuantityLabel.Location = new System.Drawing.Point(374, 49);
             QuantityLabel.Name = "QuantityLabel";
             QuantityLabel.Size = new System.Drawing.Size(21, 19);
             QuantityLabel.TabIndex = 8;
@@ -268,7 +268,7 @@
             // BoxLabel
             // 
             BoxLabel.AutoSize = true;
-            BoxLabel.Location = new System.Drawing.Point(173, 115);
+            BoxLabel.Location = new System.Drawing.Point(154, 74);
             BoxLabel.Name = "BoxLabel";
             BoxLabel.Size = new System.Drawing.Size(21, 19);
             BoxLabel.TabIndex = 7;
@@ -277,7 +277,7 @@
             // PartcountLabel
             // 
             PartcountLabel.AutoSize = true;
-            PartcountLabel.Location = new System.Drawing.Point(173, 90);
+            PartcountLabel.Location = new System.Drawing.Point(154, 49);
             PartcountLabel.Name = "PartcountLabel";
             PartcountLabel.Size = new System.Drawing.Size(21, 19);
             PartcountLabel.TabIndex = 6;
@@ -286,7 +286,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new System.Drawing.Point(291, 90);
+            label7.Location = new System.Drawing.Point(245, 49);
             label7.Name = "label7";
             label7.Size = new System.Drawing.Size(85, 19);
             label7.TabIndex = 5;
@@ -295,7 +295,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(44, 118);
+            label5.Location = new System.Drawing.Point(25, 77);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(60, 19);
             label5.TabIndex = 4;
@@ -304,7 +304,7 @@
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new System.Drawing.Point(44, 90);
+            label8.Location = new System.Drawing.Point(25, 49);
             label8.Name = "label8";
             label8.Size = new System.Drawing.Size(113, 19);
             label8.TabIndex = 3;
@@ -316,48 +316,47 @@
             ReturnTable.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             ReturnTable.BackgroundColor = System.Drawing.Color.White;
             ReturnTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            ReturnTable.Location = new System.Drawing.Point(34, 395);
+            ReturnTable.Location = new System.Drawing.Point(12, 369);
             ReturnTable.Name = "ReturnTable";
-            ReturnTable.Size = new System.Drawing.Size(1141, 243);
-            ReturnTable.TabIndex = 15;
+            ReturnTable.Size = new System.Drawing.Size(1089, 252);
+            ReturnTable.TabIndex = 16;
             // 
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1 });
-            statusStrip1.Location = new System.Drawing.Point(0, 715);
+            statusStrip1.Location = new System.Drawing.Point(0, 634);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new System.Drawing.Size(1216, 22);
-            statusStrip1.TabIndex = 17;
+            statusStrip1.Size = new System.Drawing.Size(1127, 22);
+            statusStrip1.TabIndex = 18;
             statusStrip1.Text = "statusStrip1";
             // 
             // toolStripProgressBar1
             // 
             toolStripProgressBar1.Name = "toolStripProgressBar1";
             toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
+            toolStripProgressBar1.Visible = false;
             // 
             // toolStripStatusLabel1
             // 
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
             toolStripStatusLabel1.Text = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Visible = false;
             // 
             // printDocument1
             // 
             printDocument1.PrintPage += printDocument1_PrintPage;
             // 
-            // Return
+            // WarehouseReturn
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            AutoScroll = true;
-            ClientSize = new System.Drawing.Size(1216, 737);
             Controls.Add(statusStrip1);
             Controls.Add(ReturnTable);
             Controls.Add(groupBox3);
             Controls.Add(groupBox1);
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            Name = "Return";
-            Text = "Return";
+            Name = "WarehouseReturn";
+            Size = new System.Drawing.Size(1127, 656);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox3.ResumeLayout(false);
@@ -372,6 +371,10 @@
         #endregion
 
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.ComboBox LocationComboBox;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.RichTextBox RemarkTextbox;
+        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button GenerateReturnSlipBtn;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button ClearButton;
@@ -395,10 +398,6 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.RichTextBox RemarkTextbox;
-        private System.Windows.Forms.Label label4;
         private System.Drawing.Printing.PrintDocument printDocument1;
-        private System.Windows.Forms.ComboBox LocationComboBox;
-        private System.Windows.Forms.Label label6;
     }
 }

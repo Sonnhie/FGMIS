@@ -198,6 +198,7 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(5F, 14F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScroll = true;
             ClientSize = new System.Drawing.Size(1245, 760);
             Controls.Add(SearchButton);
             Controls.Add(total_box_lbl);

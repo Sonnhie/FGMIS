@@ -29,6 +29,7 @@ namespace FGScanner
         private int pageSize = 50;
         private int totalPage = 0;
         private string _userid = string.Empty;
+        private string _partnumber = string.Empty;
 
         public InventoryForm(string userid)
         {
@@ -42,11 +43,11 @@ namespace FGScanner
             _excelService = new(_queries);
         }
 
-        public async Task FilterData()
+        public async Task FilterData(string partnumber = null)
         {
             try
             {
-                string partnumber = TxtPartnumber.Text;
+                //string partnumber = TxtPartnumber.Text;
                 var data = await _queries.GetFilteredInventory(partnumber, page, pageSize);
 
                 totalPage = data.TotalPages == 0 ? 1 : data.TotalPages;
@@ -81,8 +82,8 @@ namespace FGScanner
                                 item.CustomerId,
                                 item.ProdDate.ToString("MM/dd/yyyy"),
                                 item.ProdVer,
-                                item.TotalBox,
-                                item.Quantity,
+                                item.TotalBox.ToString(),
+                                item.Quantity.ToString(),
                                 pps,
                                 item.Location,
                                 item.StorageLocation,
@@ -229,7 +230,7 @@ namespace FGScanner
             {
                 page++;
                 BtnPrev.Enabled = true;
-                await FilterData();
+                await FilterData(TxtPartnumber.Text);
             }
             else
             {
@@ -242,7 +243,7 @@ namespace FGScanner
             if (page > 1)
             {
                 page--;
-                await FilterData();
+                await FilterData(TxtPartnumber.Text);
                 BtnNext.Enabled = true;
             }
             else
@@ -253,7 +254,7 @@ namespace FGScanner
 
         private async void InventoryForm_Load(object sender, EventArgs e)
         {
-            await FilterData();
+            await FilterData(TxtPartnumber.Text);
         }
 
         private void LogsTable_SelectionChanged(object sender, EventArgs e)
@@ -307,7 +308,7 @@ namespace FGScanner
 
                 StockEdit stockEdit = new(PPS, partnumber, location, productionVersion, ProductionDate, box, quantity, customer, whId, _userid);
                 stockEdit.ShowDialog();
-                await FilterData();
+                await FilterData(TxtPartnumber.Text);
             }
         }
 
@@ -315,7 +316,8 @@ namespace FGScanner
         {
             try
             {
-                await FilterData();
+               
+                await FilterData(TxtPartnumber.Text);
             }
             catch (Exception ex)
             {

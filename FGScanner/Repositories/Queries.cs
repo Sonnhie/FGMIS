@@ -122,7 +122,7 @@ namespace FGScanner.Repositories
                             ProdVer = inventory.ProdVer,
                             Box = 1,
                             EntryDate = DateTime.Now,
-                            Location = currLocation,
+                            Location = currLocation.ToUpper(),
                             WhId = warehouseId,
                             Remarks = "Transfer to " + newLocation,
                             Status = "Active",
@@ -289,7 +289,7 @@ namespace FGScanner.Repositories
                         ProdVer = item.ProductionVersion,
                         EntryDate = DateTime.Now,
                         TransactionType = transaction_type,
-                        Location = item.Location,
+                        Location = item.Location.ToUpper(),
                         Remarks = remarks,
                         StorageLocation = item.StorageLocation ?? "9151",
                         Status = "",
@@ -323,7 +323,7 @@ namespace FGScanner.Repositories
                     EntryDate = DateTime.Now,
                     WhId = warehouseId,
                     From = "9151",
-                    To = location,
+                    To = location.ToUpper(),
                     ReturnID = Guid.NewGuid(),
                     Remarks = remarks,
                     IsSynced = false,
@@ -344,7 +344,7 @@ namespace FGScanner.Repositories
                         ProdVer = item.ProductionVersion,
                         EntryDate = DateTime.Now,
                         TransactionType = transaction_type,
-                        Location = item.Location,
+                        Location = item.Location.ToUpper(),
                         Remarks = remarks,
                         StorageLocation = location ?? item.StorageLocation,
                         Status = "",
@@ -615,6 +615,7 @@ namespace FGScanner.Repositories
         public async Task<List<ActualInventory>> GetRackQuantity()
         {
             var result = await _dbContext.ActualInventories
+                        .Where(x => x.WhId == "WH1")
                         .GroupBy(x => x.Location)
                         .Select(x => new ActualInventory
                         {
@@ -627,13 +628,14 @@ namespace FGScanner.Repositories
 
         public async Task<string> GetRackCustomer(string location)
         {
-            var result = await _dbContext.ActualInventories.FirstOrDefaultAsync(x => x.Location == location);
+            var result = await _dbContext.ActualInventories.FirstOrDefaultAsync(x => x.Location == location && x.WhId == "WH1");
             return result?.CustomerId ?? "";
         }
 
         public async Task<Dictionary<string, int>> GetRackIds()
         {
             var result = await _dbContext.Transactions
+                        .Where(x => x.WhId == "WH1")
                         .GroupBy(x =>  x.Location)
                         .ToDictionaryAsync(x => x.Key, x => x.Max(x => x.Id));
 
@@ -643,7 +645,7 @@ namespace FGScanner.Repositories
         public async Task<int> GetRackQty(string location)
         {
             var result = await _dbContext.ActualInventories
-                         .Where(x => x.Location == location)
+                         .Where(x => x.Location == location && x.WhId == "WH1")
                          .SumAsync(x => x.Quantity);
             return result;
         }
@@ -651,7 +653,7 @@ namespace FGScanner.Repositories
         public async Task<List<ActualInventory>> GetItemByPartnumber(string partnumber)
         {
             var MappedList = await _dbContext.ActualInventories
-                            .Where(x => x.Partnumber == partnumber)
+                            .Where(x => x.Partnumber == partnumber && x.WhId == "WH1")
                             .GroupBy(x => x.Location )
                             .Select(x => new ActualInventory
                             {
@@ -664,10 +666,10 @@ namespace FGScanner.Repositories
             return MappedList;
         }
 
-        public async Task<List<ActualInventory>> GetItemByLocation(string location)
+        public async Task<List<ActualInventory>> GetItemByLocation(string location, string warehouseid)
         {
             var MappedList = await _dbContext.ActualInventories
-                            .Where(x => x.Location == location)
+                            .Where(x => x.Location == location && x.WhId == warehouseid)
                             .GroupBy(x => new { x.Partnumber, x.ProdDate, x.ProdVer })
                             .Select(x => new ActualInventory
                             {
@@ -676,7 +678,8 @@ namespace FGScanner.Repositories
                                 ProdVer = x.Key.ProdVer,
                                 CustomerId = x.First().CustomerId,
                                 Quantity = x.Sum(x => x.Quantity),
-                                TotalBox = x.Sum(x => x.TotalBox)
+                                TotalBox = x.Sum(x => x.TotalBox),
+                                WhId = x.Max(x => x.WhId)
                             })
                             .OrderBy(x => x.ProdDate)
                             .ToListAsync();
@@ -684,10 +687,10 @@ namespace FGScanner.Repositories
             return MappedList;
         }
 
-        public async Task<List<InventoryCardData>> GetInventoryCardDataByLocation(string location)
+       public async Task<List<InventoryCardData>> GetInventoryCardDataByLocation(string location, string warehouseid)
         {
             var rawData = await _dbContext.ActualInventories
-                            .Where(x => x.Location == location)
+                            .Where(x => x.Location == location && x.WhId == warehouseid)
                             .OrderBy(x => x.Partnumber)
                             .ToListAsync();
             var allCards = rawData
@@ -729,7 +732,7 @@ namespace FGScanner.Repositories
 
             if (!string.IsNullOrEmpty(partnumber))
             {
-                query = query.Where(x => x.Partnumber == partnumber);
+                query = query.Where(x => x.Partnumber.Contains(partnumber));
             }
 
             int totalCount = await query.CountAsync();
@@ -884,12 +887,12 @@ namespace FGScanner.Repositories
         }
 
       
-        public async Task<StockCardHeader> GetStockLedger(string partnumber, DateTime startDate, DateTime endDate, string prodver)
+        public async Task<StockCardHeader> GetStockLedger(string partnumber, DateTime startDate, DateTime endDate, string prodver, string warehouseid)
         {
             try
             {
                 var beginningBalance = await _dbContext.Transactions
-                    .Where(t => t.Partnumber == partnumber && t.EntryDate < startDate && t.ProdVer == prodver)
+                    .Where(t => t.Partnumber == partnumber && t.EntryDate < startDate && t.ProdVer == prodver && t.WhId == warehouseid)
                     .SumAsync(t => t.TransactionType == "IN" ? t.Quantity : t.TransactionType == "OUT" ? -t.Quantity : 0);
 
                 var dailyTransaction = await _dbContext.Transactions
@@ -897,7 +900,8 @@ namespace FGScanner.Repositories
                              && t.ProdVer == prodver
                              && t.EntryDate >= startDate
                              && t.EntryDate < endDate.AddDays(1)
-                             && t.Quantity > 0)
+                             && t.Quantity > 0
+                             && t.WhId == warehouseid)
                     .GroupBy(t => new { TransactionDate = t.EntryDate.Date, t.InCharge, t.Remarks })
                     .Select(t => new
                     {
@@ -1008,6 +1012,234 @@ namespace FGScanner.Repositories
             };
 
             return result;
+        }
+        
+        public async Task<List<int>> GetYear()
+        {
+            try
+            {
+                var result = await _dbContext.Transactions
+                                   .GroupBy(x => x.EntryDate.Year)
+                                   .Select(x => x.Key)
+                                   .ToListAsync();
+                return result;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<MonthlyInventorySummary>> GetMonthlySummary(int year)
+        {
+            var report = new List<MonthlyInventorySummary>();
+            using var dbContext = new Dbcontext();
+            try
+            {
+                var previousStock = await dbContext.Transactions
+                    .Where(x => x.EntryDate.Year < year)
+                    .SumAsync(x => x.TransactionType == "IN" ? x.Quantity :
+                                   x.TransactionType == "OUT" ? -x.Quantity : 0);
+
+                int runningStock = previousStock;
+
+                var currentStockBalance = await dbContext.Transactions
+                    .Where(x => x.EntryDate.Year == year)
+                    .GroupBy(x => x.EntryDate.Month)
+                    .Select(x => new
+                    {
+                        Month = x.Key,
+                        In = x.Where(t => t.TransactionType == "IN").Sum(t => (int?)t.Quantity) ?? 0,
+                        Out = x.Where(t => t.TransactionType == "OUT").Sum(t => (int?)t.Quantity) ?? 0
+                    })
+                    .ToListAsync();
+
+                for (int i = 1; i <= 12; i++)
+                {
+                    var monthData = currentStockBalance.FirstOrDefault(d => d.Month == i);
+
+                    int totalInForMonth = monthData?.In ?? 0;
+                    int totalOutForMonth = monthData?.Out ?? 0;
+
+
+                    runningStock += totalInForMonth - totalOutForMonth;
+
+                    report.Add(new MonthlyInventorySummary
+                    {
+                        Month = i,                 // The current month (1-12)
+                        In = totalInForMonth,
+                        Out = totalOutForMonth,
+                        EndingStock = runningStock // The cumulative balance
+                    });
+                }
+
+                return report;
+            }
+            catch
+            {
+                return [];
+            }
+        }
+
+        public async Task<List<CustomerStock>> GetCustomerStocksAsync()
+        {
+            try
+            {
+                using var dbContext = new Dbcontext();
+                var stocks = new List<CustomerStock>();
+                var result = await dbContext.Transactions
+                                  .GroupBy(x => x.CustomerId)
+                                  .Select(x => new
+                                  {
+                                      Customer = x.Key,
+                                      TotalIn = x.Where(x => x.TransactionType == "IN").Sum(x => x.Quantity),
+                                      TotalOUT = x.Where(x => x.TransactionType == "OUT").Sum(x => x.Quantity)
+                                  })
+                                  .ToListAsync();
+                foreach(var item in result)
+                {
+                    int totalStock = item.TotalIn - item.TotalOUT;
+                    stocks.Add(new CustomerStock
+                    {
+                        Customer = item.Customer,
+                        Stock = totalStock
+                    });
+                }
+
+                return stocks;
+            }
+            catch
+            {
+                return [];
+            }
+        }
+
+        public async Task<List<MonthlyShipments>> GetMonthlyShipment(int year)
+        {
+            var report = new List<MonthlyShipments>();
+            using var dbContext = new Dbcontext();
+            try
+            {
+                var previousStock = await dbContext.Transactions
+                    .Where(x => x.EntryDate.Year < year && x.controlNumber.Contains("SHIPID-"))
+                    .SumAsync(x => x.Quantity);
+
+                int runningStock = previousStock;
+
+                var currentStockBalance = await dbContext.Transactions
+                    .Where(x => x.EntryDate.Year == year && x.controlNumber.Contains("SHIPID-"))
+                    .GroupBy(x => x.EntryDate.Month)
+                    .Select(x =>  new
+                    {
+                        Month = x.Key,
+                        Quantity = x.Sum(x => x.Quantity)
+                    })
+                    .ToListAsync();
+                int previousMonthQuantity = 0;
+
+                for (int i = 1; i <= 12; i++)
+                {
+                    var monthData = currentStockBalance.FirstOrDefault(d => d.Month == i);
+
+                    int current = monthData?.Quantity ?? 0;
+
+                   
+                    runningStock += current;
+                    int change = current - previousMonthQuantity;
+                    double changePercent = previousMonthQuantity == 0
+                                   ? 0
+                                   : (change * 100.0 / previousMonthQuantity);
+
+                    report.Add(new MonthlyShipments
+                    {
+                        Month = i,                 // The current month (1-12)
+                        Out = current,
+                        Change = change,
+                        ChangePercent = changePercent
+                    });
+                }
+
+                return report;
+            }
+            catch
+            {
+                return [];
+            }
+        }
+
+        public async Task<List<MonthlyReturns>> GetMonthlyReturns(int year)
+        {
+            var report = new List<MonthlyReturns>();
+            using var dbContext = new Dbcontext();
+            try
+            {
+                var previousStock = await dbContext.Transactions
+                    .Where(x => x.EntryDate.Year < year && x.controlNumber.Contains("AS-"))
+                    .SumAsync(x => x.Quantity);
+
+                int runningStock = previousStock;
+
+                var currentStockBalance = await dbContext.Transactions
+                    .Where(x => x.EntryDate.Year == year && x.controlNumber.Contains("AS-"))
+                    .GroupBy(x => x.EntryDate.Month)
+                    .Select(x => new
+                    {
+                        Month = x.Key,
+                        Quantity = x.Sum(x => x.Quantity)
+                    })
+                    .ToListAsync();
+                int previousMonthQuantity = 0;
+
+                for (int i = 1; i <= 12; i++)
+                {
+                    var monthData = currentStockBalance.FirstOrDefault(d => d.Month == i);
+
+                    int current = monthData?.Quantity ?? 0;
+
+
+                    runningStock += current;
+                    int change = current - previousMonthQuantity;
+                    double changePercent = previousMonthQuantity == 0
+                                   ? 0
+                                   : (change * 100.0 / previousMonthQuantity);
+
+                    report.Add(new MonthlyReturns
+                    {
+                        Month = i,                 // The current month (1-12)
+                        Out = current,
+                        Change = change,
+                        ChangePercent = changePercent
+                    });
+                }
+
+                return report;
+            }
+            catch
+            {
+                return [];
+            }
+        }
+
+        public async Task<int> GetSlowMovingItem()
+        {
+            using var dbContext = new Dbcontext();
+           
+            try
+            {
+                int count = 0;
+                var result = await dbContext.ActualInventories
+                            .Where(x => x.MovementClassification == "SLOW" && x.Quantity > 0)
+                            .GroupBy(x => x.Partnumber)
+                            .Select(x => x.Key)
+                            .ToListAsync();
+                count = result.Count;
+
+                return count;
+            }
+            catch
+            {
+                return 0;
+            }
         }
     }
 }

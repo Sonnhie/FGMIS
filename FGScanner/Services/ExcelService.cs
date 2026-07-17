@@ -275,8 +275,8 @@ namespace FGScanner.Services
                     validScan.Clear();
                     for (int row = startRow; row <= rowCount; row++)
                     {
-                        QRCode = ws.Cells[row, 1].Value?.ToString().Trim();
-                        location = ws.Cells[row, 2].Value?.ToString().Trim();
+                        QRCode = ws.Cells[row, 1].Value?.ToString().Trim().ToUpper();
+                        location = ws.Cells[row, 2].Value?.ToString().Trim().ToUpper();
                         if (!string.IsNullOrWhiteSpace(QRCode) && !string.IsNullOrWhiteSpace(location))
                         {
                             var result = await ProcessBPPSQRCodeData(QRCode, location);
@@ -325,8 +325,8 @@ namespace FGScanner.Services
                     validScan.Clear();
                     for (int row = startRow; row <= rowCount; row++)
                     {
-                        QRCode = ws.Cells[row, 1].Value?.ToString().Trim();
-                        location = ws.Cells[row, 2].Value?.ToString().Trim();
+                        QRCode = ws.Cells[row, 1].Value?.ToString().Trim().ToUpper();
+                        location = ws.Cells[row, 2].Value?.ToString().Trim().ToUpper();
                         if (!string.IsNullOrWhiteSpace(QRCode) && !string.IsNullOrWhiteSpace(location))
                         {
                             var (isSuccess, Message, ScanItem) = await ProcessFGQRCodeData(QRCode, location);
@@ -379,8 +379,8 @@ namespace FGScanner.Services
                     validScan.Clear();
                     for (int row = startRow; row <= rowCount; row++)
                     {
-                        QRCode = ws.Cells[row, 1].Value?.ToString().Trim();
-                        location = ws.Cells[row, 2].Value?.ToString().Trim();
+                        QRCode = ws.Cells[row, 1].Value?.ToString().Trim().ToUpper();
+                        location = ws.Cells[row, 2].Value?.ToString().Trim().ToUpper();
                         if (!string.IsNullOrWhiteSpace(QRCode) && !string.IsNullOrWhiteSpace(location))
                         {
                             var (isSuccess, Message, ScanItem) = await ProcessFGQRCodeData(QRCode, location);
@@ -625,8 +625,8 @@ namespace FGScanner.Services
                     validScan.Clear();
                     for (int row = startRow; row <= rowCount; row++)
                     {
-                        QRCode = ws.Cells[row, 1].Value?.ToString().Trim();
-                        location = ws.Cells[row, 2].Value?.ToString().Trim();
+                        QRCode = ws.Cells[row, 1].Value?.ToString().Trim().ToUpper();
+                        location = ws.Cells[row, 2].Value?.ToString().Trim().ToUpper();
                         if (!string.IsNullOrWhiteSpace(QRCode) && !string.IsNullOrWhiteSpace(location))
                         {
                             var (isSuccess, Message, ScanItem) = await ProcessFGQRCodeData(QRCode, location);

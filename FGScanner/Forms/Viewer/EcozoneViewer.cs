@@ -37,8 +37,6 @@ namespace FGScanner
         private Dictionary<string, string> RackCustomerCache = [];
         private Dictionary<string, int> LastRackIDCache = [];
 
-        private TransactionRepo Method = new TransactionRepo();
-
         private readonly string[] Racks = new string[] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q","R","S","T", "EX-A", "EX-B", "EX-C", "EX-D", "EX-E", "EX-F", "EX-K", "EX-L", "2F", "FL" };
         private readonly string whId = "WH1";
         private readonly Dictionary<string, (int rows, int cols)> RackConfig = new()
@@ -254,7 +252,7 @@ namespace FGScanner
         {
             try
             {
-                var Datas = await _queries.GetItemByLocation(location);
+                var Datas = await _queries.GetItemByLocation(location, "WH1");
                 var totalBox = Datas
                                .Sum(d => d.TotalBox);
                 var totalQty = Datas
@@ -271,6 +269,8 @@ namespace FGScanner
                     dt.Columns.Add("Production Date", typeof(string));
                     dt.Columns.Add("Production Version", typeof(string));
                     dt.Columns.Add("Customer", typeof(string));
+                    dt.Columns.Add("Warehouse", typeof(string));
+
 
                     foreach (var Data in Datas)
                     {
@@ -283,7 +283,8 @@ namespace FGScanner
                               Data.TotalBox,
                               Data.ProdDate.ToString("MM/dd/yyyy"),
                               Data.ProdVer,
-                              Data.CustomerId
+                              Data.CustomerId,
+                              Data.WhId
                             );
                         }
                     }
@@ -375,7 +376,7 @@ namespace FGScanner
 
             try
             {
-                var data = await _queries.GetInventoryCardDataByLocation(location);
+                var data = await _queries.GetInventoryCardDataByLocation(location, "WH1");
                 cardsToPrint.Clear();
                 cardsToPrint.AddRange(data);
             }

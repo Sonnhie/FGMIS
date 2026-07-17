@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             groupBox1 = new System.Windows.Forms.GroupBox();
+            label8 = new System.Windows.Forms.Label();
+            warehouseidcmb = new System.Windows.Forms.ComboBox();
             label7 = new System.Windows.Forms.Label();
             ProdVerComboButton = new System.Windows.Forms.ComboBox();
             SearchBtn = new System.Windows.Forms.Button();
@@ -60,6 +62,8 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(label8);
+            groupBox1.Controls.Add(warehouseidcmb);
             groupBox1.Controls.Add(label7);
             groupBox1.Controls.Add(ProdVerComboButton);
             groupBox1.Controls.Add(SearchBtn);
@@ -76,6 +80,27 @@
             groupBox1.TabIndex = 2;
             groupBox1.TabStop = false;
             groupBox1.Text = "Filters";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            label8.Location = new System.Drawing.Point(265, 127);
+            label8.Name = "label8";
+            label8.Size = new System.Drawing.Size(65, 18);
+            label8.TabIndex = 17;
+            label8.Text = "Warehouse:";
+            // 
+            // warehouseidcmb
+            // 
+            warehouseidcmb.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            warehouseidcmb.FormattingEnabled = true;
+            warehouseidcmb.Items.AddRange(new object[] { "WH1", "WH2" });
+            warehouseidcmb.Location = new System.Drawing.Point(335, 119);
+            warehouseidcmb.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            warehouseidcmb.Name = "warehouseidcmb";
+            warehouseidcmb.Size = new System.Drawing.Size(135, 26);
+            warehouseidcmb.TabIndex = 16;
             // 
             // label7
             // 
@@ -178,7 +203,7 @@
             StockCardtable.Location = new System.Drawing.Point(39, 233);
             StockCardtable.Name = "StockCardtable";
             StockCardtable.ReadOnly = true;
-            StockCardtable.Size = new System.Drawing.Size(1070, 473);
+            StockCardtable.Size = new System.Drawing.Size(1146, 382);
             StockCardtable.TabIndex = 3;
             // 
             // total_sum
@@ -194,7 +219,7 @@
             // BtnExport
             // 
             BtnExport.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            BtnExport.Location = new System.Drawing.Point(1018, 189);
+            BtnExport.Location = new System.Drawing.Point(1094, 189);
             BtnExport.Name = "BtnExport";
             BtnExport.Size = new System.Drawing.Size(91, 31);
             BtnExport.TabIndex = 12;
@@ -225,7 +250,7 @@
             groupBox2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
             groupBox2.Location = new System.Drawing.Point(558, 22);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new System.Drawing.Size(551, 161);
+            groupBox2.Size = new System.Drawing.Size(627, 161);
             groupBox2.TabIndex = 15;
             groupBox2.TabStop = false;
             groupBox2.Text = "Stock Information";
@@ -292,7 +317,7 @@
             statusStrip1.Location = new System.Drawing.Point(0, 714);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 11, 0);
-            statusStrip1.Size = new System.Drawing.Size(1140, 23);
+            statusStrip1.Size = new System.Drawing.Size(1224, 23);
             statusStrip1.TabIndex = 16;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -311,7 +336,9 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(5F, 14F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1140, 737);
+            AutoScroll = true;
+            AutoSize = true;
+            ClientSize = new System.Drawing.Size(1224, 737);
             Controls.Add(statusStrip1);
             Controls.Add(groupBox2);
             Controls.Add(BtnExport);
@@ -359,5 +386,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox ProdVerComboButton;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ComboBox warehouseidcmb;
     }
 }

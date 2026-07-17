@@ -17,7 +17,7 @@ using System.Windows.Forms;
 
 namespace FGScanner.Forms.DataEntry
 {
-    public partial class FGEntry : Form
+    public partial class Incoming : UserControl
     {
         private readonly TransactionService _service;
         private readonly Queries _queries;
@@ -26,7 +26,7 @@ namespace FGScanner.Forms.DataEntry
         private string _userid;
         private List<ScannedData> validScan = new List<ScannedData>();
 
-        public FGEntry(string userid)
+        public Incoming(string userid)
         {
             InitializeComponent();
             _userid = userid;
@@ -34,8 +34,8 @@ namespace FGScanner.Forms.DataEntry
             _queries = new(_dbContext);
             _service = new(_queries);
             _excelService = new(_queries);
-            toolStripProgressBar1.Visible = false;
             toolStripStatusLabel1.Visible = false;
+            toolStripProgressBar1.Visible = false;
             UploadItemButton.Enabled = false;
         }
 
@@ -162,7 +162,7 @@ namespace FGScanner.Forms.DataEntry
             }
         }
 
-        private async void UploadItemButton_Click(object sender, EventArgs e)
+        private async void UploadItemButton_Click_1(object sender, EventArgs e)
         {
             try
             {
@@ -229,8 +229,15 @@ namespace FGScanner.Forms.DataEntry
         {
             validScan.Clear();
             RackTable.DataSource = null;
+            FileTextbox.Text = "";
             LoadInventoryTable();
             RackTable.Refresh();
+        }
+
+        private void Incoming_Load(object sender, EventArgs e)
+        {
+            toolStripProgressBar1.Visible = false;
+            toolStripStatusLabel1.Visible = false;
         }
     }
 }

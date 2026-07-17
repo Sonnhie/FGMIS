@@ -1,4 +1,6 @@
-﻿using FGScanner.Model;
+﻿using FGScanner.Database;
+using FGScanner.Models;
+using FGScanner.Repositories;
 using FGScanner.Util;
 using System;
 using System.Collections.Generic;
@@ -7,82 +9,95 @@ using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
-namespace FGScanner
+namespace FGScanner.Forms.DataEntry
 {
-    public partial class Report : Form
+    public partial class Dashboard : UserControl
     {
-        private Dictionary<int, MonthlyInventorySummary> MonthlyStocksCache = new Dictionary<int, MonthlyInventorySummary>();
+        private Dictionary<int, MonthlyInventorySummary> MonthlyStocksCache = [];
+        private readonly Queries _queries;
+        private readonly Dbcontext _dbContext;
 
-        public Report()
+        public Dashboard()
         {
-            InitializeComponent();  
+            InitializeComponent();
+            _dbContext = new();
+            _queries = new(_dbContext);
         }
 
-        private void Report_Load(object sender, EventArgs e)
-        {
-            int selectedYear = cmbYear.SelectedItem != null ? int.Parse(cmbYear.SelectedItem.ToString()) : DateTime.Now.Year;
-            LoadCMBYearDataSource();
-            PopulateStatusCards(selectedYear);
-            PopulateCharts(selectedYear);
-            StartPollingForUpdates();
-            LoadSlowMovingItems();
-        }
-
-        private void PopulateStatusCards(int year)
+        private async void Dashboard_Load(object sender, EventArgs e)
         {
             try
             {
-                GetTotalMonthlyStocks(year);
+                await LoadCMBYearDataSource();
+
+                int selectedYear = DateTime.Now.Year;
+                if (cmbYear.SelectedItem != null)
+                {
+                    selectedYear = int.Parse(cmbYear.SelectedItem.ToString());
+                }
+
+                await PopulateStatusCards(selectedYear);
+                await PopulateCharts(selectedYear);
+                await LoadSlowMovingItems();
+                StartPollingForUpdates();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading report dashboard: {ex.Message}", "Loading Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task PopulateStatusCards(int year)
+        {
+            try
+            {
+                await GetTotalMonthlyStocks(year);
                 GetMonthlyShipments(year);
                 GetTotalReturns(year);
-                GetLowStockItems();
+                await GetLowStockItems();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show($"Error populating status cards: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void PopulateCharts(int year)
+        private async Task PopulateCharts(int year)
         {
             try
             {
-                LoadLineChart(year);
-                LoadPieChart();
+                await LoadLineChart(year);
+                await LoadPieChart();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show($"Error populating charts: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void LoadCMBYearDataSource()
+        private async Task LoadCMBYearDataSource()
         {
-            var Repo = new TransactionRepo();
-            var Year = Repo.GetYear();
-
-            AutoCompleteStringCollection auto = new AutoCompleteStringCollection();
-            auto.AddRange(Year.Select(y => y.ToString()).ToArray());
-            cmbYear.DataSource = auto;
+            var result = await _queries.GetYear();
+            cmbYear.DataSource = result;
         }
 
-        private void GetTotalMonthlyStocks(int year)
+        private async Task GetTotalMonthlyStocks(int year)
         {
-           int month = DateTime.Now.Month;
-           
-           var Repo = new TransactionRepo();
-           var Data = Repo.GetMonthlyInventory(year);
+            int month = DateTime.Now.Month;
 
-           var orderedData = Data.OrderBy(d => d.Month).ToList();
+            var Data = await _queries.GetMonthlySummary(year);
 
-           List<MonthlyInventorySummary> monthlyInventorySummaries = new List<MonthlyInventorySummary>();
-           for (int i = 0; i < orderedData.Count; i++)
-           {
+            var orderedData = Data.OrderBy(d => d.Month).ToList();
+
+            List<MonthlyInventorySummary> monthlyInventorySummaries = new List<MonthlyInventorySummary>();
+            for (int i = 0; i < orderedData.Count; i++)
+            {
                 int Current = orderedData[i].EndingStock;
                 int Previous = i == 0 ? 0 : orderedData[i - 1].EndingStock;
                 int Change = Current - Previous;
@@ -95,10 +110,10 @@ namespace FGScanner
                     ChangePercent = Previous == 0 ? 0 : (Change * 100.0 / Previous),
                     Change = Change
                 });
-           }
+            }
 
-           var CurrentMonthData = monthlyInventorySummaries.FirstOrDefault(d => d.Month == month);
-           monthstock_lbl.Text = CurrentMonthData != null ? CurrentMonthData.EndingStock.ToString("N0") : "0";
+            var CurrentMonthData = monthlyInventorySummaries.FirstOrDefault(d => d.Month == month);
+            monthstock_lbl.Text = CurrentMonthData != null ? CurrentMonthData.EndingStock.ToString("N0") : "0";
 
             if (CurrentMonthData.Change >= 0)
             {
@@ -112,30 +127,13 @@ namespace FGScanner
             }
         }
 
-        private void GetMonthlyShipments(int year)
+        private async void GetMonthlyShipments(int year)
         {
             int month = DateTime.Now.Month;
-            var Repo = new TransactionRepo();
-            var Data = Repo.GetMonthlyShipments(year);
 
-            var orderedData = Data.OrderBy(d => d.Month).ToList();
-            List<MonthlyShipment> monthlyShipments = new List<MonthlyShipment>();
-            for (int i = 0; i < orderedData.Count; i++)
-            {
-                int Current = orderedData[i].Out;
-                int Previous = i == 0 ? 0 : orderedData[i - 1].Out;
-                int Change = Current - Previous;
+            var Data = await _queries.GetMonthlyShipment(year);
 
-                monthlyShipments.Add(new MonthlyShipment
-                {
-                    Month = orderedData[i].Month,
-                    Out = orderedData[i].Out,
-                    Change = Change,
-                    ChangePercent = Previous == 0 ? 0 : (Change * 100.0 / Previous)
-                });
-            }
-
-            var CurrentMonthData = monthlyShipments.FirstOrDefault(d => d.Month == month);
+            var CurrentMonthData = Data.FirstOrDefault(d => d.Month == month);
             ship_lbl.Text = CurrentMonthData != null ? CurrentMonthData.Out.ToString("N0") : "0";
             if (CurrentMonthData.Change >= 0)
             {
@@ -149,29 +147,13 @@ namespace FGScanner
             }
         }
 
-        private void GetTotalReturns(int year)
+        private async void GetTotalReturns(int year)
         {
             int month = DateTime.Now.Month;
-            var Repo = new TransactionRepo();
-            var Data = Repo.GetMonthlyReturn(year);
-            var orderedData = Data.OrderBy(d => d.Month).ToList();
-            List<MonthlyReturn> monthlyReturns = new List<MonthlyReturn>();
-            for (int i = 0; i < orderedData.Count; i++)
-            {
-                int Current = orderedData[i].Out;
-                int Previous = i == 0 ? 0 : orderedData[i - 1].Out;
-                int Change = Current - Previous;
 
-                monthlyReturns.Add(new MonthlyReturn
-                {
-                    Month = orderedData[i].Month,
-                    Out = orderedData[i].Out,
-                    Change = Change,
-                    ChangePercent = Previous == 0 ? 0 : (Change * 100.0 / Previous)
-                });
-            }
+            var Data = await _queries.GetMonthlyReturns(year);
 
-            var CurrentMonthData = monthlyReturns.FirstOrDefault(d => d.Month == month);
+            var CurrentMonthData = Data.FirstOrDefault(d => d.Month == month);
             return_lbl.Text = CurrentMonthData != null ? CurrentMonthData.Out.ToString("N0") : "0";
             if (CurrentMonthData.Change >= 0)
             {
@@ -185,19 +167,17 @@ namespace FGScanner
             }
         }
 
-        private void GetLowStockItems()
+        private async Task GetLowStockItems()
         {
-            var Repo = new TransactionRepo();
-            var Data = Repo.GetTotalSlowmovingItems();
-            slowitem_lbl.Text = Data.ToString("N0");
+            var data = await _queries.GetSlowMovingItem();
+            slowitem_lbl.Text = data.ToString("N0");
         }
 
-        private void LoadSlowMovingItems()
+        private async Task LoadSlowMovingItems()
         {
             try
             {
-                var Repo = new TransactionRepo();
-                var Data = Repo.GetSlowMovingItem();
+                var Data = await _queries.GetSlowMovingDataAsync();
 
                 if (Data != null)
                 {
@@ -210,24 +190,22 @@ namespace FGScanner
                     dt.Columns.Add("Quantity", typeof(string));
                     dt.Columns.Add("Location", typeof(string));
                     dt.Columns.Add("Last Moving Date", typeof(string));
-                    dt.Columns.Add("Classification", typeof(string));
                     dt.Columns.Add("Storage Location", typeof(string));
 
                     foreach (var item in Data)
                     {
-                        if (item.Quantity != 0)
+                        if (item.quantity != 0)
                         {
                             dt.Rows.Add
                                 (
-                                    item.Partnumber,
-                                    item.Customer,
-                                    item.ProdDate.ToString("MM/dd/yyyy"),
-                                    item.Box,
-                                    item.Quantity,
-                                    item.Location,
-                                    item.Lastmovement.HasValue ? item.Lastmovement.Value.ToString("MM/dd/yyyy") : "",
-                                    item.Classification,
-                                    item.Storage_location
+                                    item.partnumber,
+                                    item.customer,
+                                    item.proddate.ToString("MM/dd/yyyy"),
+                                    item.box,
+                                    item.quantity,
+                                    item.location,
+                                    item.updatedInventory.HasValue ? item.updatedInventory.Value.ToString("MM/dd/yyyy") : "",
+                                    item.storagelocation
                                 );
                         }
                     }
@@ -242,7 +220,6 @@ namespace FGScanner
                     SlowmovingTable.Columns["Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     SlowmovingTable.Columns["Location"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     SlowmovingTable.Columns["Last Moving Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                    SlowmovingTable.Columns["Classification"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     SlowmovingTable.Columns["Storage Location"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                 }
             }
@@ -252,11 +229,19 @@ namespace FGScanner
             }
         }
 
-        private void LoadLineChart(int year)
+        private async Task LoadLineChart(int year)
         {
-            var Repo = new TransactionRepo();
-            var Data = Repo.GetMonthlyInventory(year);
+
+            var Data = await _queries.GetMonthlySummary(year);
+
+            if (Data == null || Data.Count == 0)
+            {
+                chart1.Series.Clear(); // Clear the chart so it doesn't show old data
+                return;
+            }
+
             int maxStock = Data.Max(d => d.EndingStock);
+
             double yInterval = maxStock > 0 ? Math.Ceiling(maxStock / 5.0 / 30000000) * 30000000 : 30000000;
 
             if (maxStock <= 5000000)
@@ -280,22 +265,29 @@ namespace FGScanner
                 yInterval = Math.Ceiling(maxStock / 5.0 / 30000000) * 30000000;
             }
 
+
+
             chart1.Series.Clear();
-            Series EndingStockSeries = new Series("Ending Stock");
-            EndingStockSeries.ChartType = SeriesChartType.SplineArea;
-            EndingStockSeries.BorderWidth = 3;
-            EndingStockSeries.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
-            EndingStockSeries.MarkerSize = 8;
-            EndingStockSeries.MarkerColor = Color.DarkBlue;
-            EndingStockSeries.Color = Color.FromArgb(80, Color.Blue);
+            Series EndingStockSeries = new("Ending Stock")
+            {
+                ChartType = SeriesChartType.SplineArea,
+                BorderWidth = 3,
+                MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle,
+                MarkerSize = 8,
+                MarkerColor = Color.DarkBlue,
+                Color = Color.FromArgb(80, Color.Blue)
+            };
             chart1.Series.Add(EndingStockSeries);
 
             foreach (var item in Data)
             {
                 string monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(item.Month);
-                var point = EndingStockSeries.Points.AddXY(monthName, item.EndingStock);
-                EndingStockSeries.Points[point].ToolTip = $"Ending Stock: {item.EndingStock:N0}";
+                int pointIndex = EndingStockSeries.Points.AddXY(item.Month, item.EndingStock);
+                var point = EndingStockSeries.Points[pointIndex];
+                point.AxisLabel = monthName;
+                point.ToolTip = $"Ending Stock: {item.EndingStock:N0}";
             }
+
             var axisX = chart1.ChartAreas[0].AxisX;
             var axisY = chart1.ChartAreas[0].AxisY;
             var area = chart1.ChartAreas[0];
@@ -303,13 +295,13 @@ namespace FGScanner
             axisX.Maximum = 12;
             axisX.Interval = 1;
             axisY.Minimum = 0;
-            axisY.Maximum = maxStock + yInterval;
+            axisY.Maximum = (maxStock == 0) ? yInterval : (maxStock + yInterval);
             axisY.Interval = yInterval;
             axisY.LabelStyle.Format = "N0";
             area.RecalculateAxesScale();
         }
 
-        private void LoadPieChart()
+        private async Task LoadPieChart()
         {
             Dictionary<string, Color> customerColor = new Dictionary<string, Color>()
             {
@@ -323,8 +315,7 @@ namespace FGScanner
                 { "EXCELITAS", Color.Gray }
             };
 
-            var Repo = new TransactionRepo();
-            var Data = Repo.GetCurrentCustomerStock();
+            var Data = await _queries.GetCustomerStocksAsync();
 
             chart2.Series.Clear();
             Series series = new Series("CustomerStock");
@@ -344,9 +335,9 @@ namespace FGScanner
 
                 var point = chart2.Series["CustomerStock"].Points[pointindex];
 
-                if (customerColor.ContainsKey(item.Customer))
+                if (customerColor.TryGetValue(item.Customer, out Color value))
                 {
-                    point.Color = customerColor[item.Customer];
+                    point.Color = value;
                 }
                 else
                 {
@@ -355,18 +346,9 @@ namespace FGScanner
             }
         }
 
-        private void cmbYear_SelectedIndexChanged(object sender, EventArgs e)
+        private async Task<Dictionary<int, MonthlyInventorySummary>> LoadMonthlyStockCache(int year)
         {
-            int selectedYear = Convert.ToInt32(cmbYear.SelectedItem);
-
-            PopulateStatusCards(selectedYear);
-            PopulateCharts(selectedYear);
-        }
-
-        private Dictionary<int, MonthlyInventorySummary> LoadMonthlyStockCache(int year)
-        {
-            var Repo = new TransactionRepo();
-            var Data = Repo.GetMonthlyInventory(year);
+            var Data = await _queries.GetMonthlySummary(year);
             return Data.ToDictionary(d => d.Month, d => d);
         }
 
@@ -379,7 +361,7 @@ namespace FGScanner
 
             foreach (var item in oldData)
             {
-                if (!newData.ContainsKey(item.Key) || newData[item.Key].EndingStock != item.Value.EndingStock)
+                if (!newData.TryGetValue(item.Key, out MonthlyInventorySummary value) || value.EndingStock != item.Value.EndingStock)
                 {
                     //MessageBox.Show($"Data change detected for Month: {item.Key}. Old Ending Stock: {item.Value.EndingStock}, New Ending Stock: {newData[item.Key].EndingStock}", "Data Change Detected", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return true;
@@ -394,15 +376,40 @@ namespace FGScanner
             timer1.Start();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private async void cmbYear_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var selectedYear = cmbYear.SelectedItem != null ? int.Parse(cmbYear.SelectedItem.ToString()) : DateTime.Now.Year;
-            var newData = LoadMonthlyStockCache(selectedYear);
-            if (HasChangeds(newData, MonthlyStocksCache))
+            int selectedYear = Convert.ToInt32(cmbYear.SelectedItem);
+
+            await PopulateStatusCards(selectedYear);
+            await PopulateCharts(selectedYear);
+        }
+
+        private async void timer1_Tick(object sender, EventArgs e)
+        {
+            timer1.Stop();
+
+            try
             {
-                MonthlyStocksCache = newData;
-                PopulateStatusCards(selectedYear);
-                PopulateCharts(selectedYear);
+                var selectedYear = cmbYear.SelectedItem != null
+                    ? int.Parse(cmbYear.SelectedItem.ToString())
+                    : DateTime.Now.Year;
+
+                var newData = await LoadMonthlyStockCache(selectedYear);
+
+                if (HasChangeds(newData, MonthlyStocksCache))
+                {
+                    MonthlyStocksCache = newData;
+                    await PopulateStatusCards(selectedYear);
+                    await PopulateCharts(selectedYear);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Timer error: {ex.Message}");
+            }
+            finally
+            {
+                timer1.Start();
             }
         }
     }

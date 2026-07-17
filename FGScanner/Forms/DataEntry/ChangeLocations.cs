@@ -15,24 +15,24 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FGScanner
+namespace FGScanner.Forms.DataEntry
 {
-    public partial class TransferLocation : Form
+    public partial class ChangeLocations : UserControl
     {
         private readonly TransactionService _service;
         private readonly Queries _queries;
         private readonly Dbcontext _dbContext;
         private string _userid;
         private bool _isLoading = false;
-        private List<ActualInventory> _currentInventoryData = new List<ActualInventory>();
+        private readonly List<ActualInventory> _currentInventoryData = [];
 
-        public TransferLocation(string userid)
+        public ChangeLocations(string userid)
         {
+            InitializeComponent();
             _userid = userid;
             _dbContext = new();
             _queries = new(_dbContext);
             _service = new(_queries);
-            InitializeComponent();
         }
 
         private async Task LoadCurrRackLocationList()
@@ -74,21 +74,6 @@ namespace FGScanner
             catch (Exception ex)
             {
                 MessageBox.Show($"Error loading rack locations: {ex.Message}");
-            }
-        }
-        private async void WarehouseComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (_isLoading) return;
-
-            try
-            {
-                _isLoading = true;
-                await LoadCurrRackLocationList();
-                await LoadNewRackLocationList();
-            }
-            finally
-            {
-                _isLoading = false;
             }
         }
         private async Task LoadInventoryTable()
@@ -174,12 +159,30 @@ namespace FGScanner
                 MessageBox.Show($"Error loading inventory: {ex.Message}");
             }
         }
+
+        private async void WarehouseComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_isLoading) return;
+
+            try
+            {
+                _isLoading = true;
+                await LoadCurrRackLocationList();
+                await LoadNewRackLocationList();
+            }
+            finally
+            {
+                _isLoading = false;
+            }
+        }
+
         private async void currLocationComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (_isLoading) return;
             await LoadInventoryTable();
         }
-        private async void SelectFileButton_Click(object sender, EventArgs e)
+
+        private async void TransferButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -209,7 +212,7 @@ namespace FGScanner
                             Partnumber = row.Cells["Part Number"].Value.ToString(),
                             ProdDate = DateTime.Parse(row.Cells["Production Date"].Value.ToString()),
                             ProdVer = row.Cells["Production Version"].Value.ToString(),
-                            Quantity =  initialqty,
+                            Quantity = initialqty,
                             TotalBox = box,
                             CustomerId = row.Cells["Customer"].Value.ToString()
                         };

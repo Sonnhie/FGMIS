@@ -342,6 +342,8 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(5F, 14F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScroll = true;
+            AutoSize = true;
             ClientSize = new System.Drawing.Size(1140, 737);
             Controls.Add(CancelShipmentButton);
             Controls.Add(groupBox2);

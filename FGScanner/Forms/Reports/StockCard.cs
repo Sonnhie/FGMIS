@@ -38,11 +38,12 @@ namespace FGScanner
             try
             {
                 string partnumber = PartnumberTextbox.Text;
+                string warehouseid = warehouseidcmb.Text;
                 DateTime postingDate1 = PostingDate1.Value.Date;
                 DateTime postingDate2 = PostingDate2.Value.Date;
                 string prodver = ProdVerComboButton.Text;
 
-                var data = await _queries.GetStockLedger(partnumber, postingDate1, postingDate2, prodver);
+                var data = await _queries.GetStockLedger(partnumber, postingDate1, postingDate2, prodver, warehouseid);
               
 
                 if (data == null || data.Ledgers.Count == 0)
@@ -112,11 +113,12 @@ namespace FGScanner
         private async void BtnExport_Click(object sender, EventArgs e)
         {
             string partnumber = PartnumberTextbox.Text;
+            string warehouseid = warehouseidcmb.Text;
             DateTime postingDate1 = PostingDate1.Value.Date;
             DateTime postingDate2 = PostingDate2.Value.Date;
             string prodver = ProdVerComboButton.Text;
             string Filename = $@"StockCard_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
-            var data = await _queries.GetStockLedger(partnumber, postingDate1, postingDate2, prodver);
+            var data = await _queries.GetStockLedger(partnumber, postingDate1, postingDate2, prodver, warehouseid);
 
 
             if (data == null || data.Ledgers.Count == 0)

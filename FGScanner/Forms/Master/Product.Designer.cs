@@ -41,7 +41,7 @@
             // LblPage
             // 
             LblPage.AutoSize = true;
-            LblPage.Location = new System.Drawing.Point(36, 675);
+            LblPage.Location = new System.Drawing.Point(36, 589);
             LblPage.Name = "LblPage";
             LblPage.Size = new System.Drawing.Size(74, 18);
             LblPage.TabIndex = 27;
@@ -50,7 +50,7 @@
             // BtnPrev
             // 
             BtnPrev.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            BtnPrev.Location = new System.Drawing.Point(907, 675);
+            BtnPrev.Location = new System.Drawing.Point(909, 593);
             BtnPrev.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             BtnPrev.Name = "BtnPrev";
             BtnPrev.Size = new System.Drawing.Size(88, 36);
@@ -62,7 +62,7 @@
             // BtnNext
             // 
             BtnNext.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            BtnNext.Location = new System.Drawing.Point(1015, 675);
+            BtnNext.Location = new System.Drawing.Point(1017, 593);
             BtnNext.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             BtnNext.Name = "BtnNext";
             BtnNext.Size = new System.Drawing.Size(88, 36);
@@ -83,7 +83,7 @@
             LogsTable.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             LogsTable.Name = "LogsTable";
             LogsTable.RowHeadersWidth = 51;
-            LogsTable.Size = new System.Drawing.Size(1069, 585);
+            LogsTable.Size = new System.Drawing.Size(1069, 503);
             LogsTable.TabIndex = 22;
             // 
             // addbtn
@@ -120,6 +120,8 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(6F, 18F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScroll = true;
+            AutoSize = true;
             ClientSize = new System.Drawing.Size(1140, 737);
             Controls.Add(button1);
             Controls.Add(TxtPartnumber);

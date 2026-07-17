@@ -1,13 +1,13 @@
-﻿namespace FGScanner
+﻿namespace FGScanner.Forms.DataEntry
 {
-    partial class BPPSEntry
+    partial class Incoming
     {
-        /// <summary>
+        /// <summary> 
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
+        /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -20,10 +20,10 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+        #region Component Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
+        /// <summary> 
+        /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -67,18 +67,18 @@
             groupBox1.Controls.Add(SelectFileButton);
             groupBox1.Controls.Add(label1);
             groupBox1.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox1.Location = new System.Drawing.Point(33, 23);
+            groupBox1.Location = new System.Drawing.Point(32, 20);
             groupBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            groupBox1.Size = new System.Drawing.Size(567, 179);
-            groupBox1.TabIndex = 1;
+            groupBox1.Size = new System.Drawing.Size(500, 179);
+            groupBox1.TabIndex = 5;
             groupBox1.TabStop = false;
             groupBox1.Text = "Data Entry";
             // 
             // ClearButton
             // 
-            ClearButton.Location = new System.Drawing.Point(441, 129);
+            ClearButton.Location = new System.Drawing.Point(365, 87);
             ClearButton.Name = "ClearButton";
             ClearButton.Size = new System.Drawing.Size(92, 27);
             ClearButton.TabIndex = 11;
@@ -94,12 +94,12 @@
             UploadItemButton.TabIndex = 10;
             UploadItemButton.Text = "Upload file";
             UploadItemButton.UseVisualStyleBackColor = true;
-            UploadItemButton.Click += UploadItemButton_Click;
+            UploadItemButton.Click += UploadItemButton_Click_1;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(116, 137);
+            label2.Location = new System.Drawing.Point(114, 137);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(48, 19);
             label2.TabIndex = 9;
@@ -111,13 +111,13 @@
             FileTextbox.Location = new System.Drawing.Point(171, 88);
             FileTextbox.Name = "FileTextbox";
             FileTextbox.ReadOnly = true;
-            FileTextbox.Size = new System.Drawing.Size(264, 27);
+            FileTextbox.Size = new System.Drawing.Size(179, 27);
             FileTextbox.TabIndex = 8;
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(47, 47);
+            label3.Location = new System.Drawing.Point(45, 47);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(117, 19);
             label3.TabIndex = 7;
@@ -129,12 +129,12 @@
             WarehouseComboBox.Items.AddRange(new object[] { "WH1", "WH2" });
             WarehouseComboBox.Location = new System.Drawing.Point(172, 39);
             WarehouseComboBox.Name = "WarehouseComboBox";
-            WarehouseComboBox.Size = new System.Drawing.Size(263, 27);
+            WarehouseComboBox.Size = new System.Drawing.Size(178, 27);
             WarehouseComboBox.TabIndex = 4;
             // 
             // SelectFileButton
             // 
-            SelectFileButton.Location = new System.Drawing.Point(441, 88);
+            SelectFileButton.Location = new System.Drawing.Point(365, 46);
             SelectFileButton.Name = "SelectFileButton";
             SelectFileButton.Size = new System.Drawing.Size(92, 27);
             SelectFileButton.TabIndex = 2;
@@ -145,7 +145,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(94, 96);
+            label1.Location = new System.Drawing.Point(92, 96);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(70, 19);
             label1.TabIndex = 0;
@@ -163,19 +163,19 @@
             groupBox2.Controls.Add(label6);
             groupBox2.Controls.Add(label5);
             groupBox2.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox2.Location = new System.Drawing.Point(619, 23);
+            groupBox2.Location = new System.Drawing.Point(577, 20);
             groupBox2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox2.Name = "groupBox2";
             groupBox2.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            groupBox2.Size = new System.Drawing.Size(482, 179);
-            groupBox2.TabIndex = 2;
+            groupBox2.Size = new System.Drawing.Size(515, 179);
+            groupBox2.TabIndex = 6;
             groupBox2.TabStop = false;
             groupBox2.Text = "Uploaded Info:";
             // 
             // CustomerLabel
             // 
             CustomerLabel.AutoSize = true;
-            CustomerLabel.Location = new System.Drawing.Point(341, 39);
+            CustomerLabel.Location = new System.Drawing.Point(339, 39);
             CustomerLabel.Name = "CustomerLabel";
             CustomerLabel.Size = new System.Drawing.Size(21, 19);
             CustomerLabel.TabIndex = 10;
@@ -184,7 +184,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(267, 39);
+            label4.Location = new System.Drawing.Point(265, 39);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(62, 19);
             label4.TabIndex = 9;
@@ -193,7 +193,7 @@
             // QuantityLabel
             // 
             QuantityLabel.AutoSize = true;
-            QuantityLabel.Location = new System.Drawing.Point(396, 85);
+            QuantityLabel.Location = new System.Drawing.Point(394, 85);
             QuantityLabel.Name = "QuantityLabel";
             QuantityLabel.Size = new System.Drawing.Size(21, 19);
             QuantityLabel.TabIndex = 8;
@@ -202,7 +202,7 @@
             // BoxLabel
             // 
             BoxLabel.AutoSize = true;
-            BoxLabel.Location = new System.Drawing.Point(173, 85);
+            BoxLabel.Location = new System.Drawing.Point(171, 85);
             BoxLabel.Name = "BoxLabel";
             BoxLabel.Size = new System.Drawing.Size(21, 19);
             BoxLabel.TabIndex = 7;
@@ -211,7 +211,7 @@
             // PartcountLabel
             // 
             PartcountLabel.AutoSize = true;
-            PartcountLabel.Location = new System.Drawing.Point(173, 39);
+            PartcountLabel.Location = new System.Drawing.Point(171, 39);
             PartcountLabel.Name = "PartcountLabel";
             PartcountLabel.Size = new System.Drawing.Size(21, 19);
             PartcountLabel.TabIndex = 6;
@@ -220,7 +220,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new System.Drawing.Point(267, 85);
+            label7.Location = new System.Drawing.Point(265, 85);
             label7.Name = "label7";
             label7.Size = new System.Drawing.Size(85, 19);
             label7.TabIndex = 5;
@@ -229,7 +229,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(44, 88);
+            label6.Location = new System.Drawing.Point(42, 88);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(60, 19);
             label6.TabIndex = 4;
@@ -238,7 +238,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(44, 39);
+            label5.Location = new System.Drawing.Point(42, 39);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(113, 19);
             label5.TabIndex = 3;
@@ -250,18 +250,18 @@
             RackTable.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             RackTable.BackgroundColor = System.Drawing.Color.White;
             RackTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            RackTable.Location = new System.Drawing.Point(33, 231);
+            RackTable.Location = new System.Drawing.Point(32, 224);
             RackTable.Name = "RackTable";
-            RackTable.Size = new System.Drawing.Size(1068, 378);
-            RackTable.TabIndex = 3;
+            RackTable.Size = new System.Drawing.Size(1060, 334);
+            RackTable.TabIndex = 7;
             // 
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1 });
-            statusStrip1.Location = new System.Drawing.Point(0, 715);
+            statusStrip1.Location = new System.Drawing.Point(0, 634);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new System.Drawing.Size(1140, 22);
-            statusStrip1.TabIndex = 4;
+            statusStrip1.Size = new System.Drawing.Size(1127, 22);
+            statusStrip1.TabIndex = 8;
             statusStrip1.Text = "statusStrip1";
             // 
             // toolStripProgressBar1
@@ -275,20 +275,17 @@
             toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
             toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
-            // BPPSEntry
+            // Incoming
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            AutoScroll = true;
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             AutoSize = true;
-            ClientSize = new System.Drawing.Size(1140, 737);
             Controls.Add(statusStrip1);
             Controls.Add(RackTable);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            Name = "BPPSEntry";
-            Text = "BPPSEntry";
+            Name = "Incoming";
+            Size = new System.Drawing.Size(1127, 656);
+            Load += Incoming_Load;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);
@@ -303,6 +300,9 @@
         #endregion
 
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button ClearButton;
+        private System.Windows.Forms.Button UploadItemButton;
+        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox FileTextbox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox WarehouseComboBox;
@@ -317,12 +317,9 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Button UploadItemButton;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.DataGridView RackTable;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.Button ClearButton;
     }
 }

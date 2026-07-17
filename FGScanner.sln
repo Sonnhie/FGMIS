@@ -1,11 +1,10 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36811.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FGScanner", "FGScanner\FGScanner.csproj", "{6C744960-8C2D-43DE-8D0D-E74E9D4978F1}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FGIMS_setup", "FGIMS_setup\FGIMS_setup.vdproj", "{432FB7D5-7294-20AD-E97C-BE1581755EF0}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FGIMSInstaller", "FGIMSInstaller\FGIMSInstaller.vdproj", "{7B46B934-3553-4FD3-E8AE-0245AF617DA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,8 +16,8 @@ Global
 		{6C744960-8C2D-43DE-8D0D-E74E9D4978F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C744960-8C2D-43DE-8D0D-E74E9D4978F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C744960-8C2D-43DE-8D0D-E74E9D4978F1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{432FB7D5-7294-20AD-E97C-BE1581755EF0}.Debug|Any CPU.ActiveCfg = Debug
-		{432FB7D5-7294-20AD-E97C-BE1581755EF0}.Release|Any CPU.ActiveCfg = Release
+		{7B46B934-3553-4FD3-E8AE-0245AF617DA5}.Debug|Any CPU.ActiveCfg = Debug
+		{7B46B934-3553-4FD3-E8AE-0245AF617DA5}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

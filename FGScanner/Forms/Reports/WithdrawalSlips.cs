@@ -45,6 +45,7 @@ namespace FGScanner.Forms.Reports
             try
             {
                 string location = TransferTocomboBox.Text;
+              //  string warehouseid = warehouseComboBox.Text;
                 DateTime? startDate = StartDate.Value.Date;
                 DateTime? endDate = EndDate.Value.Date;
 
