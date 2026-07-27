@@ -75,14 +75,14 @@
             groupBox1.Margin = new System.Windows.Forms.Padding(1, 3, 1, 3);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new System.Windows.Forms.Padding(1, 3, 1, 3);
-            groupBox1.Size = new System.Drawing.Size(537, 172);
+            groupBox1.Size = new System.Drawing.Size(435, 129);
             groupBox1.TabIndex = 3;
             groupBox1.TabStop = false;
             groupBox1.Text = "Filters";
             // 
             // FilterButton
             // 
-            FilterButton.Location = new System.Drawing.Point(128, 124);
+            FilterButton.Location = new System.Drawing.Point(345, 80);
             FilterButton.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             FilterButton.Name = "FilterButton";
             FilterButton.Size = new System.Drawing.Size(67, 26);
@@ -96,7 +96,7 @@
             ShipmentID.Location = new System.Drawing.Point(128, 79);
             ShipmentID.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             ShipmentID.Name = "ShipmentID";
-            ShipmentID.Size = new System.Drawing.Size(338, 27);
+            ShipmentID.Size = new System.Drawing.Size(213, 27);
             ShipmentID.TabIndex = 12;
             // 
             // label2
@@ -158,11 +158,11 @@
             groupBox2.Controls.Add(label7);
             groupBox2.Controls.Add(label6);
             groupBox2.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox2.Location = new System.Drawing.Point(571, 18);
+            groupBox2.Location = new System.Drawing.Point(470, 18);
             groupBox2.Margin = new System.Windows.Forms.Padding(1, 3, 1, 3);
             groupBox2.Name = "groupBox2";
             groupBox2.Padding = new System.Windows.Forms.Padding(1, 3, 1, 3);
-            groupBox2.Size = new System.Drawing.Size(530, 172);
+            groupBox2.Size = new System.Drawing.Size(484, 129);
             groupBox2.TabIndex = 19;
             groupBox2.TabStop = false;
             groupBox2.Text = "Shipment Information";
@@ -180,7 +180,7 @@
             // TotalBoxLabel
             // 
             TotalBoxLabel.AutoSize = true;
-            TotalBoxLabel.Location = new System.Drawing.Point(105, 122);
+            TotalBoxLabel.Location = new System.Drawing.Point(361, 77);
             TotalBoxLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             TotalBoxLabel.Name = "TotalBoxLabel";
             TotalBoxLabel.Size = new System.Drawing.Size(27, 19);
@@ -220,7 +220,7 @@
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new System.Drawing.Point(34, 122);
+            label8.Location = new System.Drawing.Point(290, 77);
             label8.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label8.Name = "label8";
             label8.Size = new System.Drawing.Size(60, 19);
@@ -251,7 +251,7 @@
             // 
             label5.AutoSize = true;
             label5.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label5.Location = new System.Drawing.Point(19, 199);
+            label5.Location = new System.Drawing.Point(19, 149);
             label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(84, 19);
@@ -263,7 +263,7 @@
             ShipmentTable.AllowUserToAddRows = false;
             ShipmentTable.BackgroundColor = System.Drawing.Color.White;
             ShipmentTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            ShipmentTable.Location = new System.Drawing.Point(19, 221);
+            ShipmentTable.Location = new System.Drawing.Point(19, 171);
             ShipmentTable.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             ShipmentTable.Name = "ShipmentTable";
             ShipmentTable.Size = new System.Drawing.Size(537, 356);
@@ -274,7 +274,7 @@
             // 
             label4.AutoSize = true;
             label4.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label4.Location = new System.Drawing.Point(571, 196);
+            label4.Location = new System.Drawing.Point(575, 148);
             label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(85, 19);
@@ -287,16 +287,16 @@
             ShipmentItemTable.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             ShipmentItemTable.BackgroundColor = System.Drawing.Color.White;
             ShipmentItemTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            ShipmentItemTable.Location = new System.Drawing.Point(571, 219);
+            ShipmentItemTable.Location = new System.Drawing.Point(575, 171);
             ShipmentItemTable.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             ShipmentItemTable.Name = "ShipmentItemTable";
-            ShipmentItemTable.Size = new System.Drawing.Size(530, 358);
+            ShipmentItemTable.Size = new System.Drawing.Size(383, 358);
             ShipmentItemTable.TabIndex = 22;
             // 
             // CancelShipmentButton
             // 
             CancelShipmentButton.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            CancelShipmentButton.Location = new System.Drawing.Point(689, 583);
+            CancelShipmentButton.Location = new System.Drawing.Point(694, 535);
             CancelShipmentButton.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             CancelShipmentButton.Name = "CancelShipmentButton";
             CancelShipmentButton.Size = new System.Drawing.Size(95, 26);
@@ -308,7 +308,7 @@
             // GenerateButton
             // 
             GenerateButton.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            GenerateButton.Location = new System.Drawing.Point(570, 583);
+            GenerateButton.Location = new System.Drawing.Point(575, 535);
             GenerateButton.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             GenerateButton.Name = "GenerateButton";
             GenerateButton.Size = new System.Drawing.Size(115, 26);
@@ -320,10 +320,10 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1 });
-            statusStrip1.Location = new System.Drawing.Point(0, 634);
+            statusStrip1.Location = new System.Drawing.Point(0, 572);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 10, 0);
-            statusStrip1.Size = new System.Drawing.Size(1127, 22);
+            statusStrip1.Size = new System.Drawing.Size(980, 22);
             statusStrip1.TabIndex = 26;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -354,7 +354,7 @@
             Controls.Add(groupBox1);
             Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             Name = "ShipmentReport";
-            Size = new System.Drawing.Size(1127, 656);
+            Size = new System.Drawing.Size(980, 594);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

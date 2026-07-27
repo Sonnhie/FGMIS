@@ -72,11 +72,9 @@
             menuStrip1.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
             menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { menuToolStripMenuItem, inventoryToolStripMenuItem, repoertToolStripMenuItem, documentsToolStripMenuItem });
-            menuStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
             menuStrip1.Location = new System.Drawing.Point(0, 42);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            menuStrip1.Size = new System.Drawing.Size(1127, 23);
+            menuStrip1.Size = new System.Drawing.Size(980, 24);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             menuStrip1.MouseDown += menuStrip1_MouseDown;
@@ -86,7 +84,7 @@
             menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { logoutToolStripMenuItem });
             menuToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             menuToolStripMenuItem.Name = "menuToolStripMenuItem";
-            menuToolStripMenuItem.Size = new System.Drawing.Size(50, 19);
+            menuToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
             menuToolStripMenuItem.Text = "Menu";
             // 
             // logoutToolStripMenuItem
@@ -100,7 +98,7 @@
             // 
             inventoryToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { dataEntryToolStripMenuItem, rackViewerToolStripMenuItem, stockListToolStripMenuItem, slowMovingListToolStripMenuItem, iNOUTLedgerToolStripMenuItem, masterListToolStripMenuItem });
             inventoryToolStripMenuItem.Name = "inventoryToolStripMenuItem";
-            inventoryToolStripMenuItem.Size = new System.Drawing.Size(70, 19);
+            inventoryToolStripMenuItem.Size = new System.Drawing.Size(70, 20);
             inventoryToolStripMenuItem.Text = "Inventory";
             // 
             // dataEntryToolStripMenuItem
@@ -198,7 +196,7 @@
             // 
             repoertToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { inventorySummaryToolStripMenuItem });
             repoertToolStripMenuItem.Name = "repoertToolStripMenuItem";
-            repoertToolStripMenuItem.Size = new System.Drawing.Size(59, 19);
+            repoertToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
             repoertToolStripMenuItem.Text = "Reports";
             // 
             // inventorySummaryToolStripMenuItem
@@ -212,7 +210,7 @@
             // 
             documentsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { packingListToolStripMenuItem, warehouseToolStripMenuItem });
             documentsToolStripMenuItem.Name = "documentsToolStripMenuItem";
-            documentsToolStripMenuItem.Size = new System.Drawing.Size(81, 19);
+            documentsToolStripMenuItem.Size = new System.Drawing.Size(81, 20);
             documentsToolStripMenuItem.Text = "Documents";
             // 
             // packingListToolStripMenuItem
@@ -243,7 +241,7 @@
             panel2.Location = new System.Drawing.Point(0, 0);
             panel2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             panel2.Name = "panel2";
-            panel2.Size = new System.Drawing.Size(1127, 42);
+            panel2.Size = new System.Drawing.Size(980, 42);
             panel2.TabIndex = 2;
             panel2.MouseDown += panel2_MouseDown;
             // 
@@ -252,7 +250,7 @@
             TimeLbl.AutoSize = true;
             TimeLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             TimeLbl.ForeColor = System.Drawing.Color.White;
-            TimeLbl.Location = new System.Drawing.Point(950, 13);
+            TimeLbl.Location = new System.Drawing.Point(884, 13);
             TimeLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             TimeLbl.Name = "TimeLbl";
             TimeLbl.Size = new System.Drawing.Size(23, 17);
@@ -264,7 +262,7 @@
             DateLbl.AutoSize = true;
             DateLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             DateLbl.ForeColor = System.Drawing.Color.White;
-            DateLbl.Location = new System.Drawing.Point(751, 13);
+            DateLbl.Location = new System.Drawing.Point(683, 13);
             DateLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             DateLbl.Name = "DateLbl";
             DateLbl.Size = new System.Drawing.Size(23, 17);
@@ -276,7 +274,7 @@
             LblUser.AutoSize = true;
             LblUser.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             LblUser.ForeColor = System.Drawing.Color.White;
-            LblUser.Location = new System.Drawing.Point(551, 13);
+            LblUser.Location = new System.Drawing.Point(485, 13);
             LblUser.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             LblUser.Name = "LblUser";
             LblUser.Size = new System.Drawing.Size(23, 17);
@@ -288,7 +286,7 @@
             label4.AutoSize = true;
             label4.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             label4.ForeColor = System.Drawing.Color.White;
-            label4.Location = new System.Drawing.Point(889, 13);
+            label4.Location = new System.Drawing.Point(822, 13);
             label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(39, 17);
@@ -300,7 +298,7 @@
             label3.AutoSize = true;
             label3.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             label3.ForeColor = System.Drawing.Color.White;
-            label3.Location = new System.Drawing.Point(692, 13);
+            label3.Location = new System.Drawing.Point(625, 13);
             label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(38, 17);
@@ -312,7 +310,7 @@
             label2.AutoSize = true;
             label2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             label2.ForeColor = System.Drawing.Color.White;
-            label2.Location = new System.Drawing.Point(485, 12);
+            label2.Location = new System.Drawing.Point(417, 12);
             label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(38, 17);
@@ -339,17 +337,18 @@
             // 
             panel1.AutoSize = true;
             panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            panel1.Location = new System.Drawing.Point(0, 65);
-            panel1.Margin = new System.Windows.Forms.Padding(2);
+            panel1.Font = new System.Drawing.Font("Bahnschrift Condensed", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            panel1.Location = new System.Drawing.Point(0, 66);
+            panel1.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             panel1.Name = "panel1";
-            panel1.Size = new System.Drawing.Size(1127, 656);
+            panel1.Size = new System.Drawing.Size(980, 593);
             panel1.TabIndex = 3;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1127, 721);
+            ClientSize = new System.Drawing.Size(980, 659);
             ControlBox = false;
             Controls.Add(panel1);
             Controls.Add(menuStrip1);

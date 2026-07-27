@@ -61,7 +61,7 @@ namespace FGScanner.Forms.Reports
                 {
                     DataTable dt = new();
 
-                    dt.Columns.Add("Inventory Date", typeof(string));
+                    dt.Columns.Add("Inventory Date", typeof(DateTime));
                     dt.Columns.Add("IN", typeof(string));
                     dt.Columns.Add("OUT", typeof(string));
                     dt.Columns.Add("Running Stock", typeof(string));
@@ -78,7 +78,7 @@ namespace FGScanner.Forms.Reports
                     {
                         dt.Rows.Add
                         (
-                           item.InventoryDate.ToString(),
+                           item.InventoryDate,
                            item.In,
                            item.Out,
                            item.RunningStock,

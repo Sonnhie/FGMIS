@@ -70,7 +70,7 @@
             LogsTable.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             LogsTable.Name = "LogsTable";
             LogsTable.RowHeadersWidth = 51;
-            LogsTable.Size = new System.Drawing.Size(1082, 503);
+            LogsTable.Size = new System.Drawing.Size(935, 429);
             LogsTable.TabIndex = 34;
             // 
             // addbtn
@@ -89,7 +89,7 @@
             // 
             LblPage.AutoSize = true;
             LblPage.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            LblPage.Location = new System.Drawing.Point(23, 566);
+            LblPage.Location = new System.Drawing.Point(23, 496);
             LblPage.Name = "LblPage";
             LblPage.Size = new System.Drawing.Size(74, 18);
             LblPage.TabIndex = 36;
@@ -99,7 +99,7 @@
             // 
             BtnPrev.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             BtnPrev.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F);
-            BtnPrev.Location = new System.Drawing.Point(909, 566);
+            BtnPrev.Location = new System.Drawing.Point(762, 496);
             BtnPrev.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             BtnPrev.Name = "BtnPrev";
             BtnPrev.Size = new System.Drawing.Size(88, 36);
@@ -112,7 +112,7 @@
             // 
             BtnNext.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             BtnNext.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F);
-            BtnNext.Location = new System.Drawing.Point(1017, 566);
+            BtnNext.Location = new System.Drawing.Point(870, 496);
             BtnNext.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             BtnNext.Name = "BtnNext";
             BtnNext.Size = new System.Drawing.Size(88, 36);
@@ -133,7 +133,7 @@
             Controls.Add(TxtPartnumber);
             Font = new System.Drawing.Font("Bahnschrift Condensed", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             Name = "MasterList";
-            Size = new System.Drawing.Size(1127, 656);
+            Size = new System.Drawing.Size(980, 594);
             Load += MasterList_Load;
             ((System.ComponentModel.ISupportInitialize)LogsTable).EndInit();
             ResumeLayout(false);

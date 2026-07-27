@@ -91,6 +91,7 @@
             SearchButton.TabIndex = 17;
             SearchButton.Text = "Search";
             SearchButton.UseVisualStyleBackColor = true;
+            SearchButton.Click += SearchButton_Click;
             // 
             // TransferTocomboBox
             // 
@@ -170,7 +171,7 @@
             groupBox2.Margin = new System.Windows.Forms.Padding(4);
             groupBox2.Name = "groupBox2";
             groupBox2.Padding = new System.Windows.Forms.Padding(4);
-            groupBox2.Size = new System.Drawing.Size(469, 289);
+            groupBox2.Size = new System.Drawing.Size(469, 277);
             groupBox2.TabIndex = 2;
             groupBox2.TabStop = false;
             groupBox2.Text = "Return Information";
@@ -333,14 +334,14 @@
             ReturnTable.Location = new System.Drawing.Point(511, 31);
             ReturnTable.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             ReturnTable.Name = "ReturnTable";
-            ReturnTable.Size = new System.Drawing.Size(567, 237);
+            ReturnTable.Size = new System.Drawing.Size(455, 186);
             ReturnTable.TabIndex = 17;
             ReturnTable.CellContentClick += ReturnTable_CellContentClick;
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(511, 276);
+            label5.Location = new System.Drawing.Point(511, 226);
             label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(61, 16);
@@ -352,15 +353,15 @@
             ReturnItemTable.AllowUserToAddRows = false;
             ReturnItemTable.BackgroundColor = System.Drawing.Color.White;
             ReturnItemTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            ReturnItemTable.Location = new System.Drawing.Point(511, 299);
+            ReturnItemTable.Location = new System.Drawing.Point(511, 245);
             ReturnItemTable.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             ReturnItemTable.Name = "ReturnItemTable";
-            ReturnItemTable.Size = new System.Drawing.Size(567, 280);
+            ReturnItemTable.Size = new System.Drawing.Size(455, 281);
             ReturnItemTable.TabIndex = 19;
             // 
             // CancelReturnButton
             // 
-            CancelReturnButton.Location = new System.Drawing.Point(624, 585);
+            CancelReturnButton.Location = new System.Drawing.Point(622, 532);
             CancelReturnButton.Name = "CancelReturnButton";
             CancelReturnButton.Size = new System.Drawing.Size(98, 35);
             CancelReturnButton.TabIndex = 22;
@@ -370,7 +371,7 @@
             // 
             // GenerateSlipbutton
             // 
-            GenerateSlipbutton.Location = new System.Drawing.Point(510, 585);
+            GenerateSlipbutton.Location = new System.Drawing.Point(508, 532);
             GenerateSlipbutton.Name = "GenerateSlipbutton";
             GenerateSlipbutton.Size = new System.Drawing.Size(108, 35);
             GenerateSlipbutton.TabIndex = 21;
@@ -395,7 +396,7 @@
             Controls.Add(groupBox1);
             Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             Name = "ReturnListControl";
-            Size = new System.Drawing.Size(1127, 656);
+            Size = new System.Drawing.Size(980, 594);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

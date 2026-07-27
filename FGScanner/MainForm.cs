@@ -36,7 +36,7 @@ namespace FGScanner
             this.usergroup = usergroup;
             LblUser.Text = userid;
             AccessControlFeatures(usergroup);
-
+            bPPSToolStripMenuItem.Visible = false;
         }
 
         private void AccessControlFeatures(int usergroup)

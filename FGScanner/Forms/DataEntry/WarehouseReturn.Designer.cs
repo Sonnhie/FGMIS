@@ -84,7 +84,7 @@
             groupBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            groupBox1.Size = new System.Drawing.Size(622, 350);
+            groupBox1.Size = new System.Drawing.Size(492, 304);
             groupBox1.TabIndex = 7;
             groupBox1.TabStop = false;
             groupBox1.Text = "Data Entry";
@@ -93,15 +93,15 @@
             // 
             LocationComboBox.FormattingEnabled = true;
             LocationComboBox.Items.AddRange(new object[] { "SINA", "SINB", "ASSB", "ASSA" });
-            LocationComboBox.Location = new System.Drawing.Point(172, 129);
+            LocationComboBox.Location = new System.Drawing.Point(147, 125);
             LocationComboBox.Name = "LocationComboBox";
-            LocationComboBox.Size = new System.Drawing.Size(263, 27);
+            LocationComboBox.Size = new System.Drawing.Size(207, 27);
             LocationComboBox.TabIndex = 17;
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(45, 133);
+            label6.Location = new System.Drawing.Point(20, 129);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(115, 19);
             label6.TabIndex = 16;
@@ -109,16 +109,16 @@
             // 
             // RemarkTextbox
             // 
-            RemarkTextbox.Location = new System.Drawing.Point(171, 173);
+            RemarkTextbox.Location = new System.Drawing.Point(146, 169);
             RemarkTextbox.Name = "RemarkTextbox";
-            RemarkTextbox.Size = new System.Drawing.Size(418, 66);
+            RemarkTextbox.Size = new System.Drawing.Size(208, 66);
             RemarkTextbox.TabIndex = 15;
             RemarkTextbox.Text = "";
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(101, 173);
+            label4.Location = new System.Drawing.Point(76, 169);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(59, 19);
             label4.TabIndex = 14;
@@ -126,7 +126,7 @@
             // 
             // GenerateReturnSlipBtn
             // 
-            GenerateReturnSlipBtn.Location = new System.Drawing.Point(171, 300);
+            GenerateReturnSlipBtn.Location = new System.Drawing.Point(350, 255);
             GenerateReturnSlipBtn.Name = "GenerateReturnSlipBtn";
             GenerateReturnSlipBtn.Size = new System.Drawing.Size(92, 27);
             GenerateReturnSlipBtn.TabIndex = 13;
@@ -137,7 +137,7 @@
             // label11
             // 
             label11.AutoSize = true;
-            label11.Location = new System.Drawing.Point(89, 304);
+            label11.Location = new System.Drawing.Point(268, 259);
             label11.Name = "label11";
             label11.Size = new System.Drawing.Size(71, 19);
             label11.TabIndex = 12;
@@ -145,7 +145,7 @@
             // 
             // ClearButton
             // 
-            ClearButton.Location = new System.Drawing.Point(441, 128);
+            ClearButton.Location = new System.Drawing.Point(360, 124);
             ClearButton.Name = "ClearButton";
             ClearButton.Size = new System.Drawing.Size(92, 27);
             ClearButton.TabIndex = 11;
@@ -155,7 +155,7 @@
             // 
             // UploadItemButton
             // 
-            UploadItemButton.Location = new System.Drawing.Point(171, 258);
+            UploadItemButton.Location = new System.Drawing.Point(146, 254);
             UploadItemButton.Name = "UploadItemButton";
             UploadItemButton.Size = new System.Drawing.Size(92, 27);
             UploadItemButton.TabIndex = 10;
@@ -166,7 +166,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(112, 263);
+            label2.Location = new System.Drawing.Point(87, 259);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(48, 19);
             label2.TabIndex = 9;
@@ -175,16 +175,16 @@
             // FileTextbox
             // 
             FileTextbox.Font = new System.Drawing.Font("Bahnschrift", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            FileTextbox.Location = new System.Drawing.Point(171, 88);
+            FileTextbox.Location = new System.Drawing.Point(146, 84);
             FileTextbox.Name = "FileTextbox";
             FileTextbox.ReadOnly = true;
-            FileTextbox.Size = new System.Drawing.Size(264, 27);
+            FileTextbox.Size = new System.Drawing.Size(208, 27);
             FileTextbox.TabIndex = 8;
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(43, 47);
+            label3.Location = new System.Drawing.Point(18, 43);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(117, 19);
             label3.TabIndex = 7;
@@ -194,14 +194,14 @@
             // 
             WarehouseComboBox.FormattingEnabled = true;
             WarehouseComboBox.Items.AddRange(new object[] { "WH1", "WH2" });
-            WarehouseComboBox.Location = new System.Drawing.Point(172, 39);
+            WarehouseComboBox.Location = new System.Drawing.Point(147, 35);
             WarehouseComboBox.Name = "WarehouseComboBox";
-            WarehouseComboBox.Size = new System.Drawing.Size(263, 27);
+            WarehouseComboBox.Size = new System.Drawing.Size(207, 27);
             WarehouseComboBox.TabIndex = 4;
             // 
             // SelectFileButton
             // 
-            SelectFileButton.Location = new System.Drawing.Point(441, 88);
+            SelectFileButton.Location = new System.Drawing.Point(360, 84);
             SelectFileButton.Name = "SelectFileButton";
             SelectFileButton.Size = new System.Drawing.Size(92, 27);
             SelectFileButton.TabIndex = 2;
@@ -212,7 +212,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(90, 96);
+            label1.Location = new System.Drawing.Point(65, 92);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(70, 19);
             label1.TabIndex = 0;
@@ -229,11 +229,11 @@
             groupBox3.Controls.Add(label5);
             groupBox3.Controls.Add(label8);
             groupBox3.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox3.Location = new System.Drawing.Point(659, 25);
+            groupBox3.Location = new System.Drawing.Point(512, 25);
             groupBox3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox3.Name = "groupBox3";
             groupBox3.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            groupBox3.Size = new System.Drawing.Size(442, 338);
+            groupBox3.Size = new System.Drawing.Size(442, 292);
             groupBox3.TabIndex = 9;
             groupBox3.TabStop = false;
             groupBox3.Text = "Information:";
@@ -316,17 +316,17 @@
             ReturnTable.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             ReturnTable.BackgroundColor = System.Drawing.Color.White;
             ReturnTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            ReturnTable.Location = new System.Drawing.Point(12, 369);
+            ReturnTable.Location = new System.Drawing.Point(12, 323);
             ReturnTable.Name = "ReturnTable";
-            ReturnTable.Size = new System.Drawing.Size(1089, 252);
+            ReturnTable.Size = new System.Drawing.Size(942, 230);
             ReturnTable.TabIndex = 16;
             // 
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1 });
-            statusStrip1.Location = new System.Drawing.Point(0, 634);
+            statusStrip1.Location = new System.Drawing.Point(0, 572);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new System.Drawing.Size(1127, 22);
+            statusStrip1.Size = new System.Drawing.Size(980, 22);
             statusStrip1.TabIndex = 18;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -355,7 +355,7 @@
             Controls.Add(groupBox3);
             Controls.Add(groupBox1);
             Name = "WarehouseReturn";
-            Size = new System.Drawing.Size(1127, 656);
+            Size = new System.Drawing.Size(980, 594);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox3.ResumeLayout(false);

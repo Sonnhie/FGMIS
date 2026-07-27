@@ -343,7 +343,7 @@ namespace FGScanner.Services
             g.DrawString("ERP Location:", bodyFont, textBrush, new Rectangle(startX + 5, currentY, midX - startX, rowH), leftFmt);
             g.DrawString(data.ErpLocation, headerFont, textBrush, new Rectangle(midX, currentY, midX2 - midX, rowH), centerFmt);
             g.DrawString("Prepared by:", bodyFont, textBrush, new Rectangle(midX2 + 5, currentY, midX3 - midX2, rowH), leftFmt);
-            g.DrawString(_userId, headerFont, textBrush, new Rectangle(midX3, currentY, (startX + width) - midX3, rowH), centerFmt);
+            g.DrawString(data.PreparedBy, headerFont, textBrush, new Rectangle(midX3, currentY, (startX + width) - midX3, rowH), centerFmt);
 
             g.DrawLine(linePen, midX, currentY, midX, currentY + rowH);
             g.DrawLine(linePen, midX2, currentY, midX2, currentY + rowH);

@@ -295,31 +295,50 @@ namespace FGScanner.Forms.DataEntry
 
                         if (result.ScanItem != null)
                         {
-                            HashSet<string> excessItems = new HashSet<string>();
-                            HashSet<string> missingDpiItems = new HashSet<string>();
+                            HashSet<string> missingDpiItems = [];
+                            Dictionary<string, string> excessItems = [];
+                            Dictionary<string, int> runningTotals = validScan
+                                                .GroupBy(x => x.PartNumber)
+                                                .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
+                            Dictionary<string, string> stockOverflowItems = [];
+                            
+                            var stockDICT = await _queries.GetStocks(result.ScanItem);
+
 
                             foreach (var item in result.ScanItem)
                             {
+                                if (string.IsNullOrWhiteSpace(item.PartNumber)) continue;
+
+                                string stockKey = $"{item.PartNumber}|{item.ProductionDate:yyyyMMdd}|{item.ProductionVersion}|{item.WhId}|{item.Location}";
+                                stockDICT.TryGetValue(stockKey, out int stockCount);
+                              
+
                                 if (!DPIDict.TryGetValue(item.PartNumber, out var reference))
                                 {
                                     missingDpiItems.Add(item.PartNumber);
                                     continue;
                                 }
 
-                                var currentScan = validScan.Where(x => x.PartNumber == item.PartNumber).Sum(x => x.Quantity);
+                                runningTotals.TryGetValue(item.PartNumber, out int currentScan);
                                 var projectedQty = currentScan + item.Quantity;
 
                                 if (projectedQty > reference.Quantity)
                                 {
-                                    excessItems.Add($"- {item.PartNumber} (Attempted: {projectedQty}, Limit: {reference.Quantity})");
+                                    excessItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedQty}, Limit: {reference.Quantity})";
+                                    continue;
                                 }
-                                else
+
+                                if (projectedQty > stockCount)
                                 {
-                                    validScan.Add(item);
+                                    stockOverflowItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedQty}, Stock: {stockCount})";
+                                    continue;
                                 }
+
+                                validScan.Add(item);
+                                runningTotals[item.PartNumber] = projectedQty;
                             }
 
-                            if (missingDpiItems.Count > 0 || excessItems.Count > 0)
+                            if (missingDpiItems.Count > 0 || excessItems.Count > 0 || stockOverflowItems.Count > 0)
                             {
                                 string warningMessage = "Upload finished, but some items were skipped:\n\n";
 
@@ -327,7 +346,23 @@ namespace FGScanner.Forms.DataEntry
                                     warningMessage += $"Missing from DPI Plan: {missingDpiItems.Count} items.\n";
 
                                 if (excessItems.Count > 0)
-                                    warningMessage += $"Exceeded DPI Limits:\n{string.Join("\n", excessItems)}";
+                                {
+                                    var excessToDisplay = excessItems.Values.Take(10);
+                                    warningMessage += $"Exceeded DPI Limits:\n{string.Join("\n", excessToDisplay)}";
+
+                                    if (excessItems.Count > 10)
+                                        warningMessage += $"\n...and {excessItems.Count - 10} more.";
+                                }
+
+
+                                if (stockOverflowItems.Count > 0)
+                                {
+                                    var overflowToDisplay = stockOverflowItems.Values.Take(5);
+                                    warningMessage += $"Stock Overflows:\n- {string.Join("\n- ", overflowToDisplay)}";
+
+                                    if (stockOverflowItems.Count > 5)
+                                        warningMessage += $"\n...and {stockOverflowItems.Count - 5} more.";
+                                }
 
                                 MessageBox.Show(warningMessage, "Partial Success", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             }

@@ -1,11 +1,7 @@
 ﻿using FGScanner.Database;
-using FGScanner.Model;
-using FGScanner.Models;
 using FGScanner.Repositories;
 using FGScanner.Services;
-using FGScanner.Util;
-using OfficeOpenXml.Interfaces.SensitivityLabels;
-using Superpower.Model;
+using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,17 +9,15 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Zen.Barcode;
-using static MetroFramework.Drawing.MetroPaint;
 
-namespace FGScanner
+namespace FGScanner.Forms.Viewer
 {
-    public partial class EcozoneViewer : Form
+    public partial class MainWarehouseViewer : UserControl
     {
         private readonly SemaphoreSlim _dbLock = new SemaphoreSlim(1, 1);
         private readonly TransactionService _service;
@@ -37,25 +31,23 @@ namespace FGScanner
         private Dictionary<string, string> RackCustomerCache = [];
         private Dictionary<string, int> LastRackIDCache = [];
 
-        private readonly string[] Racks = new string[] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q","R","S","T", "EX-A", "EX-B", "EX-C", "EX-D", "EX-E", "EX-F", "EX-K", "EX-L", "2F", "FL" };
-        private readonly string whId = "WH1";
-        private readonly Dictionary<string, (int rows, int cols)> RackConfig = new()
+        private readonly string[] Racks = new string[] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "FL" };
+        private readonly string whId = "WH2";
+        private readonly Dictionary<string, (int rows, int cols)> RackConfig = new Dictionary<string, (int rows, int cols)>()
         {
-            { "A", (3,14) }, { "B", (3, 14) }, { "C", (3, 14) }, { "D", (3, 14) }, { "E", (3, 14) },
-            { "F", (3, 10) }, { "G", (3, 10) }, { "H", (3, 10) }, { "I", (3, 10) }, { "J", (3, 9) },
-            { "K", (3, 14) }, { "L", (3, 14) }, { "M", (3, 14) }, { "N", (3, 14) }, { "O", (3, 14) },
-            { "P", (3, 14) }, { "Q", (3, 14) }, { "R", (3, 14) }, { "S", (3, 14) }, { "T", (3, 16) },
-            { "EX-A", (3, 14) }, { "EX-B", (3, 14) }, { "EX-C", (3, 14) }, { "EX-D", (3, 14) }, { "EX-E", (3, 14) },
-            { "EX-F", (3, 14) }, { "EX-K", (3, 14) }, { "EX-L", (3, 14) }, { "2F", (4, 14) }, { "FL", (3, 13) }
+            { "A", (3,7) }, { "B", (3, 7) }, { "C", (3, 7) }, { "D", (3, 7) }, { "E", (3, 7) },
+            { "F", (3, 7) }, { "G", (3, 7) }, { "H", (3, 7) }, { "I", (3, 7) }, { "J", (3, 7) },
+            { "FL", (1, 15) }
         };
 
         private List<FGScanner.Models.InventoryCardData> cardsToPrint = new();
         private int currentCardIndex = 0;
         private string _userid = string.Empty;
 
-        public EcozoneViewer(string userid)
+        public MainWarehouseViewer(string userid)
         {
             InitializeComponent();
+
             timer1.Interval = 2000;
             timer1.Start();
             typeof(FlowLayoutPanel)
@@ -70,6 +62,7 @@ namespace FGScanner
             _printService = new(_queries);
         }
 
+
         private void InitializeRackViews(string[] Racks)
         {
             foreach (var rack in Racks)
@@ -77,14 +70,14 @@ namespace FGScanner
                 flowLayoutPanel1.SuspendLayout();
                 GenerateRackView(rack);
                 flowLayoutPanel1.ResumeLayout();
-            }  
+            }
         }
 
         private async Task LoadData(string partnumber)
         {
             try
             {
-                var Datas = await _queries.GetItemByPartnumber(partnumber);
+                var Datas = await _queries.GetItemByPartnumber(partnumber, whId);
 
                 if (Datas != null)
                 {
@@ -199,22 +192,22 @@ namespace FGScanner
             }
 
             int RackCountValue = RackCountCache.TryGetValue(rackLabel, out int quantity) ? quantity : 0;
-            var customer = await _queries.GetRackCustomer(rackLabel);
+            var customer = await _queries.GetRackCustomer(rackLabel, whId);
 
 
             if (customer == "EPPI" && RackCountValue > 0)
             {
                 btn.BackColor = Color.LightGreen;
             }
-            else if(customer == "YAZAKI" && RackCountValue > 0)
+            else if (customer == "YAZAKI" && RackCountValue > 0)
             {
                 btn.BackColor = Color.MediumPurple;
             }
-            else if(customer == "BIPH" && RackCountValue > 0)
+            else if (customer == "BIPH" && RackCountValue > 0)
             {
                 btn.BackColor = Color.SkyBlue;
             }
-            else if(RackCountValue > 0)
+            else if (RackCountValue > 0)
             {
                 btn.BackColor = Color.Gold;
             }
@@ -226,20 +219,20 @@ namespace FGScanner
 
         private async Task LoadCache()
         {
-            var result = await _queries.GetRackQuantity();
+            var result = await _queries.GetRackQuantity(whId);
             RackCountCache = result.ToDictionary(x => x.Location, x => x.Quantity);
         }
 
         private async Task LoadChangeRacks()
         {
-             Dictionary<string, int> Ids = [];
-             Ids = await _queries.GetRackIds();
+            Dictionary<string, int> Ids = [];
+            Ids = await _queries.GetRackIds(whId);
 
             foreach (var item in Ids)
             {
                 if (!LastRackIDCache.TryGetValue(item.Key, out int value) || value != item.Value)
                 {
-                    int newCount = await _queries.GetRackQty(item.Key);
+                    int newCount = await _queries.GetRackQty(item.Key, whId);
                     RackCountCache[item.Key] = newCount;
                     await UpdateRackUI(item.Key);
                     value = item.Value;
@@ -252,7 +245,7 @@ namespace FGScanner
         {
             try
             {
-                var Datas = await _queries.GetItemByLocation(location, "WH1");
+                var Datas = await _queries.GetItemByLocation(location, whId);
                 var totalBox = Datas
                                .Sum(d => d.TotalBox);
                 var totalQty = Datas
@@ -309,7 +302,8 @@ namespace FGScanner
             try
             {
                 await Loadtransactionlogs(location);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show($"Error: {ex.Message}");
             }
@@ -318,11 +312,18 @@ namespace FGScanner
                 _dbLock.Release();
                 timer1.Start();
             }
-           
+
             LblRack.Text = location;
         }
 
-        private async void EcozoneViewer_Load(object sender, EventArgs e)
+        private static Image GenerateQRCode(string QRData)
+        {
+            BarcodeDraw qrcodeDraw = BarcodeDrawFactory.CodeQr;
+            Image qrcodeImage = qrcodeDraw.Draw(QRData, 100);
+            return qrcodeImage;
+        }
+
+        private async void MainWarehouseViewer_Load(object sender, EventArgs e)
         {
             await LoadCache();
             InitializeRackViews(Racks);
@@ -344,7 +345,17 @@ namespace FGScanner
             }
         }
 
-        private async void TxtPartnumber_TextChanged_1(object sender, EventArgs e)
+        private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        {
+            _printService.ProcessPrintPage(cardsToPrint, e, _userid);
+        }
+
+        private void printDocument1_BeginPrint(object sender, System.Drawing.Printing.PrintEventArgs e)
+        {
+            _printService.Reset();
+        }
+
+        private async void TxtPartnumber_TextChanged(object sender, EventArgs e)
         {
             string partnumber = TxtPartnumber.Text;
             timer1.Stop();
@@ -361,7 +372,7 @@ namespace FGScanner
             }
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
             string location = LblRack.Text;
 
@@ -376,7 +387,7 @@ namespace FGScanner
 
             try
             {
-                var data = await _queries.GetInventoryCardDataByLocation(location, "WH1");
+                var data = await _queries.GetInventoryCardDataByLocation(location, whId, _userid);
                 cardsToPrint.Clear();
                 cardsToPrint.AddRange(data);
             }
@@ -385,7 +396,7 @@ namespace FGScanner
                 _dbLock.Release();
             }
 
- 
+
             if (cardsToPrint == null || cardsToPrint.Count == 0)
             {
                 MessageBox.Show("No inventory found in this location.", "Empty Rack", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -422,23 +433,6 @@ namespace FGScanner
             printPreviewDialog.Height = 800;
             printPreviewDialog.PrintPreviewControl.Columns = cardsToPrint.Count >= 2 ? 2 : 1;
             printPreviewDialog.ShowDialog();
-        }
-
-        private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
-        {
-            _printService.ProcessPrintPage(cardsToPrint, e, _userid);
-        }
-
-        private static Image GenerateQRCode(string QRData)
-        {
-            BarcodeDraw qrcodeDraw = BarcodeDrawFactory.CodeQr;
-            Image qrcodeImage = qrcodeDraw.Draw(QRData, 100);
-            return qrcodeImage;
-        }
-
-        private void printDocument1_BeginPrint(object sender, PrintEventArgs e)
-        {
-            _printService.Reset();
         }
     }
 }

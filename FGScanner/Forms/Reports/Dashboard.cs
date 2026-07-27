@@ -319,8 +319,17 @@ namespace FGScanner.Forms.DataEntry
 
             chart2.Series.Clear();
             Series series = new Series("CustomerStock");
-            series.ChartType = SeriesChartType.Pie;
+            series.ChartType = SeriesChartType.Doughnut;
+            series["DoughnutRadius"] = "50";
 
+            chart2.Legends.Clear();
+            Legend chartLegend = new Legend("CustomerLegend");
+            chartLegend.Docking = Docking.Bottom;
+            chart2.Legends.Add(chartLegend);
+            series.Legend = "CustomerLegend";
+            series.IsVisibleInLegend = true;
+            series.IsValueShownAsLabel = false;
+            
             chart2.Series.Add(series);
 
             foreach (var item in Data)
@@ -328,9 +337,7 @@ namespace FGScanner.Forms.DataEntry
                 int pointindex = chart2.Series["CustomerStock"].Points.AddXY(item.Customer, item.Stock);
                 chart2.Series["CustomerStock"].ToolTip =
                 "#AXISLABEL\nStock: #VALY\nPercentage: #PERCENT";
-                chart2.Series["CustomerStock"].Label = "#AXISLABEL #PERCENT{P0}";
-                chart2.Series["CustomerStock"].LabelForeColor = Color.Black;
-                chart2.Series["CustomerStock"].Font = new Font("Segoe UI", 9, FontStyle.Bold);
+                chart2.Series["CustomerStock"]["DoughnutLabelStyle"] = "Disabled";
 
 
                 var point = chart2.Series["CustomerStock"].Points[pointindex];

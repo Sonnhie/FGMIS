@@ -47,7 +47,6 @@ namespace FGScanner.Forms.Reports
         {
             try
             {
-                //string partnumber = TxtPartnumber.Text;
                 var data = await _queries.GetFilteredInventory(partnumber, page, pageSize);
 
                 totalPage = data.TotalPages == 0 ? 1 : data.TotalPages;

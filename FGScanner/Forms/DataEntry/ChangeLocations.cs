@@ -3,6 +3,7 @@ using FGScanner.Model;
 using FGScanner.Models;
 using FGScanner.Repositories;
 using FGScanner.Services;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -89,7 +90,7 @@ namespace FGScanner.Forms.DataEntry
                     dt.Columns.Add("Part Number", typeof(string));
                     dt.Columns.Add("Production Date", typeof(string));
                     dt.Columns.Add("Production Version", typeof(string));
-                    dt.Columns.Add("Quantity", typeof(int));
+                    dt.Columns.Add("Total Quantity", typeof(int));
                     dt.Columns.Add("Box Count", typeof(int));
                     dt.Columns.Add("Customer", typeof(string));
                     foreach (var item in data)
@@ -120,14 +121,14 @@ namespace FGScanner.Forms.DataEntry
                     RackTable.Columns["Part Number"].ReadOnly = true;
                     RackTable.Columns["Production Date"].ReadOnly = true;
                     RackTable.Columns["Production Version"].ReadOnly = true;
-                    RackTable.Columns["Quantity"].ReadOnly = true;
+                    RackTable.Columns["Total Quantity"].ReadOnly = true;
                     RackTable.Columns["Box Count"].ReadOnly = true;
                     RackTable.Columns["Customer"].ReadOnly = true;
 
                     RackTable.Columns["Part Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     RackTable.Columns["Production Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     RackTable.Columns["Production Version"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    RackTable.Columns["Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    RackTable.Columns["Total Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     RackTable.Columns["Box Count"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     RackTable.Columns["Customer"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
@@ -143,11 +144,11 @@ namespace FGScanner.Forms.DataEntry
 
                     DataGridViewTextBoxColumn textboxColumn = new DataGridViewTextBoxColumn
                     {
-                        Name = "Box",
-                        HeaderText = "Box"
+                        Name = "Quantity",
+                        HeaderText = "Quantity"
                     };
                     RackTable.Columns.Add(textboxColumn);
-                }
+                } 
                 else
                 {
                     MessageBox.Show("No inventory found for the selected location.");
@@ -200,19 +201,22 @@ namespace FGScanner.Forms.DataEntry
                     if (row.Cells["Select"].Value != null && (bool)row.Cells["Select"].Value)
                     {
 
-                        int box = Convert.ToInt32(row.Cells["Box"].Value);
+                        int Quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
                         string partnumber = row.Cells["Part Number"].Value.ToString();
                         var checkPPS = await _queries.GetProductInfo(partnumber);
-                        int pps = checkPPS.PPS;
-                        int initialqty = box * pps;
-
+                        int pps = 1;
+                        if (checkPPS.PPS > 0)
+                        {
+                            pps = checkPPS.PPS;
+                        }
+                        int box = (int)Math.Ceiling((double)Quantity / pps);
 
                         ActualInventory inventory = new()
                         {
                             Partnumber = row.Cells["Part Number"].Value.ToString(),
                             ProdDate = DateTime.Parse(row.Cells["Production Date"].Value.ToString()),
                             ProdVer = row.Cells["Production Version"].Value.ToString(),
-                            Quantity = initialqty,
+                            Quantity = Quantity,
                             TotalBox = box,
                             CustomerId = row.Cells["Customer"].Value.ToString()
                         };

@@ -75,10 +75,10 @@
             panel2.Controls.Add(increase_lbl);
             panel2.Controls.Add(monthstock_lbl);
             panel2.Controls.Add(label3);
-            panel2.Location = new System.Drawing.Point(21, 49);
+            panel2.Location = new System.Drawing.Point(21, 34);
             panel2.Margin = new System.Windows.Forms.Padding(12);
             panel2.Name = "panel2";
-            panel2.Size = new System.Drawing.Size(259, 122);
+            panel2.Size = new System.Drawing.Size(210, 122);
             panel2.TabIndex = 12;
             // 
             // increase_lbl
@@ -122,10 +122,10 @@
             panel3.Controls.Add(shipanalytic_lbl);
             panel3.Controls.Add(ship_lbl);
             panel3.Controls.Add(label6);
-            panel3.Location = new System.Drawing.Point(297, 49);
+            panel3.Location = new System.Drawing.Point(255, 34);
             panel3.Margin = new System.Windows.Forms.Padding(12);
             panel3.Name = "panel3";
-            panel3.Size = new System.Drawing.Size(259, 122);
+            panel3.Size = new System.Drawing.Size(197, 122);
             panel3.TabIndex = 13;
             // 
             // shipanalytic_lbl
@@ -169,10 +169,10 @@
             panel4.Controls.Add(returnanalytic_lbl);
             panel4.Controls.Add(return_lbl);
             panel4.Controls.Add(label8);
-            panel4.Location = new System.Drawing.Point(573, 49);
+            panel4.Location = new System.Drawing.Point(476, 34);
             panel4.Margin = new System.Windows.Forms.Padding(12);
             panel4.Name = "panel4";
-            panel4.Size = new System.Drawing.Size(259, 122);
+            panel4.Size = new System.Drawing.Size(198, 122);
             panel4.TabIndex = 14;
             // 
             // returnanalytic_lbl
@@ -216,10 +216,10 @@
             panel5.Controls.Add(label12);
             panel5.Controls.Add(slowitem_lbl);
             panel5.Controls.Add(label11);
-            panel5.Location = new System.Drawing.Point(844, 49);
+            panel5.Location = new System.Drawing.Point(698, 34);
             panel5.Margin = new System.Windows.Forms.Padding(12);
             panel5.Name = "panel5";
-            panel5.Size = new System.Drawing.Size(259, 122);
+            panel5.Size = new System.Drawing.Size(265, 122);
             panel5.TabIndex = 15;
             // 
             // label12
@@ -277,13 +277,15 @@
             legend1.Enabled = false;
             legend1.Name = "Legend1";
             chart2.Legends.Add(legend1);
-            chart2.Location = new System.Drawing.Point(838, 180);
+            chart2.Location = new System.Drawing.Point(698, 180);
             chart2.Margin = new System.Windows.Forms.Padding(12);
             chart2.Name = "chart2";
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Pie;
+            series1.IsVisibleInLegend = false;
             series1.Legend = "Legend1";
             series1.Name = "Series1";
+            series1.SmartLabelStyle.Enabled = false;
             chart2.Series.Add(series1);
             chart2.Size = new System.Drawing.Size(265, 227);
             chart2.TabIndex = 16;
@@ -298,7 +300,7 @@
             // 
             label13.AutoSize = true;
             label13.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            label13.Location = new System.Drawing.Point(909, 17);
+            label13.Location = new System.Drawing.Point(762, 11);
             label13.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label13.Name = "label13";
             label13.Size = new System.Drawing.Size(67, 15);
@@ -309,7 +311,7 @@
             // 
             cmbYear.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             cmbYear.FormattingEnabled = true;
-            cmbYear.Location = new System.Drawing.Point(994, 11);
+            cmbYear.Location = new System.Drawing.Point(847, 5);
             cmbYear.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             cmbYear.Name = "cmbYear";
             cmbYear.Size = new System.Drawing.Size(109, 23);
@@ -345,7 +347,7 @@
             series2.Legend = "Legend1";
             series2.Name = "Series1";
             chart1.Series.Add(series2);
-            chart1.Size = new System.Drawing.Size(811, 227);
+            chart1.Size = new System.Drawing.Size(664, 227);
             chart1.TabIndex = 19;
             chart1.Text = "chart1";
             title2.Alignment = System.Drawing.ContentAlignment.TopLeft;
@@ -358,7 +360,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            label2.Location = new System.Drawing.Point(21, 430);
+            label2.Location = new System.Drawing.Point(21, 417);
             label2.Margin = new System.Windows.Forms.Padding(12, 12, 12, 6);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(138, 20);
@@ -371,10 +373,10 @@
             SlowmovingTable.AllowUserToResizeRows = false;
             SlowmovingTable.BackgroundColor = System.Drawing.Color.White;
             SlowmovingTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            SlowmovingTable.Location = new System.Drawing.Point(21, 455);
+            SlowmovingTable.Location = new System.Drawing.Point(21, 444);
             SlowmovingTable.Margin = new System.Windows.Forms.Padding(12);
             SlowmovingTable.Name = "SlowmovingTable";
-            SlowmovingTable.Size = new System.Drawing.Size(1082, 168);
+            SlowmovingTable.Size = new System.Drawing.Size(935, 115);
             SlowmovingTable.TabIndex = 21;
             // 
             // timer1
@@ -395,7 +397,7 @@
             Controls.Add(panel4);
             Controls.Add(panel5);
             Name = "Dashboard";
-            Size = new System.Drawing.Size(1127, 656);
+            Size = new System.Drawing.Size(980, 594);
             Load += Dashboard_Load;
             panel2.ResumeLayout(false);
             panel2.PerformLayout();

@@ -50,17 +50,20 @@
             cancelbtn = new System.Windows.Forms.Button();
             label9 = new System.Windows.Forms.Label();
             reason_txtbox = new System.Windows.Forms.ComboBox();
+            Qtytxt = new System.Windows.Forms.TextBox();
+            label10 = new System.Windows.Forms.Label();
             groupBox1.SuspendLayout();
             SuspendLayout();
             // 
             // BoxTxt
             // 
-            BoxTxt.Location = new System.Drawing.Point(94, 223);
+            BoxTxt.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F);
+            BoxTxt.Location = new System.Drawing.Point(139, 270);
             BoxTxt.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             BoxTxt.Name = "BoxTxt";
+            BoxTxt.ReadOnly = true;
             BoxTxt.Size = new System.Drawing.Size(146, 23);
             BoxTxt.TabIndex = 6;
-            BoxTxt.KeyPress += textBox1_KeyPress;
             // 
             // button1
             // 
@@ -76,11 +79,11 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label5.Location = new System.Drawing.Point(15, 228);
+            label5.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F);
+            label5.Location = new System.Drawing.Point(60, 275);
             label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(62, 15);
+            label5.Size = new System.Drawing.Size(60, 19);
             label5.TabIndex = 7;
             label5.Text = "No of Box:";
             // 
@@ -112,154 +115,154 @@
             // boxlbl
             // 
             boxlbl.AutoSize = true;
-            boxlbl.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            boxlbl.Location = new System.Drawing.Point(471, 108);
+            boxlbl.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            boxlbl.Location = new System.Drawing.Point(497, 108);
             boxlbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             boxlbl.Name = "boxlbl";
-            boxlbl.Size = new System.Drawing.Size(78, 15);
+            boxlbl.Size = new System.Drawing.Size(74, 18);
             boxlbl.TabIndex = 30;
             boxlbl.Text = "Part Number:";
             // 
             // label8
             // 
             label8.AutoSize = true;
-            label8.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label8.Location = new System.Drawing.Point(430, 108);
+            label8.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            label8.Location = new System.Drawing.Point(456, 108);
             label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label8.Name = "label8";
-            label8.Size = new System.Drawing.Size(29, 15);
+            label8.Size = new System.Drawing.Size(29, 18);
             label8.TabIndex = 29;
             label8.Text = "Box:";
             // 
             // locationlbl
             // 
             locationlbl.AutoSize = true;
-            locationlbl.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            locationlbl.Location = new System.Drawing.Point(471, 73);
+            locationlbl.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            locationlbl.Location = new System.Drawing.Point(497, 73);
             locationlbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             locationlbl.Name = "locationlbl";
-            locationlbl.Size = new System.Drawing.Size(78, 15);
+            locationlbl.Size = new System.Drawing.Size(74, 18);
             locationlbl.TabIndex = 28;
             locationlbl.Text = "Part Number:";
             // 
             // label7
             // 
             label7.AutoSize = true;
-            label7.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label7.Location = new System.Drawing.Point(399, 73);
+            label7.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            label7.Location = new System.Drawing.Point(425, 73);
             label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label7.Name = "label7";
-            label7.Size = new System.Drawing.Size(56, 15);
+            label7.Size = new System.Drawing.Size(54, 18);
             label7.TabIndex = 27;
             label7.Text = "Location:";
             // 
             // stockslbl
             // 
             stockslbl.AutoSize = true;
-            stockslbl.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            stockslbl.Location = new System.Drawing.Point(471, 42);
+            stockslbl.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            stockslbl.Location = new System.Drawing.Point(497, 42);
             stockslbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             stockslbl.Name = "stockslbl";
-            stockslbl.Size = new System.Drawing.Size(78, 15);
+            stockslbl.Size = new System.Drawing.Size(74, 18);
             stockslbl.TabIndex = 26;
             stockslbl.Text = "Part Number:";
             // 
             // prodverlbl
             // 
             prodverlbl.AutoSize = true;
-            prodverlbl.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            prodverlbl.Location = new System.Drawing.Point(141, 143);
+            prodverlbl.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            prodverlbl.Location = new System.Drawing.Point(167, 143);
             prodverlbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             prodverlbl.Name = "prodverlbl";
-            prodverlbl.Size = new System.Drawing.Size(78, 15);
+            prodverlbl.Size = new System.Drawing.Size(74, 18);
             prodverlbl.TabIndex = 25;
             prodverlbl.Text = "Part Number:";
             // 
             // proddatelbl
             // 
             proddatelbl.AutoSize = true;
-            proddatelbl.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            proddatelbl.Location = new System.Drawing.Point(141, 108);
+            proddatelbl.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            proddatelbl.Location = new System.Drawing.Point(167, 108);
             proddatelbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             proddatelbl.Name = "proddatelbl";
-            proddatelbl.Size = new System.Drawing.Size(78, 15);
+            proddatelbl.Size = new System.Drawing.Size(74, 18);
             proddatelbl.TabIndex = 24;
             proddatelbl.Text = "Part Number:";
             // 
             // customerlbl
             // 
             customerlbl.AutoSize = true;
-            customerlbl.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            customerlbl.Location = new System.Drawing.Point(140, 73);
+            customerlbl.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            customerlbl.Location = new System.Drawing.Point(166, 73);
             customerlbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             customerlbl.Name = "customerlbl";
-            customerlbl.Size = new System.Drawing.Size(78, 15);
+            customerlbl.Size = new System.Drawing.Size(74, 18);
             customerlbl.TabIndex = 23;
             customerlbl.Text = "Part Number:";
             // 
             // partnumberlbl
             // 
             partnumberlbl.AutoSize = true;
-            partnumberlbl.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            partnumberlbl.Location = new System.Drawing.Point(140, 42);
+            partnumberlbl.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            partnumberlbl.Location = new System.Drawing.Point(166, 42);
             partnumberlbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             partnumberlbl.Name = "partnumberlbl";
-            partnumberlbl.Size = new System.Drawing.Size(78, 15);
+            partnumberlbl.Size = new System.Drawing.Size(74, 18);
             partnumberlbl.TabIndex = 22;
             partnumberlbl.Text = "Part Number:";
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label6.Location = new System.Drawing.Point(369, 42);
+            label6.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            label6.Location = new System.Drawing.Point(395, 42);
             label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label6.Name = "label6";
-            label6.Size = new System.Drawing.Size(82, 15);
+            label6.Size = new System.Drawing.Size(80, 18);
             label6.TabIndex = 21;
             label6.Text = "Current Stock:";
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label4.Location = new System.Drawing.Point(6, 143);
+            label4.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            label4.Location = new System.Drawing.Point(32, 143);
             label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(110, 15);
+            label4.Size = new System.Drawing.Size(105, 18);
             label4.TabIndex = 20;
             label4.Text = "Production Version:";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label3.Location = new System.Drawing.Point(6, 108);
+            label3.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            label3.Location = new System.Drawing.Point(32, 108);
             label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(96, 15);
+            label3.Size = new System.Drawing.Size(91, 18);
             label3.TabIndex = 19;
             label3.Text = "Production Date:";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label2.Location = new System.Drawing.Point(6, 73);
+            label2.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            label2.Location = new System.Drawing.Point(32, 73);
             label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(62, 15);
+            label2.Size = new System.Drawing.Size(57, 18);
             label2.TabIndex = 18;
             label2.Text = "Customer:";
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label1.Location = new System.Drawing.Point(6, 42);
+            label1.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            label1.Location = new System.Drawing.Point(32, 42);
             label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(78, 15);
+            label1.Size = new System.Drawing.Size(74, 18);
             label1.TabIndex = 17;
             label1.Text = "Part Number:";
             // 
@@ -277,29 +280,50 @@
             // label9
             // 
             label9.AutoSize = true;
-            label9.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label9.Location = new System.Drawing.Point(15, 268);
+            label9.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F);
+            label9.Location = new System.Drawing.Point(60, 315);
             label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label9.Name = "label9";
-            label9.Size = new System.Drawing.Size(48, 15);
+            label9.Size = new System.Drawing.Size(51, 19);
             label9.TabIndex = 11;
             label9.Text = "Reason:";
             // 
             // reason_txtbox
             // 
+            reason_txtbox.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F);
             reason_txtbox.FormattingEnabled = true;
             reason_txtbox.Items.AddRange(new object[] { "Manual Deduction - Excess Scan", "Manual Deduction - Damaged Goods", "Manual Deduction - Cycle Count Adjustment", "Quality Control Testing - OUT" });
-            reason_txtbox.Location = new System.Drawing.Point(94, 268);
+            reason_txtbox.Location = new System.Drawing.Point(139, 315);
             reason_txtbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             reason_txtbox.Name = "reason_txtbox";
-            reason_txtbox.Size = new System.Drawing.Size(299, 23);
+            reason_txtbox.Size = new System.Drawing.Size(261, 24);
             reason_txtbox.TabIndex = 12;
+            // 
+            // Qtytxt
+            // 
+            Qtytxt.Location = new System.Drawing.Point(139, 232);
+            Qtytxt.Name = "Qtytxt";
+            Qtytxt.Size = new System.Drawing.Size(190, 23);
+            Qtytxt.TabIndex = 20;
+            Qtytxt.TextChanged += Qtytxt_TextChanged;
+            Qtytxt.KeyPress += Qtytxt_KeyPress;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label10.Location = new System.Drawing.Point(13, 236);
+            label10.Name = "label10";
+            label10.Size = new System.Drawing.Size(108, 19);
+            label10.TabIndex = 19;
+            label10.Text = "Quantity to deduct:";
             // 
             // StockEdit
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             ClientSize = new System.Drawing.Size(622, 368);
+            Controls.Add(Qtytxt);
+            Controls.Add(label10);
             Controls.Add(reason_txtbox);
             Controls.Add(label9);
             Controls.Add(cancelbtn);
@@ -307,6 +331,7 @@
             Controls.Add(button1);
             Controls.Add(label5);
             Controls.Add(BoxTxt);
+            Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -343,5 +368,7 @@
         private System.Windows.Forms.Label boxlbl;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.ComboBox reason_txtbox;
+        private System.Windows.Forms.TextBox Qtytxt;
+        private System.Windows.Forms.Label label10;
     }
 }

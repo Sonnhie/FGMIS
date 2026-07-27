@@ -1,4 +1,5 @@
 ﻿using FGScanner.Database;
+using FGScanner.Forms.DataEntry;
 using FGScanner.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -32,6 +33,20 @@ namespace FGScanner.Repositories
             return await _dbContext.Products.FirstOrDefaultAsync(p => p.PartNumber == partnumber);
         }
 
+        public async Task<ActualInventory> GetStockInfo(string partnumber, DateTime proddate, string prodversion, string location, string whid)
+        {
+            try
+            {
+                var inventory = await _dbContext.ActualInventories
+                                .Where(x => x.Partnumber == partnumber && x.ProdDate == proddate && x.ProdVer == prodversion && x.Location == location && x.WhId == whid)
+                                .FirstOrDefaultAsync();
+                return inventory;
+            }
+            catch
+            {
+                return new();
+            }
+        }
         public int GetProductPPS(string partnumber)
         {
             var productPPS = _dbContext.Products.FirstOrDefault(x => x.PartNumber == partnumber);
@@ -88,11 +103,15 @@ namespace FGScanner.Repositories
                     return (false, "Data is null or empty");
                 }
 
+                var partNumbers = inventories.Select(i => i.Partnumber).ToList();
+                var allExistingInventory = await _dbContext.ActualInventories
+                    .Where(x => partNumbers.Contains(x.Partnumber) && x.Location == currLocation)
+                    .ToListAsync();
+
                 foreach (var inventory in inventories)
                 {
-                    var existingInventory = await _dbContext.ActualInventories
-                                                 .Where(x => x.Partnumber == inventory.Partnumber && x.ProdDate == inventory.ProdDate && x.Location == currLocation)
-                                                 .FirstOrDefaultAsync();
+                    var existingInventory = allExistingInventory
+                                            .FirstOrDefault(x => x.Partnumber == inventory.Partnumber && x.ProdDate == inventory.ProdDate);
 
                     var isExist = await GetProductInfo(inventory.Partnumber);
 
@@ -111,53 +130,50 @@ namespace FGScanner.Repositories
                         return (false, $"Transfer quantity: {inventory.Quantity} is greater than the actual inventory quantity: {existingInventory.Quantity}.");
                     }
 
-                    for (int i = 0; i < inventory.TotalBox; i++)
+                    var Pullout = new Transaction
                     {
-                        var Pullout = new Transaction
-                        {
-                            Partnumber = inventory.Partnumber,
-                            ProdDate = inventory.ProdDate,
-                            CustomerId = inventory.CustomerId,
-                            Quantity = isExist.PPS,
-                            ProdVer = inventory.ProdVer,
-                            Box = 1,
-                            EntryDate = DateTime.Now,
-                            Location = currLocation.ToUpper(),
-                            WhId = warehouseId,
-                            Remarks = "Transfer to " + newLocation,
-                            Status = "Active",
-                            StorageLocation = existingInventory.StorageLocation,
-                            TransactionType = "OUT",
-                            IsSynced = false, // (Using your model's spelling)
-                            TransactionID = Guid.NewGuid(),
-                            InCharge = userId
-                        };
-                        _dbContext.Transactions.Add(Pullout);
-                    }
+                        Partnumber = inventory.Partnumber,
+                        ProdDate = inventory.ProdDate,
+                        CustomerId = inventory.CustomerId,
+                        Quantity = inventory.Quantity,
+                        ProdVer = inventory.ProdVer,
+                        Box = inventory.TotalBox,
+                        EntryDate = DateTime.Now,
+                        Location = currLocation.ToUpper(),
+                        WhId = warehouseId,
+                        Remarks = "Transfer to " + newLocation,
+                        Status = "Active",
+                        StorageLocation = existingInventory.StorageLocation,
+                        TransactionType = "OUT",
+                        IsSynced = false, // (Using your model's spelling)
+                        TransactionID = Guid.NewGuid(),
+                        InCharge = userId
+                    };
+                    _dbContext.Transactions.Add(Pullout);
 
-                    for(int i = 0; i < inventory.TotalBox; i++)
+
+                    var TransferIn = new Transaction
                     {
-                        var TransferIn = new Transaction
-                        {
-                            Partnumber = inventory.Partnumber,
-                            ProdDate = inventory.ProdDate,
-                            CustomerId = inventory.CustomerId,
-                            Quantity = isExist.PPS,
-                            ProdVer = inventory.ProdVer,
-                            Box = 1,
-                            EntryDate = DateTime.Now,
-                            Location = newLocation,
-                            WhId = warehouseId,
-                            Remarks = "Transfer from " + currLocation,
-                            Status = "Active",
-                            StorageLocation = existingInventory.StorageLocation,
-                            TransactionType = "IN",
-                            IsSynced = false,
-                            TransactionID = Guid.NewGuid(),
-                            InCharge = userId
-                        };
-                        _dbContext.Transactions.Add(TransferIn);
-                    }
+                        Partnumber = inventory.Partnumber,
+                        ProdDate = inventory.ProdDate,
+                        CustomerId = inventory.CustomerId,
+                        Quantity = inventory.Quantity,
+                        ProdVer = inventory.ProdVer,
+                        Box = inventory.TotalBox,
+                        EntryDate = DateTime.Now,
+                        Location = newLocation,
+                        WhId = warehouseId,
+                        Remarks = "Transfer from " + currLocation,
+                        Status = "Active",
+                        StorageLocation = existingInventory.StorageLocation,
+                        TransactionType = "IN",
+                        IsSynced = false,
+                        TransactionID = Guid.NewGuid(),
+                        InCharge = userId
+                    };
+                    _dbContext.Transactions.Add(TransferIn);
+
+
                 } 
                 // 2. ONLY AFTER ALL ITEMS ARE PROCESSED, Save and Commit!
                 await _dbContext.SaveChangesAsync();
@@ -213,21 +229,40 @@ namespace FGScanner.Repositories
             }
         }
 
+        public async Task<Dictionary<string, Products>> GetProductsByPartNumbersAsync(List<string> partNumbers)
+        {
+            return await _dbContext.Products
+                .Where(p => partNumbers.Contains(p.PartNumber))
+                .ToDictionaryAsync(p => p.PartNumber);
+        }
+
         public async Task<(bool isSuccess, string Message)> InsertFGItems(List<ScannedData> Items, string warehouseId, string transaction_type, string userid)
         {
             try
             {
                 var TransactionItems = new List<Transaction>();
+                var scannedPartNumbers = Items.Select(x => x.PartNumber).Distinct().ToList();
+                var productDict =  await _dbContext.Products
+                                   .Where(p => scannedPartNumbers.Contains(p.PartNumber))
+                                   .ToDictionaryAsync(p => p.PartNumber, p => p.PPS);
+
+
 
                 foreach (var item in Items)
                 {
+                    int pps = 1;
+                    if (productDict.TryGetValue(item.PartNumber, out int dbPps) && dbPps > 0)
+                    {
+                        pps = dbPps;
+                    }
+
                     TransactionItems.Add(new Transaction
                     {
                         Partnumber = item.PartNumber,
                         ProdDate = item.ProductionDate,
                         CustomerId = item.CustomerId,
                         Quantity = item.Quantity,
-                        Box = 1,
+                        Box = (int)Math.Ceiling((double)item.Quantity / pps),
                         ProdVer = item.ProductionVersion,
                         EntryDate = DateTime.Now,
                         TransactionType = transaction_type,
@@ -370,7 +405,7 @@ namespace FGScanner.Repositories
         public async Task<List<Transaction>> GetItemByShipment(string shipmentID)
         {
             var items = await _dbContext.Transactions
-                        .Where(x => x.controlNumber == shipmentID)
+                        .Where(x => x.controlNumber.Contains(shipmentID))
                         .ToListAsync();
             return items;
         }
@@ -612,10 +647,10 @@ namespace FGScanner.Repositories
             }
         }
 
-        public async Task<List<ActualInventory>> GetRackQuantity()
+        public async Task<List<ActualInventory>> GetRackQuantity(string warehouseid)
         {
             var result = await _dbContext.ActualInventories
-                        .Where(x => x.WhId == "WH1")
+                        .Where(x => x.WhId == warehouseid)
                         .GroupBy(x => x.Location)
                         .Select(x => new ActualInventory
                         {
@@ -626,34 +661,43 @@ namespace FGScanner.Repositories
             return result;
         }
 
-        public async Task<string> GetRackCustomer(string location)
+        public async Task<string> GetRackCustomer(string location, string warehouseid)
         {
-            var result = await _dbContext.ActualInventories.FirstOrDefaultAsync(x => x.Location == location && x.WhId == "WH1");
+            var result = await _dbContext.ActualInventories.FirstOrDefaultAsync(x => x.Location == location && x.WhId == warehouseid);
             return result?.CustomerId ?? "";
         }
 
-        public async Task<Dictionary<string, int>> GetRackIds()
+        public async Task<Dictionary<string, int>> GetRackIds(string warehouseid)
         {
-            var result = await _dbContext.Transactions
-                        .Where(x => x.WhId == "WH1")
-                        .GroupBy(x =>  x.Location)
-                        .ToDictionaryAsync(x => x.Key, x => x.Max(x => x.Id));
+            var rawData = await _dbContext.Transactions
+                .Where(x => x.WhId == warehouseid && x.Location != null)
+                .Select(x => new { x.Location, x.Id })
+                .ToListAsync();
+
+            // 2. Build the dictionary safely in C#
+            var result = rawData
+                // Trim spaces and force uppercase so "2F1-09 " and "2f1-09" become identical
+                .GroupBy(x => x.Location.Trim().ToUpper())
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Max(x => x.Id)
+                );
 
             return result;
         }
 
-        public async Task<int> GetRackQty(string location)
+        public async Task<int> GetRackQty(string location, string warehouseid)
         {
             var result = await _dbContext.ActualInventories
-                         .Where(x => x.Location == location && x.WhId == "WH1")
+                         .Where(x => x.Location == location && x.WhId == warehouseid)
                          .SumAsync(x => x.Quantity);
             return result;
         }
 
-        public async Task<List<ActualInventory>> GetItemByPartnumber(string partnumber)
+        public async Task<List<ActualInventory>> GetItemByPartnumber(string partnumber, string warehouseid)
         {
             var MappedList = await _dbContext.ActualInventories
-                            .Where(x => x.Partnumber == partnumber && x.WhId == "WH1")
+                            .Where(x => x.Partnumber == partnumber && x.WhId == warehouseid)
                             .GroupBy(x => x.Location )
                             .Select(x => new ActualInventory
                             {
@@ -687,7 +731,7 @@ namespace FGScanner.Repositories
             return MappedList;
         }
 
-       public async Task<List<InventoryCardData>> GetInventoryCardDataByLocation(string location, string warehouseid)
+        public async Task<List<InventoryCardData>> GetInventoryCardDataByLocation(string location, string warehouseid, string userid)
         {
             var rawData = await _dbContext.ActualInventories
                             .Where(x => x.Location == location && x.WhId == warehouseid)
@@ -719,11 +763,32 @@ namespace FGScanner.Repositories
                                    Rows = cardRows,
                                    GrandTotalBoxes = totalBox,
                                    GrandTotalQuantity = totalQuantity,
-                                   PPS = pps
+                                   PPS = pps,
+                                   PreparedBy = userid
                                };
                            })
                            .ToList();
             return allCards;
+        }
+
+        public async Task<Dictionary<string, int>> GetStocks(List<ScannedData> data)
+        {
+            try
+            {
+                var scanPartnumbers = data.Select(x => x.PartNumber).Distinct().ToList();
+
+                var inventoryList = await _dbContext.ActualInventories
+                                 .Where(x => scanPartnumbers.Contains(x.Partnumber))
+                                 .ToListAsync();
+                var result = inventoryList
+                            .GroupBy(x => $"{x.Partnumber}|{x.ProdDate}|{x.ProdVer}|{x.WhId}|{x.Location}")
+                            .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
+                return result;
+            }
+            catch
+            {
+                return new Dictionary<string, int>();
+            }
         }
 
         public async Task<PagedResult<ActualInventory>> GetFilteredInventory(string partnumber = null, int pageNumber = 1, int pageSize = 50)
@@ -781,45 +846,38 @@ namespace FGScanner.Repositories
             return result;
         }
 
-        public async Task<(bool isSuccess, string Message)> ManualDeduction(Transaction transaction, int box)
+        public async Task<(bool isSuccess, string Message)> ManualDeduction(Transaction transaction)
         {
             try
             {
-                var isExist = await CheckIfExist(transaction.Partnumber, transaction.Location, transaction.ProdDate);
-                if (isExist == null)
+                if(transaction ==  null)
                 {
-                    return (false, $"Item {transaction.Partnumber} not exist on location {transaction.Location}");
+                    return (false, "No invntory to deduct");
                 }
 
-                var info = await GetProductInfo(transaction.Partnumber);
-                int pps = info.PPS;
-
-                for (int i = 0; i < box; i++)
+                var newItem = new Transaction
                 {
-                    var newItem = new Transaction
-                    {
-                        Partnumber = transaction.Partnumber,
-                        Location = transaction.Location,
-                        ProdDate = transaction.ProdDate,
-                        ProdVer = transaction.ProdVer,
-                        CustomerId = transaction.CustomerId,
-                        Box = 1,
-                        Quantity = pps,
-                        StorageLocation = "9151",
-                        WhId = transaction.WhId ?? "WH1",
-                        TransactionType = "OUT",
-                        EntryDate = DateTime.Now,
-                        Remarks = transaction.Remarks,
-                        Status = "",
-                        controlNumber = "",
-                        TransactionID = Guid.NewGuid(),
-                        IsSynced =  false,
-                        SyncStatus = 0
-                    };
+                    Partnumber = transaction.Partnumber,
+                    Location = transaction.Location,
+                    ProdDate = transaction.ProdDate,
+                    ProdVer = transaction.ProdVer,
+                    CustomerId = transaction.CustomerId,
+                    Box = transaction.Box,
+                    Quantity = transaction.Quantity,
+                    StorageLocation = "9151",
+                    WhId = transaction.WhId ?? "WH1",
+                    TransactionType = "OUT",
+                    EntryDate = DateTime.Now,
+                    Remarks = transaction.Remarks,
+                    Status = "",
+                    controlNumber = "",
+                    TransactionID = Guid.NewGuid(),
+                    IsSynced = false,
+                    InCharge = transaction.InCharge,
+                    SyncStatus = 0
+                };
 
-                    _dbContext.Transactions.Add(newItem);
-                }
-
+                _dbContext.Transactions.Add(newItem);
                 await _dbContext.SaveChangesAsync();
                 return (true, "Items successfully deducted.");
             }

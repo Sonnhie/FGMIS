@@ -29,186 +29,197 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Viewer));
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.minimizedBtn = new System.Windows.Forms.PictureBox();
-            this.MaxBtn = new System.Windows.Forms.PictureBox();
-            this.CloseBtn = new System.Windows.Forms.PictureBox();
-            this.TimeLbl = new System.Windows.Forms.Label();
-            this.DateLbl = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.minimizedBtn)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxBtn)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.CloseBtn)).BeginInit();
-            this.SuspendLayout();
+            panel2 = new System.Windows.Forms.Panel();
+            minimizedBtn = new System.Windows.Forms.PictureBox();
+            MaxBtn = new System.Windows.Forms.PictureBox();
+            CloseBtn = new System.Windows.Forms.PictureBox();
+            TimeLbl = new System.Windows.Forms.Label();
+            DateLbl = new System.Windows.Forms.Label();
+            label5 = new System.Windows.Forms.Label();
+            label4 = new System.Windows.Forms.Label();
+            label3 = new System.Windows.Forms.Label();
+            label2 = new System.Windows.Forms.Label();
+            label1 = new System.Windows.Forms.Label();
+            panel1 = new System.Windows.Forms.Panel();
+            panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)minimizedBtn).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)MaxBtn).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)CloseBtn).BeginInit();
+            SuspendLayout();
             // 
             // panel2
             // 
-            this.panel2.BackColor = System.Drawing.Color.RoyalBlue;
-            this.panel2.Controls.Add(this.minimizedBtn);
-            this.panel2.Controls.Add(this.MaxBtn);
-            this.panel2.Controls.Add(this.CloseBtn);
-            this.panel2.Controls.Add(this.TimeLbl);
-            this.panel2.Controls.Add(this.DateLbl);
-            this.panel2.Controls.Add(this.label5);
-            this.panel2.Controls.Add(this.label4);
-            this.panel2.Controls.Add(this.label3);
-            this.panel2.Controls.Add(this.label2);
-            this.panel2.Controls.Add(this.label1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1244, 40);
-            this.panel2.TabIndex = 3;
-            this.panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel2_MouseDown);
+            panel2.BackColor = System.Drawing.Color.RoyalBlue;
+            panel2.Controls.Add(minimizedBtn);
+            panel2.Controls.Add(MaxBtn);
+            panel2.Controls.Add(CloseBtn);
+            panel2.Controls.Add(TimeLbl);
+            panel2.Controls.Add(DateLbl);
+            panel2.Controls.Add(label5);
+            panel2.Controls.Add(label4);
+            panel2.Controls.Add(label3);
+            panel2.Controls.Add(label2);
+            panel2.Controls.Add(label1);
+            panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            panel2.Location = new System.Drawing.Point(0, 0);
+            panel2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            panel2.Name = "panel2";
+            panel2.Size = new System.Drawing.Size(1054, 46);
+            panel2.TabIndex = 3;
+            panel2.MouseDown += panel2_MouseDown;
             // 
             // minimizedBtn
             // 
-            this.minimizedBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.minimizedBtn.Image = ((System.Drawing.Image)(resources.GetObject("minimizedBtn.Image")));
-            this.minimizedBtn.Location = new System.Drawing.Point(1148, 9);
-            this.minimizedBtn.Name = "minimizedBtn";
-            this.minimizedBtn.Size = new System.Drawing.Size(20, 20);
-            this.minimizedBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.minimizedBtn.TabIndex = 10;
-            this.minimizedBtn.TabStop = false;
-            this.minimizedBtn.Click += new System.EventHandler(this.minimizedBtn_Click);
+            minimizedBtn.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            minimizedBtn.Image = (System.Drawing.Image)resources.GetObject("minimizedBtn.Image");
+            minimizedBtn.Location = new System.Drawing.Point(942, 10);
+            minimizedBtn.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            minimizedBtn.Name = "minimizedBtn";
+            minimizedBtn.Size = new System.Drawing.Size(23, 23);
+            minimizedBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            minimizedBtn.TabIndex = 10;
+            minimizedBtn.TabStop = false;
+            minimizedBtn.Click += minimizedBtn_Click;
             // 
             // MaxBtn
             // 
-            this.MaxBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.MaxBtn.Image = ((System.Drawing.Image)(resources.GetObject("MaxBtn.Image")));
-            this.MaxBtn.Location = new System.Drawing.Point(1180, 9);
-            this.MaxBtn.Name = "MaxBtn";
-            this.MaxBtn.Size = new System.Drawing.Size(20, 20);
-            this.MaxBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.MaxBtn.TabIndex = 9;
-            this.MaxBtn.TabStop = false;
-            this.MaxBtn.Click += new System.EventHandler(this.MaxBtn_Click);
+            MaxBtn.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            MaxBtn.Image = (System.Drawing.Image)resources.GetObject("MaxBtn.Image");
+            MaxBtn.Location = new System.Drawing.Point(980, 10);
+            MaxBtn.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            MaxBtn.Name = "MaxBtn";
+            MaxBtn.Size = new System.Drawing.Size(23, 23);
+            MaxBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            MaxBtn.TabIndex = 9;
+            MaxBtn.TabStop = false;
+            MaxBtn.Click += MaxBtn_Click;
             // 
             // CloseBtn
             // 
-            this.CloseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.CloseBtn.Image = ((System.Drawing.Image)(resources.GetObject("CloseBtn.Image")));
-            this.CloseBtn.Location = new System.Drawing.Point(1212, 9);
-            this.CloseBtn.Name = "CloseBtn";
-            this.CloseBtn.Size = new System.Drawing.Size(20, 20);
-            this.CloseBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.CloseBtn.TabIndex = 8;
-            this.CloseBtn.TabStop = false;
-            this.CloseBtn.Click += new System.EventHandler(this.CloseBtn_Click);
+            CloseBtn.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            CloseBtn.Image = (System.Drawing.Image)resources.GetObject("CloseBtn.Image");
+            CloseBtn.Location = new System.Drawing.Point(1017, 10);
+            CloseBtn.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            CloseBtn.Name = "CloseBtn";
+            CloseBtn.Size = new System.Drawing.Size(23, 23);
+            CloseBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            CloseBtn.TabIndex = 8;
+            CloseBtn.TabStop = false;
+            CloseBtn.Click += CloseBtn_Click;
             // 
             // TimeLbl
             // 
-            this.TimeLbl.AutoSize = true;
-            this.TimeLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TimeLbl.ForeColor = System.Drawing.Color.White;
-            this.TimeLbl.Location = new System.Drawing.Point(649, 11);
-            this.TimeLbl.Name = "TimeLbl";
-            this.TimeLbl.Size = new System.Drawing.Size(23, 17);
-            this.TimeLbl.TabIndex = 7;
-            this.TimeLbl.Text = "---";
+            TimeLbl.AutoSize = true;
+            TimeLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            TimeLbl.ForeColor = System.Drawing.Color.White;
+            TimeLbl.Location = new System.Drawing.Point(757, 13);
+            TimeLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            TimeLbl.Name = "TimeLbl";
+            TimeLbl.Size = new System.Drawing.Size(23, 17);
+            TimeLbl.TabIndex = 7;
+            TimeLbl.Text = "---";
             // 
             // DateLbl
             // 
-            this.DateLbl.AutoSize = true;
-            this.DateLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DateLbl.ForeColor = System.Drawing.Color.White;
-            this.DateLbl.Location = new System.Drawing.Point(479, 11);
-            this.DateLbl.Name = "DateLbl";
-            this.DateLbl.Size = new System.Drawing.Size(23, 17);
-            this.DateLbl.TabIndex = 6;
-            this.DateLbl.Text = "---";
+            DateLbl.AutoSize = true;
+            DateLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            DateLbl.ForeColor = System.Drawing.Color.White;
+            DateLbl.Location = new System.Drawing.Point(559, 13);
+            DateLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            DateLbl.Name = "DateLbl";
+            DateLbl.Size = new System.Drawing.Size(23, 17);
+            DateLbl.TabIndex = 6;
+            DateLbl.Text = "---";
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.ForeColor = System.Drawing.Color.White;
-            this.label5.Location = new System.Drawing.Point(281, 11);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(23, 17);
-            this.label5.TabIndex = 5;
-            this.label5.Text = "---";
+            label5.AutoSize = true;
+            label5.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label5.ForeColor = System.Drawing.Color.White;
+            label5.Location = new System.Drawing.Point(328, 13);
+            label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label5.Name = "label5";
+            label5.Size = new System.Drawing.Size(23, 17);
+            label5.TabIndex = 5;
+            label5.Text = "---";
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.ForeColor = System.Drawing.Color.White;
-            this.label4.Location = new System.Drawing.Point(597, 11);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(39, 17);
-            this.label4.TabIndex = 4;
-            this.label4.Text = "Time:";
+            label4.AutoSize = true;
+            label4.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label4.ForeColor = System.Drawing.Color.White;
+            label4.Location = new System.Drawing.Point(696, 13);
+            label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(39, 17);
+            label4.TabIndex = 4;
+            label4.Text = "Time:";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.ForeColor = System.Drawing.Color.White;
-            this.label3.Location = new System.Drawing.Point(428, 11);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(38, 17);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "Date:";
+            label3.AutoSize = true;
+            label3.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label3.ForeColor = System.Drawing.Color.White;
+            label3.Location = new System.Drawing.Point(499, 13);
+            label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(38, 17);
+            label3.TabIndex = 3;
+            label3.Text = "Date:";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.White;
-            this.label2.Location = new System.Drawing.Point(230, 11);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(38, 17);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "User:";
+            label2.AutoSize = true;
+            label2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label2.ForeColor = System.Drawing.Color.White;
+            label2.Location = new System.Drawing.Point(268, 13);
+            label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(38, 17);
+            label2.TabIndex = 2;
+            label2.Text = "User:";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(12, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 20);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "FGMIS";
+            label1.AutoSize = true;
+            label1.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            label1.ForeColor = System.Drawing.Color.White;
+            label1.Location = new System.Drawing.Point(14, 10);
+            label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(53, 20);
+            label1.TabIndex = 0;
+            label1.Text = "FGMIS";
             // 
             // panel1
             // 
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 40);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1244, 634);
-            this.panel1.TabIndex = 4;
+            panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            panel1.Location = new System.Drawing.Point(0, 46);
+            panel1.Margin = new System.Windows.Forms.Padding(2);
+            panel1.Name = "panel1";
+            panel1.Size = new System.Drawing.Size(1054, 657);
+            panel1.TabIndex = 4;
             // 
             // Viewer
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1244, 674);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.panel2);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2);
-            this.Name = "Viewer";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Viewer";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.minimizedBtn)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxBtn)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.CloseBtn)).EndInit();
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(1054, 703);
+            Controls.Add(panel1);
+            Controls.Add(panel2);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            Margin = new System.Windows.Forms.Padding(2);
+            Name = "Viewer";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            Text = "Viewer";
+            WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)minimizedBtn).EndInit();
+            ((System.ComponentModel.ISupportInitialize)MaxBtn).EndInit();
+            ((System.ComponentModel.ISupportInitialize)CloseBtn).EndInit();
+            ResumeLayout(false);
 
         }
 

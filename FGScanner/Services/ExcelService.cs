@@ -132,7 +132,7 @@ namespace FGScanner.Services
                 ProductionVersion = productionVersion,
                 ProductionDate = ProdDate,
                 Quantity = Quantity,
-                Location = location,
+                Location = location.Trim().ToUpper(),
                 CustomerId = product.CustomerId
             };
 
@@ -246,7 +246,7 @@ namespace FGScanner.Services
                 ProductionVersion = productionVersion,
                 ProductionDate = ProdDate,
                 Quantity = Quantity,
-                Location = location,
+                Location = location.Trim().ToUpper(),
                 CustomerId = product.CustomerId
             };
 
@@ -520,7 +520,7 @@ namespace FGScanner.Services
             var ws = package.Workbook.Worksheets["WarehouseCopy"];
             var wscopy = package.Workbook.Worksheets["InvoiceCopy"];
             var summarizedItems = items
-                                 .GroupBy(x => new { x.Partnumber })
+                                 .GroupBy(x => x.Partnumber )
                                  .Select(x => new
                                  {
                                      Partnumber = x.Key,
@@ -529,9 +529,6 @@ namespace FGScanner.Services
                                      Customer = x.First().CustomerId
                                  })
                                  .ToList();
-            var TotalQuantity = summarizedItems.Sum(x => x.Quantity);
-            var TotalBox = summarizedItems.Sum(x => x.Box);
-
             var startrow = 10;
             var copystartrow = 10;
             DateTime today = DateTime.Now;
@@ -542,40 +539,70 @@ namespace FGScanner.Services
             ws.Cells["C7"].Value = time;
             ws.Cells["J6"].Value = items.First().CustomerId;
             ws.Cells["J54"].Value = items.Max(x => x.controlNumber);
-            ws.Cells["G53"].Value = items.Sum(x => x.Quantity);
-            ws.Cells["E53"].Value = items.Sum(x => x.Box);
+            //ws.Cells["G53"].Value = items.Sum(x => x.Quantity);
+            //ws.Cells["E53"].Value = items.Sum(x => x.Box);
 
             wscopy.Cells["C6"].Value = date;
             wscopy.Cells["C7"].Value = time;
             wscopy.Cells["J6"].Value = items.First().CustomerId;
-            wscopy.Cells["J54"].Value = items.Max(x => x.controlNumber);
+            //wscopy.Cells["J54"].Value = items.Max(x => x.controlNumber);
 
 
             int current = 0;
             int initialRow = 10;
             int maxRowsInTemplate = 43;
             int maxRowLimit = initialRow + maxRowsInTemplate;
-            int pageCount = 1;
+            int pageCount1 = 1;
+            int pageCount2 = 1;
 
-
+            var Template2 = wscopy;
 
             foreach (var subitems in summarizedItems)
             {
+                if (copystartrow >= maxRowLimit)
+                {
+                    pageCount1++;
+                    wscopy = package.Workbook.Worksheets.Add($"InvoiceExtendPage_{pageCount1}", Template2);
+
+                    for (int r = initialRow; r < maxRowLimit; r++)
+                    {
+                        wscopy.Cells[r, 2].Value = null; // Part Number
+                        wscopy.Cells[r, 4].Value = null; // Prod Date
+                        wscopy.Cells[r, 5].Value = null; // Boxes
+                        wscopy.Cells[r, 6].Value = null; // PPS
+                        wscopy.Cells[r, 7].Value = null; // Quantity
+                    }
+
+                    copystartrow = initialRow;
+                }
+
+
                 int PPS = subitems.Quantity / subitems.Box;
-                wscopy.Cells[copystartrow, 2].Value = subitems.Partnumber;
-                wscopy.Cells[copystartrow, 5].Value = subitems.Box.ToString();
-                wscopy.Cells[copystartrow, 6].Value = PPS.ToString();
-                wscopy.Cells[copystartrow, 7].Value = subitems.Quantity.ToString();
+                wscopy.Cells[copystartrow, 2].Value = subitems.Partnumber.ToString();
+                wscopy.Cells[copystartrow, 5].Value = subitems.Box;
+                wscopy.Cells[copystartrow, 6].Value = PPS;
+                wscopy.Cells[copystartrow, 7].Value = subitems.Quantity;
                 copystartrow++;
             }
+
             var Template = ws;
 
             foreach (var item in itemsGroup)
             {
                 if (startrow >= maxRowLimit)
                 {
-                    pageCount++;
-                    ws = package.Workbook.Worksheets.Add($"WarehouseCopy", Template);
+                    pageCount2++;
+                    ws = package.Workbook.Worksheets.Add($"WarehouseExtendPage_{pageCount2}", Template);
+
+                    for (int r = initialRow; r < maxRowLimit; r++)
+                    {
+                        ws.Cells[r, 2].Value = null; // Part Number
+                        ws.Cells[r, 4].Value = null; // Prod Date
+                        ws.Cells[r, 5].Value = null; // Boxes
+                        ws.Cells[r, 6].Value = null; // PPS
+                        ws.Cells[r, 7].Value = null; // Quantity
+                    }
+
                     startrow = initialRow;
                 }
 
@@ -585,9 +612,9 @@ namespace FGScanner.Services
 
                 ws.Cells[startrow, 2].Value = item.PartNumber.ToString();
                 ws.Cells[startrow, 4].Value = item.Proddate.ToString("MM/dd/yyyy");
-                ws.Cells[startrow, 5].Value = item.Boxes.ToString();
-                ws.Cells[startrow, 6].Value = info.PPS.ToString();
-                ws.Cells[startrow, 7].Value = item.Quantity.ToString();
+                ws.Cells[startrow, 5].Value = item.Boxes;
+                ws.Cells[startrow, 6].Value = info.PPS;
+                ws.Cells[startrow, 7].Value = item.Quantity;
                 startrow++;
 
 

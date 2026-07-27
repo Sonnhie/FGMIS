@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FGScanner.Forms.Viewer;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -60,18 +61,25 @@ namespace FGScanner
             forms.Show();
         }
 
+        private void DisplayUsercontrol(UserControl forms)
+        {
+            panel1.Controls.Clear();
+            forms.Dock = DockStyle.Fill;
+            panel1.Controls.Add(forms);
+        }
+
         private void LoadViewer(string warehouseName, string userid) 
         {
             if (warehouseName == "Ecozone")
             {
-                EcozoneViewer ecozoneViewer = new EcozoneViewer(userid);
-                DisplayForm(ecozoneViewer);
+                EcozoneMainViewer ec = new(userid);
+                DisplayUsercontrol(ec);
             }
             else if(warehouseName == "Warehouse")
             {
-                WHDataEntry_Ship_OUT_ Viewer = new WHDataEntry_Ship_OUT_(userid);
-                DisplayForm(Viewer);
-            }       
+               MainWarehouseViewer mw = new(userid);
+                DisplayUsercontrol(mw);
+            }
         }
 
         private void panel2_MouseDown(object sender, MouseEventArgs e)

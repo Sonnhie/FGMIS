@@ -284,5 +284,34 @@ namespace FGScanner.Forms.Reports
                 MessageBox.Show($"Error: {ex.Message}");
             }
         }
+
+        private async void SearchButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string location = TransferTocomboBox.Text;
+                //  string warehouseid = warehouseComboBox.Text;
+                DateTime? startDate = StartDate.Value.Date;
+                DateTime? endDate = EndDate.Value.Date;
+
+                if (location == null)
+                {
+                    MessageBox.Show("Please select storage location.");
+                    return;
+                }
+
+                var result = await _service.GetReturnList(location, startDate, endDate);
+                if (result == null)
+                {
+                    MessageBox.Show("No Data found.");
+                    return;
+                }
+                LoadReturnTable(result);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
     }
 }

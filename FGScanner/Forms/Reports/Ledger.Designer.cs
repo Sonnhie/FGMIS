@@ -76,7 +76,7 @@
             groupBox1.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             groupBox1.Location = new System.Drawing.Point(20, 17);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(517, 161);
+            groupBox1.Size = new System.Drawing.Size(442, 198);
             groupBox1.TabIndex = 3;
             groupBox1.TabStop = false;
             groupBox1.Text = "Filters";
@@ -85,7 +85,7 @@
             // 
             label8.AutoSize = true;
             label8.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
-            label8.Location = new System.Drawing.Point(265, 127);
+            label8.Location = new System.Drawing.Point(36, 159);
             label8.Name = "label8";
             label8.Size = new System.Drawing.Size(65, 18);
             label8.TabIndex = 17;
@@ -96,7 +96,7 @@
             warehouseidcmb.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             warehouseidcmb.FormattingEnabled = true;
             warehouseidcmb.Items.AddRange(new object[] { "WH1", "WH2" });
-            warehouseidcmb.Location = new System.Drawing.Point(335, 119);
+            warehouseidcmb.Location = new System.Drawing.Point(106, 151);
             warehouseidcmb.Margin = new System.Windows.Forms.Padding(1, 3, 1, 3);
             warehouseidcmb.Name = "warehouseidcmb";
             warehouseidcmb.Size = new System.Drawing.Size(136, 26);
@@ -126,7 +126,7 @@
             // SearchBtn
             // 
             SearchBtn.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            SearchBtn.Location = new System.Drawing.Point(402, 33);
+            SearchBtn.Location = new System.Drawing.Point(336, 33);
             SearchBtn.Name = "SearchBtn";
             SearchBtn.Size = new System.Drawing.Size(69, 27);
             SearchBtn.TabIndex = 13;
@@ -161,7 +161,7 @@
             PartnumberTextbox.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             PartnumberTextbox.Location = new System.Drawing.Point(106, 33);
             PartnumberTextbox.Name = "PartnumberTextbox";
-            PartnumberTextbox.Size = new System.Drawing.Size(266, 26);
+            PartnumberTextbox.Size = new System.Drawing.Size(224, 26);
             PartnumberTextbox.TabIndex = 5;
             // 
             // label3
@@ -205,9 +205,9 @@
             groupBox2.Controls.Add(label5);
             groupBox2.Controls.Add(label4);
             groupBox2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox2.Location = new System.Drawing.Point(553, 17);
+            groupBox2.Location = new System.Drawing.Point(468, 17);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new System.Drawing.Size(551, 161);
+            groupBox2.Size = new System.Drawing.Size(486, 198);
             groupBox2.TabIndex = 16;
             groupBox2.TabStop = false;
             groupBox2.Text = "Stock Information";
@@ -216,7 +216,7 @@
             // 
             endstocklbl.AutoSize = true;
             endstocklbl.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            endstocklbl.Location = new System.Drawing.Point(475, 33);
+            endstocklbl.Location = new System.Drawing.Point(361, 33);
             endstocklbl.Name = "endstocklbl";
             endstocklbl.Size = new System.Drawing.Size(0, 15);
             endstocklbl.TabIndex = 21;
@@ -262,7 +262,7 @@
             // 
             total_sum.AutoSize = true;
             total_sum.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            total_sum.Location = new System.Drawing.Point(367, 33);
+            total_sum.Location = new System.Drawing.Point(253, 33);
             total_sum.Name = "total_sum";
             total_sum.Size = new System.Drawing.Size(110, 17);
             total_sum.TabIndex = 13;
@@ -291,7 +291,7 @@
             // BtnExport
             // 
             BtnExport.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            BtnExport.Location = new System.Drawing.Point(1013, 184);
+            BtnExport.Location = new System.Drawing.Point(20, 221);
             BtnExport.Name = "BtnExport";
             BtnExport.Size = new System.Drawing.Size(91, 31);
             BtnExport.TabIndex = 17;
@@ -305,19 +305,19 @@
             StockCardtable.AllowUserToDeleteRows = false;
             StockCardtable.BackgroundColor = System.Drawing.Color.White;
             StockCardtable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            StockCardtable.Location = new System.Drawing.Point(20, 221);
+            StockCardtable.Location = new System.Drawing.Point(20, 258);
             StockCardtable.Name = "StockCardtable";
             StockCardtable.ReadOnly = true;
-            StockCardtable.Size = new System.Drawing.Size(1084, 382);
+            StockCardtable.Size = new System.Drawing.Size(934, 299);
             StockCardtable.TabIndex = 18;
             // 
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1 });
-            statusStrip1.Location = new System.Drawing.Point(0, 634);
+            statusStrip1.Location = new System.Drawing.Point(0, 572);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 11, 0);
-            statusStrip1.Size = new System.Drawing.Size(1127, 22);
+            statusStrip1.Size = new System.Drawing.Size(980, 22);
             statusStrip1.TabIndex = 19;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -344,7 +344,7 @@
             Controls.Add(groupBox1);
             Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             Name = "Ledger";
-            Size = new System.Drawing.Size(1127, 656);
+            Size = new System.Drawing.Size(980, 594);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

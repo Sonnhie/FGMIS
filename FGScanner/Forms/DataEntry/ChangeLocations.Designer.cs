@@ -65,7 +65,7 @@
             groupBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            groupBox1.Size = new System.Drawing.Size(567, 213);
+            groupBox1.Size = new System.Drawing.Size(484, 213);
             groupBox1.TabIndex = 1;
             groupBox1.TabStop = false;
             groupBox1.Text = "Data Entry";
@@ -85,7 +85,7 @@
             newLocationComboBox.Items.AddRange(new object[] { "WH1", "WH2" });
             newLocationComboBox.Location = new System.Drawing.Point(172, 142);
             newLocationComboBox.Name = "newLocationComboBox";
-            newLocationComboBox.Size = new System.Drawing.Size(263, 27);
+            newLocationComboBox.Size = new System.Drawing.Size(197, 27);
             newLocationComboBox.TabIndex = 6;
             // 
             // currLocationComboBox
@@ -93,7 +93,7 @@
             currLocationComboBox.FormattingEnabled = true;
             currLocationComboBox.Location = new System.Drawing.Point(172, 87);
             currLocationComboBox.Name = "currLocationComboBox";
-            currLocationComboBox.Size = new System.Drawing.Size(263, 27);
+            currLocationComboBox.Size = new System.Drawing.Size(197, 27);
             currLocationComboBox.TabIndex = 5;
             currLocationComboBox.SelectedIndexChanged += currLocationComboBox_SelectedIndexChanged;
             // 
@@ -103,7 +103,7 @@
             WarehouseComboBox.Items.AddRange(new object[] { "WH1", "WH2" });
             WarehouseComboBox.Location = new System.Drawing.Point(172, 39);
             WarehouseComboBox.Name = "WarehouseComboBox";
-            WarehouseComboBox.Size = new System.Drawing.Size(263, 27);
+            WarehouseComboBox.Size = new System.Drawing.Size(197, 27);
             WarehouseComboBox.TabIndex = 4;
             WarehouseComboBox.SelectedIndexChanged += WarehouseComboBox_SelectedIndexChanged;
             // 
@@ -118,7 +118,7 @@
             // 
             // TransferButton
             // 
-            TransferButton.Location = new System.Drawing.Point(441, 142);
+            TransferButton.Location = new System.Drawing.Point(375, 142);
             TransferButton.Name = "TransferButton";
             TransferButton.Size = new System.Drawing.Size(92, 27);
             TransferButton.TabIndex = 2;
@@ -147,11 +147,11 @@
             groupBox2.Controls.Add(label6);
             groupBox2.Controls.Add(label5);
             groupBox2.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox2.Location = new System.Drawing.Point(614, 20);
+            groupBox2.Location = new System.Drawing.Point(518, 20);
             groupBox2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox2.Name = "groupBox2";
             groupBox2.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            groupBox2.Size = new System.Drawing.Size(482, 213);
+            groupBox2.Size = new System.Drawing.Size(431, 213);
             groupBox2.TabIndex = 2;
             groupBox2.TabStop = false;
             groupBox2.Text = "Rack Information:";
@@ -236,7 +236,7 @@
             RackTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             RackTable.Location = new System.Drawing.Point(18, 239);
             RackTable.Name = "RackTable";
-            RackTable.Size = new System.Drawing.Size(1078, 388);
+            RackTable.Size = new System.Drawing.Size(931, 331);
             RackTable.TabIndex = 3;
             // 
             // ChangeLocations
@@ -246,7 +246,7 @@
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
             Name = "ChangeLocations";
-            Size = new System.Drawing.Size(1127, 656);
+            Size = new System.Drawing.Size(980, 594);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

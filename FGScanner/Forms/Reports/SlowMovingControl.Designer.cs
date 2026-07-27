@@ -58,7 +58,7 @@
             // BtnExport
             // 
             BtnExport.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            BtnExport.Location = new System.Drawing.Point(1022, 15);
+            BtnExport.Location = new System.Drawing.Point(875, 15);
             BtnExport.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             BtnExport.Name = "BtnExport";
             BtnExport.Size = new System.Drawing.Size(86, 37);
@@ -89,7 +89,7 @@
             LogsTable.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             LogsTable.Name = "LogsTable";
             LogsTable.RowHeadersWidth = 51;
-            LogsTable.Size = new System.Drawing.Size(1087, 504);
+            LogsTable.Size = new System.Drawing.Size(940, 446);
             LogsTable.TabIndex = 35;
             // 
             // total_box_lbl
@@ -97,7 +97,7 @@
             total_box_lbl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             total_box_lbl.AutoSize = true;
             total_box_lbl.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F);
-            total_box_lbl.Location = new System.Drawing.Point(521, 571);
+            total_box_lbl.Location = new System.Drawing.Point(377, 514);
             total_box_lbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             total_box_lbl.Name = "total_box_lbl";
             total_box_lbl.Size = new System.Drawing.Size(60, 19);
@@ -109,7 +109,7 @@
             total_sum.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             total_sum.AutoSize = true;
             total_sum.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F);
-            total_sum.Location = new System.Drawing.Point(674, 571);
+            total_sum.Location = new System.Drawing.Point(530, 514);
             total_sum.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             total_sum.Name = "total_sum";
             total_sum.Size = new System.Drawing.Size(85, 19);
@@ -120,7 +120,7 @@
             // 
             LblPage.AutoSize = true;
             LblPage.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            LblPage.Location = new System.Drawing.Point(21, 571);
+            LblPage.Location = new System.Drawing.Point(24, 514);
             LblPage.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             LblPage.Name = "LblPage";
             LblPage.Size = new System.Drawing.Size(74, 18);
@@ -130,7 +130,7 @@
             // BtnPrev
             // 
             BtnPrev.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            BtnPrev.Location = new System.Drawing.Point(958, 564);
+            BtnPrev.Location = new System.Drawing.Point(814, 507);
             BtnPrev.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             BtnPrev.Name = "BtnPrev";
             BtnPrev.Size = new System.Drawing.Size(74, 36);
@@ -142,7 +142,7 @@
             // BtnNext
             // 
             BtnNext.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            BtnNext.Location = new System.Drawing.Point(1036, 564);
+            BtnNext.Location = new System.Drawing.Point(892, 507);
             BtnNext.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             BtnNext.Name = "BtnNext";
             BtnNext.Size = new System.Drawing.Size(72, 36);
@@ -155,10 +155,10 @@
             // 
             statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1 });
-            statusStrip1.Location = new System.Drawing.Point(0, 634);
+            statusStrip1.Location = new System.Drawing.Point(0, 572);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 9, 0);
-            statusStrip1.Size = new System.Drawing.Size(1127, 22);
+            statusStrip1.Size = new System.Drawing.Size(980, 22);
             statusStrip1.TabIndex = 42;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -190,7 +190,7 @@
             Controls.Add(TxtPartnumber);
             Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             Name = "SlowMovingControl";
-            Size = new System.Drawing.Size(1127, 656);
+            Size = new System.Drawing.Size(980, 594);
             Load += SlowMovingControl_Load;
             ((System.ComponentModel.ISupportInitialize)LogsTable).EndInit();
             statusStrip1.ResumeLayout(false);

@@ -49,10 +49,8 @@
             label21 = new System.Windows.Forms.Label();
             DPITotalQuantityLabel = new System.Windows.Forms.Label();
             DPITotalBoxLabel = new System.Windows.Forms.Label();
-            DPIPartcountLabel = new System.Windows.Forms.Label();
             label16 = new System.Windows.Forms.Label();
             label17 = new System.Windows.Forms.Label();
-            label18 = new System.Windows.Forms.Label();
             label10 = new System.Windows.Forms.Label();
             label9 = new System.Windows.Forms.Label();
             CustomerLabel = new System.Windows.Forms.Label();
@@ -70,6 +68,8 @@
             statusStrip1 = new System.Windows.Forms.StatusStrip();
             toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            label18 = new System.Windows.Forms.Label();
+            DPIPartcountLabel = new System.Windows.Forms.Label();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -89,14 +89,14 @@
             groupBox2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox2.Name = "groupBox2";
             groupBox2.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            groupBox2.Size = new System.Drawing.Size(484, 124);
+            groupBox2.Size = new System.Drawing.Size(484, 86);
             groupBox2.TabIndex = 7;
             groupBox2.TabStop = false;
             groupBox2.Text = "DPI Data Entry";
             // 
             // DPIClearButton
             // 
-            DPIClearButton.Location = new System.Drawing.Point(336, 72);
+            DPIClearButton.Location = new System.Drawing.Point(367, 40);
             DPIClearButton.Name = "DPIClearButton";
             DPIClearButton.Size = new System.Drawing.Size(92, 27);
             DPIClearButton.TabIndex = 11;
@@ -110,12 +110,12 @@
             DPITextBox.Location = new System.Drawing.Point(105, 40);
             DPITextBox.Name = "DPITextBox";
             DPITextBox.ReadOnly = true;
-            DPITextBox.Size = new System.Drawing.Size(216, 27);
+            DPITextBox.Size = new System.Drawing.Size(158, 27);
             DPITextBox.TabIndex = 8;
             // 
             // DPIFileButton
             // 
-            DPIFileButton.Location = new System.Drawing.Point(336, 39);
+            DPIFileButton.Location = new System.Drawing.Point(269, 40);
             DPIFileButton.Name = "DPIFileButton";
             DPIFileButton.Size = new System.Drawing.Size(92, 27);
             DPIFileButton.TabIndex = 2;
@@ -145,7 +145,7 @@
             groupBox1.Controls.Add(SelectFileButton);
             groupBox1.Controls.Add(label1);
             groupBox1.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox1.Location = new System.Drawing.Point(21, 143);
+            groupBox1.Location = new System.Drawing.Point(21, 104);
             groupBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
@@ -269,11 +269,11 @@
             groupBox3.Controls.Add(label5);
             groupBox3.Controls.Add(label8);
             groupBox3.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox3.Location = new System.Drawing.Point(19, 364);
+            groupBox3.Location = new System.Drawing.Point(19, 325);
             groupBox3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             groupBox3.Name = "groupBox3";
             groupBox3.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            groupBox3.Size = new System.Drawing.Size(486, 254);
+            groupBox3.Size = new System.Drawing.Size(486, 233);
             groupBox3.TabIndex = 9;
             groupBox3.TabStop = false;
             groupBox3.Text = "Information:";
@@ -281,7 +281,7 @@
             // ShipmentIdLabel
             // 
             ShipmentIdLabel.AutoSize = true;
-            ShipmentIdLabel.Location = new System.Drawing.Point(197, 223);
+            ShipmentIdLabel.Location = new System.Drawing.Point(197, 197);
             ShipmentIdLabel.Name = "ShipmentIdLabel";
             ShipmentIdLabel.Size = new System.Drawing.Size(21, 19);
             ShipmentIdLabel.TabIndex = 22;
@@ -290,7 +290,7 @@
             // label21
             // 
             label21.AutoSize = true;
-            label21.Location = new System.Drawing.Point(69, 223);
+            label21.Location = new System.Drawing.Point(69, 197);
             label21.Name = "label21";
             label21.Size = new System.Drawing.Size(69, 19);
             label21.TabIndex = 21;
@@ -299,7 +299,7 @@
             // DPITotalQuantityLabel
             // 
             DPITotalQuantityLabel.AutoSize = true;
-            DPITotalQuantityLabel.Location = new System.Drawing.Point(420, 81);
+            DPITotalQuantityLabel.Location = new System.Drawing.Point(420, 68);
             DPITotalQuantityLabel.Name = "DPITotalQuantityLabel";
             DPITotalQuantityLabel.Size = new System.Drawing.Size(21, 19);
             DPITotalQuantityLabel.TabIndex = 18;
@@ -308,25 +308,16 @@
             // DPITotalBoxLabel
             // 
             DPITotalBoxLabel.AutoSize = true;
-            DPITotalBoxLabel.Location = new System.Drawing.Point(197, 81);
+            DPITotalBoxLabel.Location = new System.Drawing.Point(197, 68);
             DPITotalBoxLabel.Name = "DPITotalBoxLabel";
             DPITotalBoxLabel.Size = new System.Drawing.Size(21, 19);
             DPITotalBoxLabel.TabIndex = 17;
             DPITotalBoxLabel.Text = "--";
             // 
-            // DPIPartcountLabel
-            // 
-            DPIPartcountLabel.AutoSize = true;
-            DPIPartcountLabel.Location = new System.Drawing.Point(197, 56);
-            DPIPartcountLabel.Name = "DPIPartcountLabel";
-            DPIPartcountLabel.Size = new System.Drawing.Size(21, 19);
-            DPIPartcountLabel.TabIndex = 16;
-            DPIPartcountLabel.Text = "--";
-            // 
             // label16
             // 
             label16.AutoSize = true;
-            label16.Location = new System.Drawing.Point(291, 81);
+            label16.Location = new System.Drawing.Point(291, 68);
             label16.Name = "label16";
             label16.Size = new System.Drawing.Size(85, 19);
             label16.TabIndex = 15;
@@ -335,20 +326,11 @@
             // label17
             // 
             label17.AutoSize = true;
-            label17.Location = new System.Drawing.Point(68, 84);
+            label17.Location = new System.Drawing.Point(68, 71);
             label17.Name = "label17";
             label17.Size = new System.Drawing.Size(60, 19);
             label17.TabIndex = 14;
             label17.Text = "Total Box:";
-            // 
-            // label18
-            // 
-            label18.AutoSize = true;
-            label18.Location = new System.Drawing.Point(68, 56);
-            label18.Name = "label18";
-            label18.Size = new System.Drawing.Size(113, 19);
-            label18.TabIndex = 13;
-            label18.Text = "Part number Count:";
             // 
             // label10
             // 
@@ -362,7 +344,7 @@
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new System.Drawing.Point(44, 129);
+            label9.Location = new System.Drawing.Point(44, 103);
             label9.Name = "label9";
             label9.Size = new System.Drawing.Size(141, 19);
             label9.TabIndex = 11;
@@ -371,7 +353,7 @@
             // CustomerLabel
             // 
             CustomerLabel.AutoSize = true;
-            CustomerLabel.Location = new System.Drawing.Point(365, 165);
+            CustomerLabel.Location = new System.Drawing.Point(365, 139);
             CustomerLabel.Name = "CustomerLabel";
             CustomerLabel.Size = new System.Drawing.Size(21, 19);
             CustomerLabel.TabIndex = 10;
@@ -380,7 +362,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(291, 165);
+            label4.Location = new System.Drawing.Point(291, 139);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(62, 19);
             label4.TabIndex = 9;
@@ -389,7 +371,7 @@
             // QuantityLabel
             // 
             QuantityLabel.AutoSize = true;
-            QuantityLabel.Location = new System.Drawing.Point(420, 190);
+            QuantityLabel.Location = new System.Drawing.Point(420, 164);
             QuantityLabel.Name = "QuantityLabel";
             QuantityLabel.Size = new System.Drawing.Size(21, 19);
             QuantityLabel.TabIndex = 8;
@@ -398,7 +380,7 @@
             // BoxLabel
             // 
             BoxLabel.AutoSize = true;
-            BoxLabel.Location = new System.Drawing.Point(197, 190);
+            BoxLabel.Location = new System.Drawing.Point(197, 164);
             BoxLabel.Name = "BoxLabel";
             BoxLabel.Size = new System.Drawing.Size(21, 19);
             BoxLabel.TabIndex = 7;
@@ -407,7 +389,7 @@
             // PartcountLabel
             // 
             PartcountLabel.AutoSize = true;
-            PartcountLabel.Location = new System.Drawing.Point(197, 165);
+            PartcountLabel.Location = new System.Drawing.Point(197, 139);
             PartcountLabel.Name = "PartcountLabel";
             PartcountLabel.Size = new System.Drawing.Size(21, 19);
             PartcountLabel.TabIndex = 6;
@@ -416,7 +398,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new System.Drawing.Point(291, 190);
+            label7.Location = new System.Drawing.Point(291, 164);
             label7.Name = "label7";
             label7.Size = new System.Drawing.Size(85, 19);
             label7.TabIndex = 5;
@@ -425,7 +407,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(68, 193);
+            label5.Location = new System.Drawing.Point(68, 167);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(60, 19);
             label5.TabIndex = 4;
@@ -434,7 +416,7 @@
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new System.Drawing.Point(68, 165);
+            label8.Location = new System.Drawing.Point(68, 139);
             label8.Name = "label8";
             label8.Size = new System.Drawing.Size(113, 19);
             label8.TabIndex = 3;
@@ -444,7 +426,7 @@
             // 
             label20.AutoSize = true;
             label20.Font = new System.Drawing.Font("Bahnschrift Condensed", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label20.Location = new System.Drawing.Point(544, 326);
+            label20.Location = new System.Drawing.Point(544, 256);
             label20.Name = "label20";
             label20.Size = new System.Drawing.Size(55, 23);
             label20.TabIndex = 19;
@@ -456,9 +438,9 @@
             ShipmenTable.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             ShipmenTable.BackgroundColor = System.Drawing.Color.White;
             ShipmenTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            ShipmenTable.Location = new System.Drawing.Point(542, 355);
+            ShipmenTable.Location = new System.Drawing.Point(542, 285);
             ShipmenTable.Name = "ShipmenTable";
-            ShipmenTable.Size = new System.Drawing.Size(541, 263);
+            ShipmenTable.Size = new System.Drawing.Size(394, 263);
             ShipmenTable.TabIndex = 18;
             // 
             // label19
@@ -479,16 +461,16 @@
             DPITable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             DPITable.Location = new System.Drawing.Point(542, 41);
             DPITable.Name = "DPITable";
-            DPITable.Size = new System.Drawing.Size(541, 276);
+            DPITable.Size = new System.Drawing.Size(394, 199);
             DPITable.TabIndex = 16;
             DPITable.RowPrePaint += DPITable_RowPrePaint;
             // 
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1 });
-            statusStrip1.Location = new System.Drawing.Point(0, 634);
+            statusStrip1.Location = new System.Drawing.Point(0, 572);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new System.Drawing.Size(1127, 22);
+            statusStrip1.Size = new System.Drawing.Size(980, 22);
             statusStrip1.TabIndex = 20;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -505,6 +487,24 @@
             toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             toolStripStatusLabel1.Visible = false;
             // 
+            // label18
+            // 
+            label18.AutoSize = true;
+            label18.Location = new System.Drawing.Point(68, 43);
+            label18.Name = "label18";
+            label18.Size = new System.Drawing.Size(113, 19);
+            label18.TabIndex = 13;
+            label18.Text = "Part number Count:";
+            // 
+            // DPIPartcountLabel
+            // 
+            DPIPartcountLabel.AutoSize = true;
+            DPIPartcountLabel.Location = new System.Drawing.Point(197, 43);
+            DPIPartcountLabel.Name = "DPIPartcountLabel";
+            DPIPartcountLabel.Size = new System.Drawing.Size(21, 19);
+            DPIPartcountLabel.TabIndex = 16;
+            DPIPartcountLabel.Text = "--";
+            // 
             // Shipments
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -517,7 +517,7 @@
             Controls.Add(groupBox1);
             Controls.Add(groupBox2);
             Name = "Shipments";
-            Size = new System.Drawing.Size(1127, 656);
+            Size = new System.Drawing.Size(980, 594);
             Load += Shipments_Load;
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
@@ -556,10 +556,8 @@
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.Label DPITotalQuantityLabel;
         private System.Windows.Forms.Label DPITotalBoxLabel;
-        private System.Windows.Forms.Label DPIPartcountLabel;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label CustomerLabel;
@@ -577,5 +575,7 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.Label DPIPartcountLabel;
+        private System.Windows.Forms.Label label18;
     }
 }

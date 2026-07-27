@@ -82,17 +82,19 @@ namespace FGScanner.Services
         {
             try
             {
+                var partnumbers  = ScanItem.Select(x => x.PartNumber).Distinct().ToList();
+                var productdict = await _queries.GetProductsByPartNumbersAsync(partnumbers);
+
                 foreach (var data in ScanItem)
                 {
-                    var isExist = await _queries.GetProductInfo(data.PartNumber);
-                    if (isExist == null)
+                    if (!productdict.TryGetValue(data.PartNumber, out var productInfo))
                     {
-                        return (false, "Partnumber not exist in database.");
+                        return (false, $"Partnumber '{data.PartNumber}' does not exist in database.");
                     }
 
-                    if (isExist.PPS != data.Quantity)
+                    if (data.Quantity <= 0)
                     {
-                        return (false, "Invalid PPS Quantity");
+                        return (false, $"Quantity for {data.PartNumber} must be greater than zero.");
                     }
                 }
 

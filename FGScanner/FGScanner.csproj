@@ -32,6 +32,7 @@
     <SignManifests>true</SignManifests>
     <Win32Resource />
     <ApplicationIcon>Gemini_Generated_Image_1knwy21knwy21knw.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -41,7 +42,7 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.configuration" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Security" />
     <Reference Include="System.ValueTuple" />
