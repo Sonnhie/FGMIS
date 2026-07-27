@@ -1,4 +1,7 @@
-﻿using System;
+﻿using FGScanner.Forms.DataEntry;
+using FGScanner.Forms.Master;
+using FGScanner.Forms.Reports;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -33,17 +36,14 @@ namespace FGScanner
             this.usergroup = usergroup;
             LblUser.Text = userid;
             AccessControlFeatures(usergroup);
-            //MessageBox.Show("user:" + _userid);
+            bPPSToolStripMenuItem.Visible = false;
         }
 
         private void AccessControlFeatures(int usergroup)
         {
             if (usergroup != 2)
             {
-                iNToolStripMenuItem.Enabled = false;
-                oUTToolStripMenuItem.Enabled = false;
-                cHANGELOCATIONToolStripMenuItem.Enabled = false;
-                warehouseReturnToolStripMenuItem.Enabled = false;
+     
                 rackViewerToolStripMenuItem.Enabled = false;
                 warehouseToolStripMenuItem.Enabled = false;
                 packingListToolStripMenuItem.Enabled = false;
@@ -62,42 +62,32 @@ namespace FGScanner
 
         private void DisplayForm(Form forms)
         {
-            panel1.Controls.Clear();
+           
             forms.TopLevel = false;
+            forms.FormBorderStyle = FormBorderStyle.None;
             forms.Dock = DockStyle.Fill;
+            panel1.Controls.Clear();
             panel1.Controls.Add(forms);
             forms.Show();
         }
 
-        private void LoadDashboard()
+        private void DisplayUsercontrol(UserControl forms)
         {
-            Report report = new Report();
-            DisplayForm(report);
+            panel1.Controls.Clear();
+            forms.Dock = DockStyle.Fill;
+            panel1.Controls.Add(forms);
         }
 
-        private void iNToolStripMenuItem_Click(object sender, EventArgs e)
+        private void LoadDashboard()
         {
-            _TransactionType = "IN";
-            WHDataEntryIN DataEntryIn = new WHDataEntryIN(_TransactionType,_userid);
-            DisplayForm(DataEntryIn);
+            Dashboard dashboard = new();
+            DisplayUsercontrol(dashboard);
         }
 
         private void menuStrip1_MouseDown(object sender, MouseEventArgs e)
         {
             ReleaseCapture();
             SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
-        }
-
-        private void oUTToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            _TransactionType = "OUT";
-            WH_OUT DataEntryOut = new WH_OUT(_TransactionType, _userid);
-            DisplayForm(DataEntryOut);
-        }
-
-        private void rackViewerToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void logoutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -114,33 +104,23 @@ namespace FGScanner
 
         private void stockListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            InventoryForm inventory = new InventoryForm(_userid);
-            DisplayForm(inventory);
+            InventoryControl inventoryControl = new(_userid);
+            DisplayUsercontrol(inventoryControl);
         }
 
-        private void cHANGELOCATIONToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ChangeLocation changeLocation = new ChangeLocation(_userid);
-            DisplayForm(changeLocation);
-        }
 
         private void inventorySummaryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Report report = new Report();
-            DisplayForm(report);
+            Dashboard dashboard = new();
+            DisplayUsercontrol(dashboard);
         }
 
         private void panel2_MouseDown(object sender, MouseEventArgs e)
         {
             ReleaseCapture();
-            SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+            SendMessage(Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
         }
 
-        private void warehouseReturnToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            WarehouseReturn wr = new WarehouseReturn(_userid);
-            DisplayForm(wr);
-        }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -154,14 +134,14 @@ namespace FGScanner
 
         private void slowMovingListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Slowmoving form = new Slowmoving();
-            DisplayForm(form);
+            SlowMovingControl slowMovingControl = new();
+            DisplayUsercontrol(slowMovingControl);
         }
 
         private void warehouseToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             string warehouse = "Warehouse";
-            var form = Viewer.GetInstance(warehouse,_userid);
+            var form = Viewer.GetInstance(warehouse, _userid);
 
             form.Show();
             form.BringToFront();
@@ -178,31 +158,56 @@ namespace FGScanner
 
         private void warehouseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WHRForm wr = new WHRForm();
-            DisplayForm(wr);
+            ReturnListControl returnListControl = new(_userid);
+            DisplayUsercontrol(returnListControl);
         }
 
         private void packingListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PackingList packingList = new PackingList();
-            DisplayForm(packingList);
+            ShipmentReport shipmentReport = new(_userid);
+            DisplayUsercontrol(shipmentReport);
         }
 
         private void iNOUTLedgerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StockCard stockCard = new StockCard();
-            DisplayForm(stockCard);
-        }
-
-        private void dataEntryToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
+            Ledger ledger = new();
+            DisplayUsercontrol(ledger);
         }
 
         private void masterListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Product product = new Product(_userid);
-            DisplayForm(product);
+            MasterList masterList = new(_userid);
+            DisplayUsercontrol(masterList);
+        }
+
+        private void transferLocationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ChangeLocations changeLocations = new(_userid);
+            DisplayUsercontrol(changeLocations);
+        }
+
+        private void bPPSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BPPS bPPS = new(_userid);
+            DisplayUsercontrol(bPPS);
+        }
+
+        private void incomingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Incoming incoming = new(_userid);
+            DisplayUsercontrol(incoming);
+        }
+
+        private void outgoingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Shipments shipments = new(_userid);
+            DisplayUsercontrol(shipments);
+        }
+
+        private void warehouseReturnToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            WarehouseReturn warehouseReturn = new(_userid);
+            DisplayUsercontrol(warehouseReturn);
         }
     }
 }

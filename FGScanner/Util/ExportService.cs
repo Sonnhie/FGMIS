@@ -24,8 +24,8 @@ namespace FGScanner.Util
                     throw new ArgumentNullException(nameof(data), "Data is empty or null.");
                if(string.IsNullOrWhiteSpace(filepath))
                     throw new ArgumentNullException(nameof(filepath), "File path is required");
-               
-                using(var package = new ExcelPackage())
+
+                using (var package = new ExcelPackage())
                 {
                     var worksheet = package.Workbook.Worksheets.Add(worksheetName);
                     int ColIndex = 0;

@@ -1,7 +1,7 @@
 ﻿using FGScanner.Model;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,11 +11,11 @@ namespace FGScanner.Util
 {
     public class UserService
     {
-        private readonly db_connection _Connection;
+        private readonly Util.db_connection _Connection;
 
         public UserService()
         {
-            _Connection = new db_connection();
+            _Connection = new Util.db_connection();
         }
 
         public bool CheckIfExist(string username)

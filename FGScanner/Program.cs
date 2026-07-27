@@ -3,19 +3,20 @@ using OfficeOpenXml;
 using OfficeOpenXml.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FGScanner.Database;
 
 
 namespace FGScanner
 {
     internal static class Program
     {
-        private static readonly db_connection _Connection = new db_connection();
+        private static readonly Util.db_connection _Connection = new Util.db_connection();
 
         /// <summary>
         /// The main entry point for the application.
