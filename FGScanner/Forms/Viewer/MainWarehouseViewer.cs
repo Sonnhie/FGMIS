@@ -49,11 +49,13 @@ namespace FGScanner.Forms.Viewer
             InitializeComponent();
 
             timer1.Interval = 2000;
-            timer1.Start();
+
+            // Setup UI and Services FIRST
             typeof(FlowLayoutPanel)
-            .GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-            .SetValue(flowLayoutPanel1, true, null);
+                .GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                .SetValue(flowLayoutPanel1, true, null);
             TxtPartnumber.CharacterCasing = CharacterCasing.Upper;
+
             _userid = userid;
             _dbContext = new();
             _queries = new(_dbContext);
@@ -121,7 +123,7 @@ namespace FGScanner.Forms.Viewer
             int rackRows = config.Item1;
             int rackColumns = config.Item2;
 
-            int buttonWidth = 80;
+            int buttonWidth = 70;
             int buttonHeight = 40;
             int spacing = 2;
 
@@ -142,7 +144,7 @@ namespace FGScanner.Forms.Viewer
             Label rackTitle = new()
             {
                 Text = RackID,
-                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Font = new Font("Bahnschrift", 11, FontStyle.Bold),
                 Width = buttonWidth,
                 Height = rackPanel.Height,
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -169,7 +171,7 @@ namespace FGScanner.Forms.Viewer
                         Left = col * (buttonWidth + spacing),
                         Top = row * (buttonHeight + spacing),
                         Text = RackLabel,
-                        Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                        Font = new Font("Bahnschrift", 9, FontStyle.Regular),
                         BackColor = Color.White,
                         ForeColor = Color.Black
                     };

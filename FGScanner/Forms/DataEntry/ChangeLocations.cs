@@ -3,6 +3,7 @@ using FGScanner.Model;
 using FGScanner.Models;
 using FGScanner.Repositories;
 using FGScanner.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using OfficeOpenXml;
 using System;
@@ -15,6 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Globalization;
 
 namespace FGScanner.Forms.DataEntry
 {
@@ -190,44 +192,70 @@ namespace FGScanner.Forms.DataEntry
                 string warehouseId = WarehouseComboBox.Text;
                 string currLocation = currLocationComboBox.Text;
                 string newLocation = newLocationComboBox.Text;
+
+
                 if (string.IsNullOrEmpty(warehouseId) || string.IsNullOrEmpty(currLocation) || string.IsNullOrEmpty(newLocation))
                 {
                     MessageBox.Show("Please select a warehouse, current location, and new location.");
                     return;
                 }
-                List<ActualInventory> selectedInventories = new();
-                foreach (DataGridViewRow row in RackTable.Rows)
+
+                var selectedRows = RackTable.Rows.Cast<DataGridViewRow>()
+                                    .Where(row => row.Cells["Select"].Value != null && (bool)row.Cells["Select"].Value)
+                                    .ToList();
+                var partNumbers = selectedRows
+                                .Select(row => row.Cells["Part Number"].Value.ToString())
+                                .Distinct()
+                                .ToList();
+
+                var productDict = await _dbContext.Products
+                                  .Where(p => partNumbers.Contains(p.PartNumber))
+                                  .ToDictionaryAsync(x => x.PartNumber, x => x.PPS);
+
+                List<ActualInventory> selectedInventories = [];
+                foreach (var row in selectedRows)
                 {
-                    if (row.Cells["Select"].Value != null && (bool)row.Cells["Select"].Value)
-                    {
-
-                        int Quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
-                        string partnumber = row.Cells["Part Number"].Value.ToString();
-                        var checkPPS = await _queries.GetProductInfo(partnumber);
-                        int pps = 1;
-                        if (checkPPS.PPS > 0)
-                        {
-                            pps = checkPPS.PPS;
-                        }
-                        int box = (int)Math.Ceiling((double)Quantity / pps);
-
-                        ActualInventory inventory = new()
-                        {
-                            Partnumber = row.Cells["Part Number"].Value.ToString(),
-                            ProdDate = DateTime.Parse(row.Cells["Production Date"].Value.ToString()),
-                            ProdVer = row.Cells["Production Version"].Value.ToString(),
-                            Quantity = Quantity,
-                            TotalBox = box,
-                            CustomerId = row.Cells["Customer"].Value.ToString()
+                    int Quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
+                    string partnumber = row.Cells["Part Number"].Value.ToString();
+                    string dateString = row.Cells["Production Date"].Value.ToString();
+                    string[] dateFormats = {
+                            "MM/dd/yyyy", "M/d/yyyy", "M/dd/yyyy", "MM/d/yyyy",
+                            "MM-dd-yyyy", "M-d-yyyy", "M-dd-yyyy", "MM-d-yyyy"
                         };
-                        selectedInventories.Add(inventory);
+
+                    DateTime safeProdDate = DateTime.ParseExact(
+                        dateString,
+                        dateFormats,
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None
+                    );
+
+                    int pps = 1;
+                    if (productDict.TryGetValue(partnumber, out int dbPPS) && dbPPS > 0)
+                    {
+                        pps = dbPPS;
                     }
+                    int box = (int)Math.Ceiling((double)Quantity / pps);
+
+                    ActualInventory inventory = new()
+                    {
+                        Partnumber = row.Cells["Part Number"].Value.ToString(),
+                        ProdDate = safeProdDate,
+                        ProdVer = row.Cells["Production Version"].Value.ToString(),
+                        Quantity = Quantity,
+                        TotalBox = box,
+                        CustomerId = row.Cells["Customer"].Value.ToString()
+                    };
+
+                    selectedInventories.Add(inventory);
                 }
+
                 if (selectedInventories.Count == 0)
                 {
                     MessageBox.Show("Please select at least one inventory item to transfer.");
                     return;
                 }
+
                 var result = MessageBox.Show($"Transfer {selectedInventories.Count} items, {selectedInventories.Sum(i => i.Quantity)} Quantity, {selectedInventories.Sum(x => x.TotalBox)} Boxes from {currLocation} to {newLocation}?", "Transfer Items", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {

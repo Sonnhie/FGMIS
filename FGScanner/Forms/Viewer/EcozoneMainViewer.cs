@@ -125,8 +125,9 @@ namespace FGScanner.Forms.Viewer
             int rackRows = config.Item1;
             int rackColumns = config.Item2;
 
+
             int buttonWidth = 80;
-            int buttonHeight = 40;
+            int buttonHeight = 30;
             int spacing = 2;
 
             int RackLabelIdentifiation1 = 0;
@@ -146,7 +147,7 @@ namespace FGScanner.Forms.Viewer
             Label rackTitle = new()
             {
                 Text = RackID,
-                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Font = new Font("Bahnschrift", 11, FontStyle.Bold),
                 Width = buttonWidth,
                 Height = rackPanel.Height,
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -173,7 +174,7 @@ namespace FGScanner.Forms.Viewer
                         Left = col * (buttonWidth + spacing),
                         Top = row * (buttonHeight + spacing),
                         Text = RackLabel,
-                        Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                        Font = new Font("Bahnschrift", 10, FontStyle.Regular),
                         BackColor = Color.White,
                         ForeColor = Color.Black
                     };
