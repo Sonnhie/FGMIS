@@ -190,12 +190,12 @@ namespace FGScanner.Forms.DataEntry
 
                     ShipmenTable.ReadOnly = true;
 
-                    ShipmenTable.Columns["Part Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    ShipmenTable.Columns["Production Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    ShipmenTable.Columns["Production Version"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    ShipmenTable.Columns["Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    ShipmenTable.Columns["Box Count"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    ShipmenTable.Columns["Customer"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    ShipmenTable.Columns["Part Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    ShipmenTable.Columns["Production Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    ShipmenTable.Columns["Production Version"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    ShipmenTable.Columns["Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    ShipmenTable.Columns["Box Count"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    ShipmenTable.Columns["Customer"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                 }
                 else
                 {
@@ -298,7 +298,7 @@ namespace FGScanner.Forms.DataEntry
                             HashSet<string> missingDpiItems = [];
                             Dictionary<string, string> excessItems = [];
                             Dictionary<string, int> runningTotals = validScan
-                                                .GroupBy(x => x.PartNumber)
+                                                .GroupBy(x => $"{x.PartNumber}|{x.ProductionDate}|{x.ProductionVersion}|{warehouse}|{x.Location}")
                                                 .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
                             Dictionary<string, string> stockOverflowItems = [];
                             
@@ -309,7 +309,7 @@ namespace FGScanner.Forms.DataEntry
                             {
                                 if (string.IsNullOrWhiteSpace(item.PartNumber)) continue;
 
-                                string stockKey = $"{item.PartNumber}|{item.ProductionDate:yyyyMMdd}|{item.ProductionVersion}|{item.WhId}|{item.Location}";
+                                string stockKey = $"{item.PartNumber}|{item.ProductionDate}|{item.ProductionVersion}|{warehouse}|{item.Location}";
                                 stockDICT.TryGetValue(stockKey, out int stockCount);
                               
 
@@ -318,19 +318,19 @@ namespace FGScanner.Forms.DataEntry
                                     missingDpiItems.Add(item.PartNumber);
                                     continue;
                                 }
-
-                                runningTotals.TryGetValue(item.PartNumber, out int currentScan);
+                                string key = $"{item.PartNumber}|{item.ProductionDate}|{item.ProductionVersion}|{warehouse}|{Location}";
+                                runningTotals.TryGetValue(key, out int currentScan);
                                 var projectedQty = currentScan + item.Quantity;
 
                                 if (projectedQty > reference.Quantity)
                                 {
-                                    excessItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedQty}, Limit: {reference.Quantity})";
+                                    excessItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedQty}, Limit: {reference.Quantity}, Production: {item.ProductionDate}, Rack: {item.Location})";
                                     continue;
                                 }
 
                                 if (projectedQty > stockCount)
                                 {
-                                    stockOverflowItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedQty}, Stock: {stockCount})";
+                                    stockOverflowItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedQty}, Stock: {stockCount}, Production: {item.ProductionDate}, Rack: {item.Location})";
                                     continue;
                                 }
 
@@ -357,11 +357,11 @@ namespace FGScanner.Forms.DataEntry
 
                                 if (stockOverflowItems.Count > 0)
                                 {
-                                    var overflowToDisplay = stockOverflowItems.Values.Take(5);
+                                    var overflowToDisplay = stockOverflowItems.Values;
                                     warningMessage += $"Stock Overflows:\n- {string.Join("\n- ", overflowToDisplay)}";
 
-                                    if (stockOverflowItems.Count > 5)
-                                        warningMessage += $"\n...and {stockOverflowItems.Count - 5} more.";
+                                    //if (stockOverflowItems.Count > 5)
+                                    //    warningMessage += $"\n...and {stockOverflowItems.Count - 5} more.";
                                 }
 
                                 MessageBox.Show(warningMessage, "Partial Success", MessageBoxButtons.OK, MessageBoxIcon.Warning);
