@@ -54,6 +54,7 @@
             statusStrip1 = new System.Windows.Forms.StatusStrip();
             toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            ExportExcel = new System.Windows.Forms.Button();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)ShipmentTable).BeginInit();
@@ -340,9 +341,22 @@
             toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             toolStripStatusLabel1.Visible = false;
             // 
+            // ExportExcel
+            // 
+            ExportExcel.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            ExportExcel.Location = new System.Drawing.Point(19, 533);
+            ExportExcel.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            ExportExcel.Name = "ExportExcel";
+            ExportExcel.Size = new System.Drawing.Size(115, 26);
+            ExportExcel.TabIndex = 27;
+            ExportExcel.Text = "Export Excel";
+            ExportExcel.UseVisualStyleBackColor = true;
+            ExportExcel.Click += ExportExcel_Click;
+            // 
             // ShipmentReport
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            Controls.Add(ExportExcel);
             Controls.Add(statusStrip1);
             Controls.Add(CancelShipmentButton);
             Controls.Add(GenerateButton);
@@ -395,5 +409,6 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.Button ExportExcel;
     }
 }

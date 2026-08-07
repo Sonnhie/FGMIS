@@ -916,6 +916,32 @@ namespace FGScanner.Repositories
             }
         }
 
+        public async Task<List<ShipmentReport>> GetShipmentData(DateTime? startDate, DateTime? endDate)
+        {
+            try
+            {
+                var result = await _dbContext.Transactions
+                            .Where(s => s.controlNumber.Contains("SHIPID") && s.Remarks != "Cancelled Shipment" && s.Status != "Cancelled" && s.EntryDate >= startDate && s.EntryDate <= endDate)
+                            .GroupBy(s => new { s.Partnumber, s.controlNumber, s.ProdDate, s.ProdVer, s.CustomerId, s.EntryDate })
+                            .Select(s => new ShipmentReport
+                            {
+                                ControlNumber = s.Key.controlNumber,
+                                Partnumber = s.Key.Partnumber,
+                                Customer = s.Key.CustomerId,
+                                ProdDate = s.Key.ProdDate,
+                                ProdVersion = s.Key.ProdVer,
+                                Quantity = s.Sum(x => x.Quantity),
+                                Box  = s.Sum(x => x.Box),
+                                EntryDate = s.Key.EntryDate,
+                            })
+                            .ToListAsync();
+                return result;
+            }catch 
+            {
+                return [];
+            }
+        }
+
         public async Task<List<SlowMovingReport>> GetSlowMovingDataAsync()
         {
             try

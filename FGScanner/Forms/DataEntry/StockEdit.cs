@@ -99,6 +99,7 @@ namespace FGScanner
                     if (isSuccess)
                     {
                         MessageBox.Show(Message);
+                        await LoadStockInformation();
                     }
                     else
                     {
@@ -132,16 +133,16 @@ namespace FGScanner
             {
                 if (int.TryParse(Qtytxt.Text, out int CurrentQuantity))
                 {
-
+                    int quantity = int.Parse(stockslbl.Text);
                     if (CurrentQuantity < 0)
                     {
                         BoxTxt.Text = "0";
                         return;
                     }
 
-                    if (CurrentQuantity > _quantity)
+                    if (CurrentQuantity > quantity)
                     {
-                        MessageBox.Show($"You cannot deduct more than the available quantity ({_quantity}).", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show($"You cannot deduct more than the available quantity ({quantity}).", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
 

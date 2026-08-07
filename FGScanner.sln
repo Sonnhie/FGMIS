@@ -4,8 +4,6 @@ VisualStudioVersion = 17.14.36811.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FGScanner", "FGScanner\FGScanner.csproj", "{6C744960-8C2D-43DE-8D0D-E74E9D4978F1}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FGIMSDesktopApp", "FGIMSDesktopApp\FGIMSDesktopApp.vdproj", "{0C3FB8EE-F7B7-612D-8B39-05D0E9DAF2FD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -16,8 +14,6 @@ Global
 		{6C744960-8C2D-43DE-8D0D-E74E9D4978F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C744960-8C2D-43DE-8D0D-E74E9D4978F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C744960-8C2D-43DE-8D0D-E74E9D4978F1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0C3FB8EE-F7B7-612D-8B39-05D0E9DAF2FD}.Debug|Any CPU.ActiveCfg = Debug
-		{0C3FB8EE-F7B7-612D-8B39-05D0E9DAF2FD}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

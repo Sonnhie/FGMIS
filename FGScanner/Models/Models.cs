@@ -341,6 +341,18 @@ namespace FGScanner.Models
         public string classification { get; set; }
     }
 
+    public class ShipmentReport
+    {
+        public string ControlNumber {  get; set; }
+        public string Partnumber {  get; set; }
+        public string Customer {  get; set; }
+        public DateTime ProdDate {  get; set; }
+        public string ProdVersion { get; set; }
+        public int Quantity { get; set; }
+        public int Box { get; set; }
+        public DateTime EntryDate {  get; set; }
+    }
+
     public class SlowMovingReport
     {
         public string partnumber { get; set; }

@@ -280,5 +280,85 @@ namespace FGScanner.Forms.Reports
                 await LoadShipmentItemTable(controlnumber);
             }
         }
+
+        private async void ExportExcel_Click(object sender, EventArgs e)
+        {
+            DateTime today = DateTime.Today;
+            string Date = today.ToString("yyyyMMdd");
+            string fileName = $"ShipmentList_{Date}.xlsx";
+
+            DateTime? startDate = StartDate.Value.Date;
+            DateTime? endDate = EndDate.Value.Date;
+
+            using SaveFileDialog Save = new();
+            Save.Filter = "Excel files (*.xlsx)|*.xlsx";
+            Save.Title = "Save Exported Data";
+            Save.DefaultExt = "xlsx";
+            Save.FileName = fileName;
+
+            if (Save.ShowDialog() == DialogResult.OK)
+            {
+                string filepath = Save.FileName;
+                var result = await _queries.GetShipmentData(startDate, endDate);
+
+                if (result.Count == 0)
+                {
+                    MessageBox.Show("No data to be generate.");
+                    return;
+                }
+
+                toolStripProgressBar1.Value = 0;
+                toolStripProgressBar1.Visible = true;
+                toolStripStatusLabel1.Visible = true;
+                toolStripStatusLabel1.Text = $"Exporting...";
+
+                var progress = new Progress<int>(value =>
+                {
+                    toolStripProgressBar1.Value = value;
+                    toolStripStatusLabel1.Text = $"Exporting... {value}%";
+                });
+
+
+                string[] columnheaders = ["Control number", "Part Number", "Customer", "Production Date",
+                                              "Production Version", "Quantity", "Box", "Entry Date"];
+
+
+                var reportInfo = new ReportGeneration<Models.ShipmentReport>
+                {
+                    Title = "Packing Report",
+                    Columns = columnheaders,
+                    Items = result
+                };
+
+                try
+                {
+                    var (isSuccess, Message) = await _excelService.GenerateReportExcel(reportInfo, filepath, progress);
+                    if (isSuccess)
+                    {
+                        toolStripProgressBar1.Value = 100;
+                        toolStripStatusLabel1.Text = Message;
+                        MessageBox.Show(Message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        toolStripProgressBar1.Value = 0;
+                        MessageBox.Show(Message, "Export Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    toolStripStatusLabel1.Text = "Export failed!";
+                    toolStripStatusLabel1.ForeColor = Color.Red;
+                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    toolStripProgressBar1.Value = 0;
+                    toolStripProgressBar1.Visible = false;
+                    toolStripStatusLabel1.Text = "";
+                }
+            }
+        }
     }
 }

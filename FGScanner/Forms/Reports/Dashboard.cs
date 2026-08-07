@@ -34,12 +34,15 @@ namespace FGScanner.Forms.DataEntry
         {
             try
             {
+                timer1.Stop();
                 await LoadCMBYearDataSource();
 
                 int selectedYear = DateTime.Now.Year;
-                if (cmbYear.SelectedItem != null)
+
+                // Use int.TryParse for safer conversion
+                if (cmbYear.SelectedItem != null && int.TryParse(cmbYear.SelectedItem.ToString(), out int parsedYear))
                 {
-                    selectedYear = int.Parse(cmbYear.SelectedItem.ToString());
+                    selectedYear = parsedYear;
                 }
 
                 await PopulateStatusCards(selectedYear);

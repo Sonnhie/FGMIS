@@ -349,21 +349,15 @@ namespace FGScanner.Forms.DataEntry
                                 {
                                     var excessToDisplay = excessItems.Values.Take(10);
                                     warningMessage += $"Exceeded DPI Limits:\n{string.Join("\n", excessToDisplay)}";
-
                                     if (excessItems.Count > 10)
                                         warningMessage += $"\n...and {excessItems.Count - 10} more.";
                                 }
-
 
                                 if (stockOverflowItems.Count > 0)
                                 {
                                     var overflowToDisplay = stockOverflowItems.Values;
                                     warningMessage += $"Stock Overflows:\n- {string.Join("\n- ", overflowToDisplay)}";
-
-                                    //if (stockOverflowItems.Count > 5)
-                                    //    warningMessage += $"\n...and {stockOverflowItems.Count - 5} more.";
                                 }
-
                                 MessageBox.Show(warningMessage, "Partial Success", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             }
                             else

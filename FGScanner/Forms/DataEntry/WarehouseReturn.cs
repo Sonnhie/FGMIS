@@ -160,14 +160,41 @@ namespace FGScanner.Forms.DataEntry
                     var result = await _excelService.ProcessReturnUpload(fileinfo, progress, warehouse);
                     if (result.isSuccess)
                     {
+                        Dictionary<string, int> runningTotals = validScan
+                               .GroupBy(x => $"{x.PartNumber}|{x.ProductionDate}|{x.ProductionVersion}|{warehouse}|{x.Location}")
+                               .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
+                        Dictionary<string, string> stockOverflowItems = [];
+                        var stockDICT = await _queries.GetStocks(result.ScanItem);
 
-                        if (result.ScanItem != null)
+                        foreach (var item in result.ScanItem)
                         {
-                            foreach (var item in result.ScanItem)
+                            if (string.IsNullOrWhiteSpace(item.PartNumber)) continue;
+
+                            string stockKey = $"{item.PartNumber}|{item.ProductionDate}|{item.ProductionVersion}|{warehouse}|{item.Location}";
+                            stockDICT.TryGetValue(stockKey, out int stockCount);
+
+                            string key = $"{item.PartNumber}|{item.ProductionDate}|{item.ProductionVersion}|{warehouse}|{Location}";
+                            runningTotals.TryGetValue(key, out int currentScan);
+
+                            var projectedQty = currentScan + item.Quantity;
+
+                            if (projectedQty > stockCount)
                             {
-                                validScan.Add(item);
+                                stockOverflowItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedQty}, Stock: {stockCount}, Production: {item.ProductionDate}, Rack: {item.Location})";
+                                continue;
                             }
+
+                            validScan.Add(item);
+                            runningTotals[item.PartNumber] = projectedQty;
                         }
+
+                       if (stockOverflowItems.Count > 0)
+                       {
+                            string warningMessage = "Upload finished, but some items were skipped:\n\n";
+                            var overflowToDisplay = stockOverflowItems.Values;
+                            warningMessage += $"Stock Overflows:\n- {string.Join("\n- ", overflowToDisplay)}";
+                            MessageBox.Show(warningMessage, "Partial Success", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                       }
                     }
                     else
                     {
@@ -225,6 +252,7 @@ namespace FGScanner.Forms.DataEntry
                 }
 
                 var result = MessageBox.Show($"Are you sure you want to save {validScan.Count} transactions?", "Confirm Save", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
 
                 string transactionType = "OUT";
                 string ReturnId = ReturnIdLabel.Text;

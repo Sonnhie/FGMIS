@@ -76,7 +76,7 @@
             // addbtn
             // 
             addbtn.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F);
-            addbtn.Location = new System.Drawing.Point(1000, 14);
+            addbtn.Location = new System.Drawing.Point(853, 8);
             addbtn.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             addbtn.Name = "addbtn";
             addbtn.Size = new System.Drawing.Size(105, 38);
