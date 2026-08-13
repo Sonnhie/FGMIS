@@ -233,11 +233,6 @@ namespace FGScanner.Services
                 return (false, "Customer ID not found for the part number.", null);
             }
 
-            if (product.PPS != Quantity)
-            {
-                return (false, "Invalid PPS.", null);
-            }
-
 
             //Create a new ScannedModel object to store the scanned item
             var scannedItem = new ScannedData

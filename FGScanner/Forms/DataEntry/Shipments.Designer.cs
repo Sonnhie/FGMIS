@@ -49,8 +49,10 @@
             label21 = new System.Windows.Forms.Label();
             DPITotalQuantityLabel = new System.Windows.Forms.Label();
             DPITotalBoxLabel = new System.Windows.Forms.Label();
+            DPIPartcountLabel = new System.Windows.Forms.Label();
             label16 = new System.Windows.Forms.Label();
             label17 = new System.Windows.Forms.Label();
+            label18 = new System.Windows.Forms.Label();
             label10 = new System.Windows.Forms.Label();
             label9 = new System.Windows.Forms.Label();
             CustomerLabel = new System.Windows.Forms.Label();
@@ -68,8 +70,6 @@
             statusStrip1 = new System.Windows.Forms.StatusStrip();
             toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            label18 = new System.Windows.Forms.Label();
-            DPIPartcountLabel = new System.Windows.Forms.Label();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -314,6 +314,15 @@
             DPITotalBoxLabel.TabIndex = 17;
             DPITotalBoxLabel.Text = "--";
             // 
+            // DPIPartcountLabel
+            // 
+            DPIPartcountLabel.AutoSize = true;
+            DPIPartcountLabel.Location = new System.Drawing.Point(197, 43);
+            DPIPartcountLabel.Name = "DPIPartcountLabel";
+            DPIPartcountLabel.Size = new System.Drawing.Size(21, 19);
+            DPIPartcountLabel.TabIndex = 16;
+            DPIPartcountLabel.Text = "--";
+            // 
             // label16
             // 
             label16.AutoSize = true;
@@ -331,6 +340,15 @@
             label17.Size = new System.Drawing.Size(60, 19);
             label17.TabIndex = 14;
             label17.Text = "Total Box:";
+            // 
+            // label18
+            // 
+            label18.AutoSize = true;
+            label18.Location = new System.Drawing.Point(68, 43);
+            label18.Name = "label18";
+            label18.Size = new System.Drawing.Size(113, 19);
+            label18.TabIndex = 13;
+            label18.Text = "Part number Count:";
             // 
             // label10
             // 
@@ -486,24 +504,6 @@
             toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
             toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             toolStripStatusLabel1.Visible = false;
-            // 
-            // label18
-            // 
-            label18.AutoSize = true;
-            label18.Location = new System.Drawing.Point(68, 43);
-            label18.Name = "label18";
-            label18.Size = new System.Drawing.Size(113, 19);
-            label18.TabIndex = 13;
-            label18.Text = "Part number Count:";
-            // 
-            // DPIPartcountLabel
-            // 
-            DPIPartcountLabel.AutoSize = true;
-            DPIPartcountLabel.Location = new System.Drawing.Point(197, 43);
-            DPIPartcountLabel.Name = "DPIPartcountLabel";
-            DPIPartcountLabel.Size = new System.Drawing.Size(21, 19);
-            DPIPartcountLabel.TabIndex = 16;
-            DPIPartcountLabel.Text = "--";
             // 
             // Shipments
             // 
