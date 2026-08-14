@@ -2,7 +2,6 @@
 using FGScanner.Model;
 using FGScanner.Models;
 using FGScanner.Repositories;
-using FGScanner.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using OfficeOpenXml;
@@ -17,6 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Globalization;
+using FGScanner.Services.Classes;
 
 namespace FGScanner.Forms.DataEntry
 {
@@ -99,10 +99,10 @@ namespace FGScanner.Forms.DataEntry
                     {
                         dt.Rows.Add(
                             item.Partnumber,
-                            item.ProdDate.ToString("MM/dd/yyyy"),
-                            item.ProdVer,
+                            item.ProductionDate,
+                            item.ProductionVersion,
                             item.Quantity,
-                            item.TotalBox,
+                            item.Box,
                             item.CustomerId
                         );
                     }

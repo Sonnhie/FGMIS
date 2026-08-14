@@ -42,4 +42,8 @@ public partial class TransactionHistory
     public string InCharge { get; set; }
 
     public int? Box { get; set; }
+
+    public virtual ShipmentTable ControlNumber1 { get; set; }
+
+    public virtual ReturnTable ControlNumberNavigation { get; set; }
 }

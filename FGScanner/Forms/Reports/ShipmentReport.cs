@@ -3,6 +3,7 @@ using FGScanner.Model;
 using FGScanner.Models;
 using FGScanner.Repositories;
 using FGScanner.Services;
+using FGScanner.Services.Classes;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Superpower.Model;
 using System;

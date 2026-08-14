@@ -1,6 +1,7 @@
 ﻿using FGScanner.Database;
 using FGScanner.Repositories;
 using FGScanner.Services;
+using FGScanner.Services.Classes;
 using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;

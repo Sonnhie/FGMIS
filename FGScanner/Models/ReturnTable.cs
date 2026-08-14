@@ -26,4 +26,6 @@ public partial class ReturnTable
     public bool? IsSynced { get; set; }
 
     public int? SyncStatus { get; set; }
+
+    public virtual ICollection<TransactionHistory> TransactionHistories { get; set; } = new List<TransactionHistory>();
 }

@@ -2,6 +2,7 @@
 using FGScanner.Models;
 using FGScanner.Repositories;
 using FGScanner.Services;
+using FGScanner.Services.Classes;
 using FGScanner.Util;
 using Microsoft.VisualBasic.ApplicationServices;
 using System;
@@ -90,7 +91,7 @@ namespace FGScanner.Forms.DataEntry
                 if (data.Count != 0)
                 {
                     DataTable dt = new DataTable();
-                    dt.Columns.Add("Part Number", typeof(string)); ;
+                    dt.Columns.Add("Part Number", typeof(string)); 
                     dt.Columns.Add("Quantity", typeof(int));
                     dt.Columns.Add("Box Count", typeof(int));
                     dt.Columns.Add("PPS", typeof(string));
@@ -318,6 +319,7 @@ namespace FGScanner.Forms.DataEntry
                                     missingDpiItems.Add(item.PartNumber);
                                     continue;
                                 }
+                                 
                                 string key = $"{item.PartNumber}|{item.ProductionDate}|{item.ProductionVersion}|{warehouse}|{Location}";
                                 runningTotals.TryGetValue(key, out int currentScan);
                                 var projectedQty = currentScan + item.Quantity;

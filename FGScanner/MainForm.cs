@@ -1,6 +1,6 @@
-﻿using FGScanner.Forms.DataEntry;
-using FGScanner.Forms.Master;
-using FGScanner.Forms.Reports;
+﻿//using FGScanner.Forms.DataEntry;
+//using FGScanner.Forms.Master;
+//using FGScanner.Forms.Reports;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -60,17 +60,6 @@ namespace FGScanner
             TimeLbl.Text = Time;
         }
 
-        private void DisplayForm(Form forms)
-        {
-           
-            forms.TopLevel = false;
-            forms.FormBorderStyle = FormBorderStyle.None;
-            forms.Dock = DockStyle.Fill;
-            panel1.Controls.Clear();
-            panel1.Controls.Add(forms);
-            forms.Show();
-        }
-
         private void DisplayUsercontrol(UserControl forms)
         {
             panel1.Controls.Clear();
@@ -80,7 +69,7 @@ namespace FGScanner
 
         private void LoadDashboard()
         {
-            Dashboard dashboard = new();
+           Dashboard dashboard = new();
             DisplayUsercontrol(dashboard);
         }
 

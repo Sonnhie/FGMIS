@@ -8,44 +8,46 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
-using FGScanner.Util;
+//using FGScanner.Util;
 using System.Reflection;
+using FGScanner.Services.Interfaces;
+using FGScanner.Services.Classes;
+using FGScanner.Models;
+using FGScanner.DTOs;
 
 namespace FGScanner
 {
     public partial class login : Form
     {
+        private readonly IAuthInterface _authservice;  
+        //private readonly InventoryDbContext _context;
+        private readonly InventoryDbDevContext _context;
         public login()
         {
             InitializeComponent();
+            _context = new InventoryDbDevContext();
+
+            _authservice = new AuthenticationServices(_context);
         }
 
-        private void Login(string username, string password)
+        private async Task Login(UserInputDto inputDto)
         {
             try
             {
-                var Service = new UserService();
 
-                bool CheckUser = Service.CheckIfExist(username);
-
-                if (!CheckUser)
+                var result = await _authservice.AuthenticateUser(inputDto);
+                if (result.Item1.Success)
                 {
-                    MessageBox.Show("User does not exist on the database!", "Login error");
+                    MessageBox.Show(result.Item1.Message, "Login successfull", MessageBoxButtons.OK);
+                    MainForm m = new MainForm(result.Item2.UserId, result.Item2.GroupId);
+                    this.Hide();
+                    m.Show();
+                }
+                else
+                {
+                    MessageBox.Show(result.Item1.Message, "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-
-                var userid = Service.VerifyUser(username, password);
-
-                if (userid.Role == "User")
-                {
-                    //MessageBox.Show($"User Group: {userid.UserGroup}");
-                    MainForm main = new MainForm(userid.Name, userid.UserGroup);
-                    this.Hide();
-                    main.Show();
-                }
-
-
-
             }
             catch (Exception ex)
             {
@@ -69,18 +71,21 @@ namespace FGScanner
             version_lbl.Text = $"Version: {version}";
         }
 
-        private void BtnSignIn_Click_1(object sender, EventArgs e)
+        private async void BtnSignIn_Click_1(object sender, EventArgs e)
         {
-            string username = TxtUserId.Text;
-            string password = TxtPassword.Text;
+            var UserInput = new UserInputDto
+            {
+                Username = TxtUserId.Text,
+                Password = TxtPassword.Text
+            };
 
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            if (UserInput == null)
             {
                 MessageBox.Show("Username and password required!");
                 return;
             }
 
-            Login(username, password);
+            await Login(UserInput);
         }
     }
 }

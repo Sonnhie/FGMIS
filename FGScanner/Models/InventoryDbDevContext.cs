@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using FGScanner.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace FGScanner.Models;
 
-public partial class InventoryDbContext : DbContext
+public partial class InventoryDbDevContext : DbContext
 {
-    public InventoryDbContext()
+    public InventoryDbDevContext()
     {
     }
 
-    public InventoryDbContext(DbContextOptions<InventoryDbContext> options)
+    public InventoryDbDevContext(DbContextOptions<InventoryDbDevContext> options)
         : base(options)
     {
     }
@@ -54,6 +55,16 @@ public partial class InventoryDbContext : DbContext
     public virtual DbSet<UserGroup> UserGroups { get; set; }
 
     public virtual DbSet<UserInformation> UserInformations { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            // Here is where we inject your brand new connection logic!
+            string connectionString = db_connection.GetConnectionString();
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+    }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -340,6 +351,9 @@ public partial class InventoryDbContext : DbContext
             entity.Property(e => e.TransactionId)
                 .HasMaxLength(50)
                 .HasColumnName("transaction_id");
+            entity.Property(e => e.CustomerId)
+                .HasMaxLength(50)
+                .HasColumnName("customer_id");
             entity.Property(e => e.EntryDate)
                 .HasColumnType("datetime")
                 .HasColumnName("entry_date");

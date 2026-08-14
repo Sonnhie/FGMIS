@@ -3,6 +3,7 @@ using FGScanner.Model;
 using FGScanner.Models;
 using FGScanner.Repositories;
 using FGScanner.Services;
+using FGScanner.Services.Classes;
 using FGScanner.Util;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.VisualBasic.ApplicationServices;

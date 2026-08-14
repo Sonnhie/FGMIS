@@ -1,4 +1,4 @@
-﻿using FGScanner.Forms.Viewer;
+﻿//using FGScanner.Forms.Viewer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,7 +30,7 @@ namespace FGScanner
         public Viewer(string warehouse, string userid)
         {
             InitializeComponent();
-            LoadViewer(warehouse, userid);
+          //  LoadViewer(warehouse, userid);
             _warehouseName = warehouse;
             _userid = userid;
             label5.Text = _userid;
@@ -52,15 +52,6 @@ namespace FGScanner
             return _instance;
         }
 
-        private void DisplayForm(Form forms)
-        {
-            panel1.Controls.Clear();
-            forms.TopLevel = false;
-            forms.Dock = DockStyle.Fill;
-            panel1.Controls.Add(forms);
-            forms.Show();
-        }
-
         private void DisplayUsercontrol(UserControl forms)
         {
             panel1.Controls.Clear();
@@ -68,19 +59,19 @@ namespace FGScanner
             panel1.Controls.Add(forms);
         }
 
-        private void LoadViewer(string warehouseName, string userid) 
-        {
-            if (warehouseName == "Ecozone")
-            {
-                EcozoneMainViewer ec = new(userid);
-                DisplayUsercontrol(ec);
-            }
-            else if(warehouseName == "Warehouse")
-            {
-               MainWarehouseViewer mw = new(userid);
-                DisplayUsercontrol(mw);
-            }
-        }
+        //private void LoadViewer(string warehouseName, string userid) 
+        //{
+        //    if (warehouseName == "Ecozone")
+        //    {
+        //        EcozoneMainViewer ec = new(userid);
+        //        DisplayUsercontrol(ec);
+        //    }
+        //    else if(warehouseName == "Warehouse")
+        //    {
+        //       MainWarehouseViewer mw = new(userid);
+        //        DisplayUsercontrol(mw);
+        //    }
+        //}
 
         private void panel2_MouseDown(object sender, MouseEventArgs e)
         {

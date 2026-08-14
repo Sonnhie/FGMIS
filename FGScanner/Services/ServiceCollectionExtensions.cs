@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FGScanner.Services.Classes;
+using FGScanner.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +13,13 @@ namespace FGScanner.Services
     {
         public static IServiceCollection AddCustomServices(this IServiceCollection services)
         {
-            services.AddScoped<PrintService>();
-            services.AddScoped<TransactionService>();
-            services.AddScoped<ExcelService>();
-            
+           // services.AddScoped<PrintService>();
+           // services.AddScoped<TransactionService>();
+          //  services.AddScoped<ExcelService>();
+
+
+            services.AddScoped<IAuthInterface, AuthenticationServices>();
+
             return services;
         }
     }
