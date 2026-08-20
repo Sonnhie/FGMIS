@@ -36,7 +36,7 @@ namespace FGScanner
             this.usergroup = usergroup;
             LblUser.Text = userid;
             AccessControlFeatures(usergroup);
-            bPPSToolStripMenuItem.Visible = false;
+            //bPPSToolStripMenuItem.Visible = false;
         }
 
         private void AccessControlFeatures(int usergroup)
@@ -58,17 +58,6 @@ namespace FGScanner
             string Time = DateTime.Now.ToString("HH:mm:ss");
             DateLbl.Text = Today.ToString("MM/dd/yyy");
             TimeLbl.Text = Time;
-        }
-
-        private void DisplayForm(Form forms)
-        {
-
-            forms.TopLevel = false;
-            forms.FormBorderStyle = FormBorderStyle.None;
-            forms.Dock = DockStyle.Fill;
-            panel1.Controls.Clear();
-            panel1.Controls.Add(forms);
-            forms.Show();
         }
 
         private void DisplayUsercontrol(UserControl forms)
