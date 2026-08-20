@@ -1,4 +1,5 @@
 ﻿using FGScanner.Database;
+using FGScanner.Models;
 using FGScanner.Repositories;
 using FGScanner.Services;
 using FGScanner.Util;
@@ -23,7 +24,7 @@ namespace FGScanner.Forms.Master
         private int totalPage = 0;
         private string _userid = string.Empty;
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private readonly ExcelService _excelService;
 
         public MasterList(string userid)
@@ -68,10 +69,10 @@ namespace FGScanner.Forms.Master
                         dt.Rows.Add
                         (
                            item.Id,
-                           item.PartNumber,
-                           item.PartName,
+                           item.Partnumber,
+                           item.Partname,
                            item.CustomerId,
-                           item.PPS.ToString("N0")
+                           item.Pps.ToString("N0")
                         );
                     }
 
@@ -93,14 +94,15 @@ namespace FGScanner.Forms.Master
 
                     if (_userid == "N. Marquez")
                     {
-                        DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn = new DataGridViewCheckBoxColumn
+                        DataGridViewButtonColumn dataGridViewButtonColumn = new()
                         {
-                            Name = "ActionCheckbox",
+                            Name = "ActionButton",
                             HeaderText = "Action",
+                            Text = "Delete",
+                            UseColumnTextForButtonValue = true
                         };
                         LogsTable.EditMode = DataGridViewEditMode.EditOnEnter;
-                        LogsTable.Columns.Add(dataGridViewCheckBoxColumn);
-                        LogsTable.Columns["ActionCheckbox"].ReadOnly = false;
+                        LogsTable.Columns.Add(dataGridViewButtonColumn);
                     }
 
 
@@ -149,6 +151,31 @@ namespace FGScanner.Forms.Master
             else
             {
                 BtnPrev.Enabled = false;
+            }
+        }
+
+        private async void LogsTable_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && LogsTable.Columns[e.ColumnIndex].Name == "ActionButton")
+            {
+                DataGridViewRow selectedRow = LogsTable.Rows[e.RowIndex];
+                int id = Convert.ToInt32(selectedRow.Cells["ID"].Value);
+
+                var result = MessageBox.Show("Are you sure you want to delete this item?","Delete", MessageBoxButtons.YesNo);
+
+                if (result == DialogResult.Yes)
+                {
+                    var isDeleted = await _queries.DeletePartnumber(id);
+                    if (isDeleted.isSuccess)
+                    {
+                        MessageBox.Show(isDeleted.Message);
+                        await LoadProducts();
+                    }
+                    else
+                    {
+                        MessageBox.Show(isDeleted.Message);
+                    }
+                }
             }
         }
     }

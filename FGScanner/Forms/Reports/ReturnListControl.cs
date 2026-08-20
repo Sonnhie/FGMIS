@@ -21,7 +21,7 @@ namespace FGScanner.Forms.Reports
     {
         private readonly TransactionService _service;
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private readonly ExcelService _excelService;
         private string _userid;
         private readonly PrintService _printService;
@@ -41,7 +41,7 @@ namespace FGScanner.Forms.Reports
             CancelReturnButton.Enabled = false;
         }
 
-        private void LoadReturnTable(List<Return> data)
+        private void LoadReturnTable(List<ReturnTable> data)
         {
             try
             {
@@ -58,12 +58,12 @@ namespace FGScanner.Forms.Reports
                     foreach (var item in data)
                     {
                         dt.Rows.Add(
-                            item.TransactionID.ToString(),
+                            item.TransactionId.ToString(),
                             item.EntryDate.ToString("MM/dd/yyyy"),
                             item.EntryDate.ToString("hh:mm:ss tt"),
                             item.Quantity.ToString(),
                             item.Box.ToString(),
-                            item.To,
+                            item.ToLocation,
                             item.Status
                         );
                     }
@@ -215,14 +215,14 @@ namespace FGScanner.Forms.Reports
 
 
             _documentToPrint = result
-                .GroupBy(docgroup => docgroup.controlNumber)
+                .GroupBy(docgroup => docgroup.ControlNumber)
                 .Select(docgroup => new PrintDocumentDTO
                 {
                     DocNo = docgroup.Key,
                     EntryDate = docgroup.Max(x => x.EntryDate),
                     PreparedBy = docgroup.First().InCharge,
-                    FromLocation = docgroup.First().Returns.From,
-                    ToLocation = docgroup.First().Returns.To,
+                    FromLocation = docgroup.First().ReturnTable.FromLocation,
+                    ToLocation = docgroup.First().ReturnTable.ToLocation,
                     Items = [.. docgroup
                         .GroupBy(item => new { item.Partnumber, item.ProdDate })
                         .Select(itemgroup => new PrintItemDTO
@@ -232,7 +232,7 @@ namespace FGScanner.Forms.Reports
                             PartName = _queries.GetProductPartName(itemgroup.Key.Partnumber),
                             PPS = _queries.GetProductPPS(itemgroup.Key.Partnumber),
                             Quantity = itemgroup.Sum(x => x.Quantity),
-                            Box = itemgroup.Sum(x => x.Box),
+                            Box = itemgroup.Sum(x => x.Box) ?? 0,
                             remarks = itemgroup.FirstOrDefault().Remarks
                         })]
                 }).FirstOrDefault();

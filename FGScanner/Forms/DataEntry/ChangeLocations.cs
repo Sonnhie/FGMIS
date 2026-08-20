@@ -24,7 +24,7 @@ namespace FGScanner.Forms.DataEntry
     {
         private readonly TransactionService _service;
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private string _userid;
         private bool _isLoading = false;
         private readonly List<ActualInventory> _currentInventoryData = [];
@@ -103,7 +103,7 @@ namespace FGScanner.Forms.DataEntry
                             item.ProdVer,
                             item.Quantity,
                             item.TotalBox,
-                            item.CustomerId
+                            item.Customer
                         );
                     }
                     RackTable.Columns.Clear();
@@ -113,7 +113,7 @@ namespace FGScanner.Forms.DataEntry
                     int count = data.Count;
                     int sumQuantity = data.Sum(item => item.Quantity);
                     int totalBoxCount = data.Sum(item => item.TotalBox);
-                    string customerId = data.FirstOrDefault()?.CustomerId ?? string.Empty;
+                    string customerId = data.FirstOrDefault()?.Customer ?? string.Empty;
 
                     PartcountLabel.Text = count.ToString();
                     QuantityLabel.Text = sumQuantity.ToString();
@@ -209,8 +209,8 @@ namespace FGScanner.Forms.DataEntry
                                 .ToList();
 
                 var productDict = await _dbContext.Products
-                                  .Where(p => partNumbers.Contains(p.PartNumber))
-                                  .ToDictionaryAsync(x => x.PartNumber, x => x.PPS);
+                                  .Where(p => partNumbers.Contains(p.Partnumber))
+                                  .ToDictionaryAsync(x => x.Partnumber, x => x.Pps);
 
                 List<ActualInventory> selectedInventories = [];
                 foreach (var row in selectedRows)
@@ -223,7 +223,7 @@ namespace FGScanner.Forms.DataEntry
                             "MM-dd-yyyy", "M-d-yyyy", "M-dd-yyyy", "MM-d-yyyy"
                         };
 
-                    DateTime safeProdDate = DateTime.ParseExact(
+                    DateOnly safeProdDate = DateOnly.ParseExact(
                         dateString,
                         dateFormats,
                         CultureInfo.InvariantCulture,
@@ -244,7 +244,7 @@ namespace FGScanner.Forms.DataEntry
                         ProdVer = row.Cells["Production Version"].Value.ToString(),
                         Quantity = Quantity,
                         TotalBox = box,
-                        CustomerId = row.Cells["Customer"].Value.ToString()
+                        Customer = row.Cells["Customer"].Value.ToString()
                     };
 
                     selectedInventories.Add(inventory);

@@ -254,7 +254,7 @@ namespace FGScanner.Services
                         "SECTION COPY"
                 );
 
-                _transferRowIndex += 10;
+                _transferRowIndex += 8;
 
                 if (_transferRowIndex < data.Items.Count)
                 {

@@ -21,7 +21,7 @@ namespace FGScanner.Forms.DataEntry
     {
         private readonly TransactionService _service;
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private readonly ExcelService _excelService;
         private string _userid;
         private List<ScannedData> validScan = new List<ScannedData>();

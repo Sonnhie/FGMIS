@@ -25,7 +25,7 @@ namespace FGScanner.Forms.DataEntry
     {
         private readonly TransactionService _service;
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private readonly ExcelService _excelService;
         private readonly PrintService _printService;
         private string _userid;
@@ -130,157 +130,164 @@ namespace FGScanner.Forms.DataEntry
 
         private async void SelectFileButton_Click(object sender, EventArgs e)
         {
-            string warehouse = WarehouseComboBox.Text;
+            string warehouse = WarehouseComboBox.Text.Trim();
             if (string.IsNullOrWhiteSpace(warehouse))
             {
-                MessageBox.Show("Please select a warehouse.");
+                MessageBox.Show("Please select a warehouse.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             using OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Excel Files|*.xlsx;*.xls";
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+
+            string filePath = openFileDialog.FileName;
+            FileTextbox.Text = filePath;
+            FileInfo fileInfo = new(filePath);
+
+            var progress = new Progress<int>(value =>
             {
+                toolStripProgressBar1.Value = value;
+                toolStripStatusLabel1.Text = $"Processing: {value}%";
+            });
 
-                string filePath = openFileDialog.FileName;
-                FileTextbox.Text = filePath;
-                FileInfo fileinfo = new(filePath);
-                var progress = new Progress<int>(value =>
+            validScan.Clear();
+
+            try
+            {
+                toolStripProgressBar1.Visible = true;
+                toolStripStatusLabel1.Visible = true;
+                toolStripStatusLabel1.Text = "Processing: 0%";
+
+                // 1. Parse Excel file into memory
+                var fileResult = await _excelService.ProcessReturnUpload(fileInfo, progress, warehouse);
+
+                if (!fileResult.isSuccess)
                 {
-                    toolStripProgressBar1.Value = value;
-                    toolStripStatusLabel1.Text = $"Processing: {value}%";
-                });
-                validScan.Clear();
-                try
-                {
-                    toolStripProgressBar1.Visible = true;
-                    toolStripStatusLabel1.Visible = true;
-                    toolStripStatusLabel1.Text = "Processing: 0%";
-                    var result = await _excelService.ProcessReturnUpload(fileinfo, progress, warehouse);
-                    if (result.isSuccess)
-                    {
-                        Dictionary<string, int> runningTotals = validScan
-                               .GroupBy(x => $"{x.PartNumber}|{x.ProductionDate}|{x.ProductionVersion}|{warehouse}|{x.Location}")
-                               .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
-                        Dictionary<string, string> stockOverflowItems = [];
-                        var stockDICT = await _queries.GetStocks(result.ScanItem);
-
-                        foreach (var item in result.ScanItem)
-                        {
-                            if (string.IsNullOrWhiteSpace(item.PartNumber)) continue;
-
-                            string stockKey = $"{item.PartNumber}|{item.ProductionDate}|{item.ProductionVersion}|{warehouse}|{item.Location}";
-                            stockDICT.TryGetValue(stockKey, out int stockCount);
-
-                            string key = $"{item.PartNumber}|{item.ProductionDate}|{item.ProductionVersion}|{warehouse}|{Location}";
-                            runningTotals.TryGetValue(key, out int currentScan);
-
-                            var projectedQty = currentScan + item.Quantity;
-
-                            if (projectedQty > stockCount)
-                            {
-                                stockOverflowItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedQty}, Stock: {stockCount}, Production: {item.ProductionDate}, Rack: {item.Location})";
-                                continue;
-                            }
-
-                            validScan.Add(item);
-                            runningTotals[item.PartNumber] = projectedQty;
-                        }
-
-                       if (stockOverflowItems.Count > 0)
-                       {
-                            string warningMessage = "Upload finished, but some items were skipped:\n\n";
-                            var overflowToDisplay = stockOverflowItems.Values;
-                            warningMessage += $"Stock Overflows:\n- {string.Join("\n- ", overflowToDisplay)}";
-                            MessageBox.Show(warningMessage, "Partial Success", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                       }
-                    }
-                    else
-                    {
-
-                        MessageBox.Show(result.Message, "Upload Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                    MessageBox.Show(fileResult.Message, "File Read Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error processing file: {ex.Message}");
-                }
-                finally
-                {
-                    LoadReturnTable();
-                    toolStripProgressBar1.Value = 0;
-                    toolStripStatusLabel1.Text = "Ready";
-                    toolStripProgressBar1.Visible = false;
-                    toolStripStatusLabel1.Visible = false;
-                    UploadItemButton.Enabled = true;
 
-                }
+                // 2. Load items into UI preview grid (No DB insert yet)
+                validScan.AddRange(fileResult.ScanItem);
+
+                MessageBox.Show($"Loaded {validScan.Count} item(s) from Excel file. Review items before uploading.", "File Loaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error processing file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                LoadReturnTable(); // Bind validScan to DataGridView
+                toolStripProgressBar1.Value = 0;
+                toolStripStatusLabel1.Text = "Ready";
+                toolStripProgressBar1.Visible = false;
+                toolStripStatusLabel1.Visible = false;
+                UploadItemButton.Enabled = validScan.Count > 0;
             }
         }
 
         private async void UploadItemButton_Click(object sender, EventArgs e)
         {
+            string warehouse = WarehouseComboBox.Text.Trim();
+            string remarks = RemarkTextbox.Text.Trim();
+            string transferTo = LocationComboBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(warehouse))
+            {
+                MessageBox.Show("Please select a warehouse.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(transferTo))
+            {
+                MessageBox.Show("Please select a Storage Location.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(remarks))
+            {
+                MessageBox.Show("Please put remarks.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (validScan == null || validScan.Count == 0)
+            {
+                MessageBox.Show("No items to upload. Please select and load a file first.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Confirmation dialog
+            var confirmResult = MessageBox.Show(
+                $"Are you sure you want to save {validScan.Count} transaction(s)?",
+                "Confirm Save",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (confirmResult != DialogResult.Yes) return;
+
+            string transactionType = "OUT";
+            string returnId = ReturnIdLabel.Text.Trim();
+
+            // Lock UI controls to prevent double submissions
+            UploadItemButton.Enabled = false;
+            SelectFileButton.Enabled = false;
+
             try
             {
-                string warehouse = WarehouseComboBox.Text;
-                string remarks = RemarkTextbox.Text;
-                string TransferTo = LocationComboBox.Text;
-
-                if (string.IsNullOrWhiteSpace(warehouse))
+                // Check duplicate Return ID prior to submission
+                var existingReturn = await _queries.CheckReturnIdDuplicate(returnId);
+                if (existingReturn != null)
                 {
-                    MessageBox.Show("Please select a warehouse.");
+                    MessageBox.Show("Return ID is already used. Please refresh or enter a new control number.", "Duplicate Return ID", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(TransferTo))
+                // Validate stock limits & write to Database in Service Layer
+                var (isSuccess, message, validItems, overflowWarnings) = await _service.InsertReturns(
+                    validScan,
+                    warehouse,
+                    returnId,
+                    transactionType,
+                    _userid,
+                    remarks,
+                    transferTo
+                );
+
+                if (isSuccess)
                 {
-                    MessageBox.Show("Please select a Storage Location.");
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(remarks))
-                {
-                    MessageBox.Show("Please put remarks.");
-                    return;
-                }
-
-                if (validScan.Count == 0)
-                {
-                    MessageBox.Show("No file to upload");
-                    return;
-                }
-
-                var result = MessageBox.Show($"Are you sure you want to save {validScan.Count} transactions?", "Confirm Save", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-
-                string transactionType = "OUT";
-                string ReturnId = ReturnIdLabel.Text;
-
-                var isExixt = await _queries.CheckReturnIdDuplicate(ReturnId);
-                if (isExixt != null)
-                {
-                    MessageBox.Show("Return Id already used", "Duplicate control number");
-                    return;
-                }
-
-                if (result == DialogResult.Yes)
-                {
-                    var (isSuccess, Message) = await _service.InsertReturns(validScan, warehouse, ReturnId, transactionType, _userid, remarks, TransferTo);
-                    if (isSuccess)
+                    if (overflowWarnings.Count > 0)
                     {
-                        MessageBox.Show(Message);
-                        GenerateReturnSlipBtn.Enabled = true;
+                        string warningMessage = "Upload finished, but some items were skipped due to stock limits:\n\n" +
+                                               $"Stock Overflows:\n- {string.Join("\n- ", overflowWarnings)}";
+                        MessageBox.Show(warningMessage, "Partial Success", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                     else
                     {
-                        MessageBox.Show(Message);
+                        MessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
+
+                    // Post-success cleanup
+                    GenerateReturnSlipBtn.Enabled = true;
+                    validScan.Clear(); // Clear memory buffer to prevent double uploads
+                    LoadReturnTable(); // Refresh UI table
+                }
+                else
+                {
+                    MessageBox.Show(message, "Upload Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}");
+                MessageBox.Show($"Unexpected Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                SelectFileButton.Enabled = true;
+                UploadItemButton.Enabled = validScan.Count > 0;
             }
         }
 
@@ -296,14 +303,14 @@ namespace FGScanner.Forms.DataEntry
             var result = await _service.getItemsByReturns(docNumber);
 
             _documentToPrint = result
-                .GroupBy(docgroup => docgroup.controlNumber)
+                .GroupBy(docgroup => docgroup.ControlNumber)
                 .Select(docgroup => new PrintDocumentDTO
                 {
                     DocNo = docgroup.Key,
                     EntryDate = docgroup.Max(x => x.EntryDate),
                     PreparedBy = docgroup.First().InCharge,
-                    FromLocation = docgroup.First().Returns.From,
-                    ToLocation = docgroup.First().Returns.To,
+                    FromLocation = docgroup.First().ReturnTable.FromLocation,
+                    ToLocation = docgroup.First().ReturnTable.ToLocation,
                     Items = [.. docgroup
                         .GroupBy(item => new { item.Partnumber, item.ProdDate })
                         .Select(itemgroup => new PrintItemDTO
@@ -313,7 +320,7 @@ namespace FGScanner.Forms.DataEntry
                             PartName = _queries.GetProductPartName(itemgroup.Key.Partnumber),
                             PPS =  _queries.GetProductPPS(itemgroup.Key.Partnumber),
                             Quantity = itemgroup.Sum(x => x.Quantity),
-                            Box = itemgroup.Sum(x => x.Box),
+                            Box = itemgroup.Sum(x => x.Box) ?? 0,
                             remarks = itemgroup.FirstOrDefault().Remarks
                         })]
                 }).FirstOrDefault();

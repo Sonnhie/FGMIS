@@ -34,6 +34,8 @@
             DPIFileButton = new System.Windows.Forms.Button();
             label6 = new System.Windows.Forms.Label();
             groupBox1 = new System.Windows.Forms.GroupBox();
+            MarketCode = new System.Windows.Forms.ComboBox();
+            label12 = new System.Windows.Forms.Label();
             GeneratePackingListBtn = new System.Windows.Forms.Button();
             label11 = new System.Windows.Forms.Label();
             ClearButton = new System.Windows.Forms.Button();
@@ -49,8 +51,10 @@
             label21 = new System.Windows.Forms.Label();
             DPITotalQuantityLabel = new System.Windows.Forms.Label();
             DPITotalBoxLabel = new System.Windows.Forms.Label();
+            DPIPartcountLabel = new System.Windows.Forms.Label();
             label16 = new System.Windows.Forms.Label();
             label17 = new System.Windows.Forms.Label();
+            label18 = new System.Windows.Forms.Label();
             label10 = new System.Windows.Forms.Label();
             label9 = new System.Windows.Forms.Label();
             CustomerLabel = new System.Windows.Forms.Label();
@@ -68,8 +72,6 @@
             statusStrip1 = new System.Windows.Forms.StatusStrip();
             toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            label18 = new System.Windows.Forms.Label();
-            DPIPartcountLabel = new System.Windows.Forms.Label();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -134,6 +136,8 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(MarketCode);
+            groupBox1.Controls.Add(label12);
             groupBox1.Controls.Add(GeneratePackingListBtn);
             groupBox1.Controls.Add(label11);
             groupBox1.Controls.Add(ClearButton);
@@ -154,9 +158,28 @@
             groupBox1.TabStop = false;
             groupBox1.Text = "FG Data Entry";
             // 
+            // MarketCode
+            // 
+            MarketCode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            MarketCode.FormattingEnabled = true;
+            MarketCode.Items.AddRange(new object[] { "CBMP", "BIPH", "YCICGZ-SYA", "PASI", "YCICGZ-ZZY", "YCICGZ-FSY", "YIPL-COMBU", "FSY-C", "YYA", "FSY-D", "HNY", "JAI", "PEMI", "SAI-T", "SAI-B", "SAMI", "SAMIJF", "GYSA-DC", "TAP-B", "TAP-P", "TJY", "TYC", "XGY", "YBL-S", "YEV", "YEV-TV", "YHK", "YHV", "YHVQN", "YHVTB", "YIPL-B", "ZZY", "SYA", "SAMI-AI", "YKBO", "YIPL-P", "SUAI", "TYC-TL", "YC", "YNA-JDCM", "SYA-CH", "EMI", "YTMI", "YTP", "EPPI", "EPLB", "IONICS", "DAIHO PH", "PHILINAK", "SUMITRONICS", "ZAMA", "TRC", "JCM", "TSUKIDEN", "KOWA EMORI", "EXCELITAS", "NCFL", "K&K", "IVOCLAR", "NIKKO SHOKAI", "YNA-DDC", "YNA-CANTON", "YNA", "SAMPO", "TAIHAN", "DMM", "SEIWA" });
+            MarketCode.Location = new System.Drawing.Point(328, 115);
+            MarketCode.Name = "MarketCode";
+            MarketCode.Size = new System.Drawing.Size(134, 27);
+            MarketCode.TabIndex = 15;
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Location = new System.Drawing.Point(231, 123);
+            label12.Name = "label12";
+            label12.Size = new System.Drawing.Size(91, 19);
+            label12.TabIndex = 14;
+            label12.Text = "Customer Code:";
+            // 
             // GeneratePackingListBtn
             // 
-            GeneratePackingListBtn.Location = new System.Drawing.Point(171, 171);
+            GeneratePackingListBtn.Location = new System.Drawing.Point(105, 157);
             GeneratePackingListBtn.Name = "GeneratePackingListBtn";
             GeneratePackingListBtn.Size = new System.Drawing.Size(92, 27);
             GeneratePackingListBtn.TabIndex = 13;
@@ -167,7 +190,7 @@
             // label11
             // 
             label11.AutoSize = true;
-            label11.Location = new System.Drawing.Point(85, 175);
+            label11.Location = new System.Drawing.Point(20, 165);
             label11.Name = "label11";
             label11.Size = new System.Drawing.Size(76, 19);
             label11.TabIndex = 12;
@@ -175,9 +198,9 @@
             // 
             // ClearButton
             // 
-            ClearButton.Location = new System.Drawing.Point(377, 129);
+            ClearButton.Location = new System.Drawing.Point(401, 77);
             ClearButton.Name = "ClearButton";
-            ClearButton.Size = new System.Drawing.Size(92, 27);
+            ClearButton.Size = new System.Drawing.Size(61, 27);
             ClearButton.TabIndex = 11;
             ClearButton.Text = "Clear Upload";
             ClearButton.UseVisualStyleBackColor = true;
@@ -185,7 +208,7 @@
             // 
             // UploadItemButton
             // 
-            UploadItemButton.Location = new System.Drawing.Point(171, 132);
+            UploadItemButton.Location = new System.Drawing.Point(105, 119);
             UploadItemButton.Name = "UploadItemButton";
             UploadItemButton.Size = new System.Drawing.Size(92, 27);
             UploadItemButton.TabIndex = 10;
@@ -196,7 +219,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(113, 137);
+            label2.Location = new System.Drawing.Point(18, 127);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(48, 19);
             label2.TabIndex = 9;
@@ -204,34 +227,34 @@
             // 
             // FileTextbox
             // 
-            FileTextbox.Font = new System.Drawing.Font("Bahnschrift", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            FileTextbox.Location = new System.Drawing.Point(171, 88);
+            FileTextbox.Font = new System.Drawing.Font("Bahnschrift SemiLight", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            FileTextbox.Location = new System.Drawing.Point(105, 77);
             FileTextbox.Name = "FileTextbox";
             FileTextbox.ReadOnly = true;
-            FileTextbox.Size = new System.Drawing.Size(195, 27);
+            FileTextbox.Size = new System.Drawing.Size(174, 27);
             FileTextbox.TabIndex = 8;
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(44, 47);
+            label3.Location = new System.Drawing.Point(18, 37);
             label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(117, 19);
+            label3.Size = new System.Drawing.Size(81, 19);
             label3.TabIndex = 7;
-            label3.Text = "Select WarehouseID:";
+            label3.Text = "WarehouseID:";
             // 
             // WarehouseComboBox
             // 
             WarehouseComboBox.FormattingEnabled = true;
             WarehouseComboBox.Items.AddRange(new object[] { "WH1", "WH2" });
-            WarehouseComboBox.Location = new System.Drawing.Point(172, 39);
+            WarehouseComboBox.Location = new System.Drawing.Point(105, 29);
             WarehouseComboBox.Name = "WarehouseComboBox";
             WarehouseComboBox.Size = new System.Drawing.Size(194, 27);
             WarehouseComboBox.TabIndex = 4;
             // 
             // SelectFileButton
             // 
-            SelectFileButton.Location = new System.Drawing.Point(377, 88);
+            SelectFileButton.Location = new System.Drawing.Point(303, 77);
             SelectFileButton.Name = "SelectFileButton";
             SelectFileButton.Size = new System.Drawing.Size(92, 27);
             SelectFileButton.TabIndex = 2;
@@ -242,7 +265,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(91, 96);
+            label1.Location = new System.Drawing.Point(18, 85);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(70, 19);
             label1.TabIndex = 0;
@@ -314,6 +337,15 @@
             DPITotalBoxLabel.TabIndex = 17;
             DPITotalBoxLabel.Text = "--";
             // 
+            // DPIPartcountLabel
+            // 
+            DPIPartcountLabel.AutoSize = true;
+            DPIPartcountLabel.Location = new System.Drawing.Point(197, 43);
+            DPIPartcountLabel.Name = "DPIPartcountLabel";
+            DPIPartcountLabel.Size = new System.Drawing.Size(21, 19);
+            DPIPartcountLabel.TabIndex = 16;
+            DPIPartcountLabel.Text = "--";
+            // 
             // label16
             // 
             label16.AutoSize = true;
@@ -331,6 +363,15 @@
             label17.Size = new System.Drawing.Size(60, 19);
             label17.TabIndex = 14;
             label17.Text = "Total Box:";
+            // 
+            // label18
+            // 
+            label18.AutoSize = true;
+            label18.Location = new System.Drawing.Point(68, 43);
+            label18.Name = "label18";
+            label18.Size = new System.Drawing.Size(113, 19);
+            label18.TabIndex = 13;
+            label18.Text = "Part number Count:";
             // 
             // label10
             // 
@@ -487,24 +528,6 @@
             toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             toolStripStatusLabel1.Visible = false;
             // 
-            // label18
-            // 
-            label18.AutoSize = true;
-            label18.Location = new System.Drawing.Point(68, 43);
-            label18.Name = "label18";
-            label18.Size = new System.Drawing.Size(113, 19);
-            label18.TabIndex = 13;
-            label18.Text = "Part number Count:";
-            // 
-            // DPIPartcountLabel
-            // 
-            DPIPartcountLabel.AutoSize = true;
-            DPIPartcountLabel.Location = new System.Drawing.Point(197, 43);
-            DPIPartcountLabel.Name = "DPIPartcountLabel";
-            DPIPartcountLabel.Size = new System.Drawing.Size(21, 19);
-            DPIPartcountLabel.TabIndex = 16;
-            DPIPartcountLabel.Text = "--";
-            // 
             // Shipments
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -577,5 +600,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.Label DPIPartcountLabel;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.ComboBox MarketCode;
+        private System.Windows.Forms.Label label12;
     }
 }

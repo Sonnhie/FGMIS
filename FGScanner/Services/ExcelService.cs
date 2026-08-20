@@ -97,7 +97,7 @@ namespace FGScanner.Services
                 productionVersion = leftPart[4];
             }
 
-            if (!DateTime.TryParseExact(productionDate, "dd-MM-yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var ProdDate))
+            if (!DateOnly.TryParseExact(productionDate, "dd-MM-yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var ProdDate))
             {
                 return (false, "Invalid production date format.", null);
             }
@@ -205,7 +205,7 @@ namespace FGScanner.Services
                 productionVersion = leftPart[4];
             }
 
-            if (!DateTime.TryParseExact(productionDate, "dd-MM-yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var ProdDate))
+            if (!DateOnly.TryParseExact(productionDate, "dd-MM-yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var ProdDate))
             {
                 return (false, "Invalid production date format.", null);
             }
@@ -233,7 +233,7 @@ namespace FGScanner.Services
                 return (false, "Customer ID not found for the part number.", null);
             }
 
-            if (product.PPS != Quantity)
+            if (product.Pps != Quantity)
             {
                 return (false, "Invalid PPS.", null);
             }
@@ -538,7 +538,7 @@ namespace FGScanner.Services
             ws.Cells["C6"].Value = date;
             ws.Cells["C7"].Value = time;
             ws.Cells["J6"].Value = items.First().CustomerId;
-            ws.Cells["J54"].Value = items.Max(x => x.controlNumber);
+            ws.Cells["J54"].Value = items.Max(x => x.ControlNumber);
             //ws.Cells["G53"].Value = items.Sum(x => x.Quantity);
             //ws.Cells["E53"].Value = items.Sum(x => x.Box);
 
@@ -577,7 +577,7 @@ namespace FGScanner.Services
                 }
 
 
-                int PPS = subitems.Quantity / subitems.Box;
+                int? PPS = subitems.Quantity / subitems.Box;
                 wscopy.Cells[copystartrow, 2].Value = subitems.Partnumber.ToString();
                 wscopy.Cells[copystartrow, 5].Value = subitems.Box;
                 wscopy.Cells[copystartrow, 6].Value = PPS;
@@ -613,7 +613,7 @@ namespace FGScanner.Services
                 ws.Cells[startrow, 2].Value = item.PartNumber.ToString();
                 ws.Cells[startrow, 4].Value = item.Proddate.ToString("MM/dd/yyyy");
                 ws.Cells[startrow, 5].Value = item.Boxes;
-                ws.Cells[startrow, 6].Value = info.PPS;
+                ws.Cells[startrow, 6].Value = info.Pps;
                 ws.Cells[startrow, 7].Value = item.Quantity;
                 startrow++;
 
@@ -629,6 +629,8 @@ namespace FGScanner.Services
             progress?.Report(100);
             return (true, "Packing List successfully generated.");
         }
+
+
         public async Task<(bool isSuccess, string Message, List<ScannedData> ScanItem)> ProcessReturnUpload(FileInfo fileinfo, IProgress<int> progress, string warehouseId)
         {
             try
@@ -749,7 +751,7 @@ namespace FGScanner.Services
                             var value = prop.GetValue(items);
                             var cell = worksheet.Cells[currentRow, col + 1];
                             cell.Value = value;
-                            if (value is DateTime)
+                            if (value is DateTime || value is DateOnly)
                             {
                                 cell.Style.Numberformat.Format = "mm/dd/yyyy";
                             }

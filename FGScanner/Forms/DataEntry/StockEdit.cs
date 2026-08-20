@@ -18,10 +18,10 @@ namespace FGScanner
     public partial class StockEdit : Form
     {
         private string _partnumber, _customer, _location, _productionVersion, _whId, _userid;
-        private DateTime _productionDate;
+        private DateOnly _productionDate;
         private int _box, _quantity, _pps;
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
 
         private async void StockEdit_Load(object sender, EventArgs e)
         {
@@ -29,7 +29,7 @@ namespace FGScanner
         }
 
 
-        public StockEdit(int pps, string partnumber, string location, string productionVersion, DateTime productionDate, int box, int quantity, string customer, string whId, string userid)
+        public StockEdit(int pps, string partnumber, string location, string productionVersion, DateOnly productionDate, int box, int quantity, string customer, string whId, string userid)
         {
             InitializeComponent();
             _dbContext = new();
@@ -54,7 +54,7 @@ namespace FGScanner
             stock = await _queries.GetStockInfo(_partnumber, _productionDate, _productionVersion, _location, _whId);
 
             partnumberlbl.Text = stock.Partnumber.ToString();
-            customerlbl.Text = stock.CustomerId.ToString();
+            customerlbl.Text = stock.Customer.ToString();
             proddatelbl.Text = stock.ProdDate.ToString("MM-dd-yyyy");
             prodverlbl.Text = stock.ProdVer.ToString();
             stockslbl.Text = stock.Quantity.ToString();
@@ -80,7 +80,7 @@ namespace FGScanner
                 if (int.TryParse(BoxTxt.Text, out int boxCount) && int.TryParse(Qtytxt.Text, out int Quantity))
                 {
 
-                    var items = new Transaction
+                    var items = new TransactionHistory
                     {
                         Partnumber = _partnumber,
                         ProdDate = _productionDate,
@@ -149,9 +149,9 @@ namespace FGScanner
 
                     var productinfo = await _queries.GetProductInfo(_partnumber);
                     int pps = 1;
-                    if (productinfo.PPS > 0)
+                    if (productinfo.Pps > 0)
                     {
-                        pps = productinfo.PPS;
+                        pps = productinfo.Pps;
                     }
 
                     int box = (int)Math.Ceiling((double)CurrentQuantity / pps);

@@ -107,7 +107,16 @@ namespace FGScanner.Services
             }
         }
 
-        public async Task<(bool isSuccess, string Message)> InsertFGOutgoing(List<ScannedData> ScanItem, string warehouseid, string id, string transaction_type, string userid, string remarks = "FG")
+        public async Task<(bool isSuccess, string Message)> 
+            InsertFGOutgoing(
+            List<ScannedData> ScanItem, 
+            string warehouseid, 
+            string id, 
+            string transaction_type, 
+            string userid,
+            string marketcode,
+            string remarks = "FG"
+            )
         {
             try
             {
@@ -119,13 +128,13 @@ namespace FGScanner.Services
                         return (false, "Partnumber not exist in database.");
                     }
 
-                    if (isExist.PPS != data.Quantity)
+                    if (isExist.Pps != data.Quantity)
                     {
                         return (false, "Invalid PPS Quantity");
                     }
                 }
 
-                return await _queries.InsertFGOutgoingItems(ScanItem, warehouseid, id, transaction_type, userid, remarks);
+                return await _queries.InsertFGOutgoingItems(ScanItem, warehouseid, id, transaction_type, userid, marketcode, remarks);
             }
             catch (Exception ex)
             {
@@ -134,46 +143,150 @@ namespace FGScanner.Services
             }
         }
 
-        public async Task<(bool isSuccess, string Message)> InsertReturns(List<ScannedData> ScanItem, string warehouseid, string id, string transaction_type, string userid, string remarks, string location)
+
+        public async Task<(bool isSuccess, string Message, List<ScannedData> ValidItems, List<string> OverflowWarnings)> InsertReturns(
+      List<ScannedData> scanItems,
+      string warehouseId,
+      string id,
+      string transactionType,
+      string userId,
+      string remarks,
+      string location)
         {
             try
             {
-                foreach (var data in ScanItem)
+                if (scanItems == null || !scanItems.Any())
                 {
-                    var isExist = await _queries.GetProductInfo(data.PartNumber);
-                    if (isExist == null)
+                    return (false, "No scanned items provided.", new List<ScannedData>(), new List<string>());
+                }
+
+                // 1. Batch Product Check
+                var distinctParts = scanItems
+                    .Select(x => x.PartNumber)
+                    .Where(p => !string.IsNullOrWhiteSpace(p))
+                    .Distinct()
+                    .ToList();
+
+                // FIX: If GetProductsByPartNumbers returns Dictionary<string, Product> or similar
+                var masterProducts = await _queries.GetProductsByPartNumbersAsync(distinctParts);
+
+                foreach (var item in scanItems)
+                {
+                    if (string.IsNullOrWhiteSpace(item.PartNumber)) continue;
+
+                    // FIX for CS0019 & CS1061: Use TryGetValue or check default KeyValuePair
+                    if (!masterProducts.TryGetValue(item.PartNumber, out var product) || product == null)
                     {
-                        return (false, "Partnumber not exist in database.");
+                        return (false, $"Partnumber '{item.PartNumber}' does not exist in database.", new List<ScannedData>(), new List<string>());
                     }
 
-                    if (isExist.PPS != data.Quantity)
+                    // FIX: Product is now properly extracted from the dictionary value
+                    if (product.Pps != item.Quantity)
                     {
-                        return (false, "Invalid PPS Quantity");
+                        return (false, $"Invalid PPS Quantity for Partnumber '{item.PartNumber}'. Expected: {product.Pps}, Got: {item.Quantity}", new List<ScannedData>(), new List<string>());
                     }
                 }
 
-                return await _queries.InsertReturnItems(ScanItem, warehouseid, id, transaction_type, userid, remarks, location);
+                // 2. Query Stocks & Validate Limits
+                var stockDict = await _queries.GetStocks(scanItems);
+                var runningTotals = new Dictionary<string, int>();
+                var validItems = new List<ScannedData>();
+                var overflowWarnings = new List<string>();
+
+                string GetCompositeKey(string partNo, DateOnly prodDate, string prodVer, string wh, string loc)
+                    => $"{partNo}|{prodDate:yyyy-MM-dd}|{prodVer}|{wh}|{loc}";
+
+                foreach (var item in scanItems)
+                {
+                    if (string.IsNullOrWhiteSpace(item.PartNumber)) continue;
+
+                    string compositeKey = GetCompositeKey(
+                        item.PartNumber,
+                        item.ProductionDate,
+                        item.ProductionVersion,
+                        warehouseId,
+                        item.Location
+                    );
+
+                    stockDict.TryGetValue(compositeKey, out int totalAvailableStock);
+                    runningTotals.TryGetValue(compositeKey, out int currentScanTotal);
+
+                    int projectedQty = currentScanTotal + item.Quantity;
+
+                    if (projectedQty > totalAvailableStock)
+                    {
+                        overflowWarnings.Add(
+                            $"{item.PartNumber} (Attempted: {projectedQty}, Stock: {totalAvailableStock}, Production: {item.ProductionDate:yyyy-MM-dd}, Rack: {item.Location})"
+                        );
+                        continue;
+                    }
+
+                    validItems.Add(item);
+                    runningTotals[compositeKey] = projectedQty;
+                }
+
+                if (!validItems.Any())
+                {
+                    return (false, "All items were skipped due to stock overflow limits.", validItems, overflowWarnings);
+                }
+
+                // 3. Save Valid Items to Database
+                var (isSuccess, Message) = await _queries.InsertReturnItems(validItems, warehouseId, id, transactionType, userId, remarks, location);
+
+                if (!isSuccess)
+                {
+                    return (false, Message, validItems, overflowWarnings);
+                }
+
+                return (true, Message, validItems, overflowWarnings);
             }
             catch (Exception ex)
             {
-                string errorMessage = ex.Message;
-                return (false, $"Error: {errorMessage}");
+                return (false, $"Error: {ex.Message}", new List<ScannedData>(), new List<string>());
             }
         }
 
-        public async Task<List<Transaction>> getItemsByReturns(string docnum)
+
+        //public async Task<(bool isSuccess, string Message)> InsertReturns(List<ScannedData> ScanItem, string warehouseid, string id, string transaction_type, string userid, string remarks, string location)
+        //{
+        //    try
+        //    {
+        //        foreach (var data in ScanItem)
+        //        {
+        //            var isExist = await _queries.GetProductInfo(data.PartNumber);
+        //            if (isExist == null)
+        //            {
+        //                return (false, "Partnumber not exist in database.");
+        //            }
+
+        //            if (isExist.Pps != data.Quantity)
+        //            {
+        //                return (false, "Invalid PPS Quantity");
+        //            }
+        //        }
+
+        //        return await _queries.InsertReturnItems(ScanItem, warehouseid, id, transaction_type, userid, remarks, location);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        string errorMessage = ex.Message;
+        //        return (false, $"Error: {errorMessage}");
+        //    }
+        //}
+
+        public async Task<List<TransactionHistory>> getItemsByReturns(string docnum)
         {
             return await _queries.GetItemByReturn(docnum);
         }
 
-        public async Task<List<Transaction>> GetShipmentList(string shipmentID = null, DateTime? start = null, DateTime? end = null)
+        public async Task<List<TransactionHistory>> GetShipmentList(string shipmentID = null, DateTime? start = null, DateTime? end = null)
         {
             var result = await _queries.GetFilteredShipment(shipmentID, start, end);
 
             return result;
         }
 
-        public async Task<List<Transaction>> LoadShipmentItems(string controlnumber)
+        public async Task<List<TransactionHistory>> LoadShipmentItems(string controlnumber)
         {
             var result = await _queries.GetShipmentItems(controlnumber);
             return result;
@@ -185,14 +298,14 @@ namespace FGScanner.Services
             return result;
         }
 
-        public async Task<List<Return>> GetReturnList(string location, DateTime? start = null, DateTime? end = null)
+        public async Task<List<ReturnTable>> GetReturnList(string location, DateTime? start = null, DateTime? end = null)
         {
             var result = await _queries.GetFilteredReturn(location, start, end);
 
             return result;
         }
 
-        public async Task<List<Transaction>> LoadReturnItems(string controlnumber)
+        public async Task<List<TransactionHistory>> LoadReturnItems(string controlnumber)
         {
             var result = await _queries.GetReturnItems(controlnumber);
             return result;

@@ -43,7 +43,7 @@ namespace FGScanner
         {
             if (usergroup != 2)
             {
-     
+
                 rackViewerToolStripMenuItem.Enabled = false;
                 warehouseToolStripMenuItem.Enabled = false;
                 packingListToolStripMenuItem.Enabled = false;
@@ -62,7 +62,7 @@ namespace FGScanner
 
         private void DisplayForm(Form forms)
         {
-           
+
             forms.TopLevel = false;
             forms.FormBorderStyle = FormBorderStyle.None;
             forms.Dock = DockStyle.Fill;
@@ -105,7 +105,8 @@ namespace FGScanner
         private void stockListToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InventoryControl inventoryControl = new(_userid);
-            DisplayUsercontrol(inventoryControl);
+            Form1 Stock = new(inventoryControl);
+            Stock.Show();
         }
 
 
@@ -208,6 +209,21 @@ namespace FGScanner
         {
             WarehouseReturn warehouseReturn = new(_userid);
             DisplayUsercontrol(warehouseReturn);
+        }
+
+        private void closebutton_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Are you sure you want to close the application?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
+        }
+
+        private void minimize_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
         }
     }
 }

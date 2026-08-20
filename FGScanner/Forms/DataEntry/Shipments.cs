@@ -23,7 +23,7 @@ namespace FGScanner.Forms.DataEntry
 
         private readonly TransactionService _service;
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private readonly ExcelService _excelService;
         private string _userid;
         private List<ScannedData> validScan = new List<ScannedData>();
@@ -318,6 +318,7 @@ namespace FGScanner.Forms.DataEntry
                                     missingDpiItems.Add(item.PartNumber);
                                     continue;
                                 }
+
                                 string key = $"{item.PartNumber}|{item.ProductionDate}|{item.ProductionVersion}|{warehouse}|{Location}";
                                 runningTotals.TryGetValue(key, out int currentScan);
                                 var projectedQty = currentScan + item.Quantity;
@@ -359,6 +360,7 @@ namespace FGScanner.Forms.DataEntry
                                     warningMessage += $"Stock Overflows:\n- {string.Join("\n- ", overflowToDisplay)}";
                                 }
                                 MessageBox.Show(warningMessage, "Partial Success", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                return;
                             }
                             else
                             {
@@ -452,9 +454,16 @@ namespace FGScanner.Forms.DataEntry
             try
             {
                 string warehouse = WarehouseComboBox.Text;
+                string marketcode = MarketCode.Text;
                 if (string.IsNullOrWhiteSpace(warehouse))
                 {
                     MessageBox.Show("Please select a warehouse.");
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(marketcode))
+                {
+                    MessageBox.Show("Please select a customer code.");
                     return;
                 }
 
@@ -478,7 +487,7 @@ namespace FGScanner.Forms.DataEntry
 
                 if (result == DialogResult.Yes)
                 {
-                    var (isSuccess, Message) = await _service.InsertFGOutgoing(validScan, warehouse, shipmentId, transactionType, _userid, "FG");
+                    var (isSuccess, Message) = await _service.InsertFGOutgoing(validScan, warehouse, shipmentId, transactionType, _userid, "FG", marketcode);
                     if (isSuccess)
                     {
                         MessageBox.Show(Message);

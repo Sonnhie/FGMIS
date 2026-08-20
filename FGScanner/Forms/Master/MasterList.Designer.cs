@@ -72,11 +72,12 @@
             LogsTable.RowHeadersWidth = 51;
             LogsTable.Size = new System.Drawing.Size(935, 429);
             LogsTable.TabIndex = 34;
+            LogsTable.CellContentClick += LogsTable_CellContentClick;
             // 
             // addbtn
             // 
             addbtn.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F);
-            addbtn.Location = new System.Drawing.Point(853, 8);
+            addbtn.Location = new System.Drawing.Point(853, 13);
             addbtn.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             addbtn.Name = "addbtn";
             addbtn.Size = new System.Drawing.Size(105, 38);

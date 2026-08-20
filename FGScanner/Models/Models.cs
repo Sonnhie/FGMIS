@@ -159,7 +159,7 @@ namespace FGScanner.Models
     }
 
     [Table("actual_inventory")]
-    public class ActualInventory
+    public class ActualInventorys
     {
         [Key]
         [Column("id")]
@@ -226,7 +226,7 @@ namespace FGScanner.Models
     public class ScannedData
     {
         public string PartNumber { get; set; }
-        public DateTime ProductionDate { get; set; }
+        public DateOnly ProductionDate { get; set; }
         public string CustomerId { get; set; }
         public int Quantity { get; set; }
         public string ProductionVersion { get; set; }
@@ -272,7 +272,7 @@ namespace FGScanner.Models
     {
         public string PartNumber { get; set; }
         public string PartName { get; set; }
-        public DateTime ProductionDate { get; set; }
+        public DateOnly ProductionDate { get; set; }
         public int Box { get; set; }
         public int Quantity { get; set; }
         public int PPS { get; set; }
@@ -331,7 +331,7 @@ namespace FGScanner.Models
     {
         public string partnumber { get; set; }
         public string customer { get; set; }
-        public DateTime proddate { get; set; }
+        public DateOnly proddate { get; set; }
         public string prodver { get; set; }
         public string location { get; set; }
         public int quantity { get; set; }
@@ -346,7 +346,7 @@ namespace FGScanner.Models
         public string ControlNumber {  get; set; }
         public string Partnumber {  get; set; }
         public string Customer {  get; set; }
-        public DateTime ProdDate {  get; set; }
+        public DateOnly ProdDate {  get; set; }
         public string ProdVersion { get; set; }
         public int Quantity { get; set; }
         public int Box { get; set; }
@@ -357,7 +357,7 @@ namespace FGScanner.Models
     {
         public string partnumber { get; set; }
         public string customer { get; set; }
-        public DateTime proddate { get; set; }
+        public DateOnly proddate { get; set; }
         public string prodver { get; set; }
         public string location { get; set; }
         public int quantity { get; set; }

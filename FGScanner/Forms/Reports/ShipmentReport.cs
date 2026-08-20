@@ -23,7 +23,7 @@ namespace FGScanner.Forms.Reports
     {
         private readonly TransactionService _service;
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private readonly ExcelService _excelService;
         private string _userid;
         private string controlnumber;
@@ -40,7 +40,7 @@ namespace FGScanner.Forms.Reports
             toolStripStatusLabel1.Visible = false;
         }
 
-        private void LoadShipmentTable(List<FGScanner.Models.Transaction> data)
+        private void LoadShipmentTable(List<TransactionHistory> data)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace FGScanner.Forms.Reports
                     foreach (var item in data)
                     {
                         dt.Rows.Add(
-                            item.controlNumber.ToString(),
+                            item.ControlNumber.ToString(),
                             item.EntryDate.ToString("MM/dd/yyyy"),
                             item.Quantity.ToString(),
                             item.Box.ToString(),

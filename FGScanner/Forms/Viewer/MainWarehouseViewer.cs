@@ -1,4 +1,5 @@
 ﻿using FGScanner.Database;
+using FGScanner.Models;
 using FGScanner.Repositories;
 using FGScanner.Services;
 using Microsoft.VisualBasic.ApplicationServices;
@@ -22,7 +23,7 @@ namespace FGScanner.Forms.Viewer
         private readonly SemaphoreSlim _dbLock = new SemaphoreSlim(1, 1);
         private readonly TransactionService _service;
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private readonly ExcelService _excelService;
         private readonly PrintService _printService;
 
@@ -278,7 +279,7 @@ namespace FGScanner.Forms.Viewer
                               Data.TotalBox,
                               Data.ProdDate.ToString("MM/dd/yyyy"),
                               Data.ProdVer,
-                              Data.CustomerId,
+                              Data.Customer,
                               Data.WhId
                             );
                         }

@@ -1,5 +1,6 @@
 ﻿using FGScanner.Database;
 using FGScanner.Model;
+using FGScanner.Models;
 using FGScanner.Repositories;
 using FGScanner.Services;
 using FGScanner.Util;
@@ -21,7 +22,7 @@ namespace FGScanner.Forms.Reports
     public partial class Ledger : UserControl
     {
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private readonly ExcelService _excelService;
 
         public Ledger()

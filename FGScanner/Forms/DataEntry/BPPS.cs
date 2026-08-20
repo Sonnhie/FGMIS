@@ -21,7 +21,8 @@ namespace FGScanner.Forms.DataEntry
     {
         private readonly TransactionService _service;
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        //private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private readonly ExcelService _excelService;
         private string _userid;
         private List<ScannedData> validScan = new List<ScannedData>();
@@ -113,6 +114,7 @@ namespace FGScanner.Forms.DataEntry
                                Customerid = item.Key.CustomerId,
                            })
                            .ToList();
+
                 if (data.Count != 0)
                 {
                     DataTable dt = new DataTable();

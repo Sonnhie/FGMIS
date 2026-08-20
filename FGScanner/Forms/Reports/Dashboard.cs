@@ -21,7 +21,7 @@ namespace FGScanner.Forms.DataEntry
     {
         private Dictionary<int, MonthlyInventorySummary> MonthlyStocksCache = [];
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
 
         public Dashboard()
         {

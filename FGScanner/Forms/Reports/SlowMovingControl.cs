@@ -19,7 +19,7 @@ namespace FGScanner.Forms.Reports
     public partial class SlowMovingControl : UserControl
     {
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private readonly ExcelService _excelService;
         private int page = 1;
         private int pageSize = 50;
@@ -68,13 +68,13 @@ namespace FGScanner.Forms.Reports
                             dt.Rows.Add
                             (
                                 item.Partnumber,
-                                item.CustomerId,
+                                item.Customer,
                                 item.ProdDate.ToString("MM/dd/yyyy"),
                                 item.ProdVer,
                                 item.TotalBox,
                                 item.Quantity,
                                 item.Location,
-                                item.Last_Out_Date,
+                                item.LastOutDate,
                                 item.MovementClassification,
                                 item.StorageLocation
                             );

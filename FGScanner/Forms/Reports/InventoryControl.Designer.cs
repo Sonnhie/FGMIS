@@ -47,7 +47,7 @@
             // SearchButton
             // 
             SearchButton.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            SearchButton.Location = new System.Drawing.Point(378, 14);
+            SearchButton.Location = new System.Drawing.Point(403, 15);
             SearchButton.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             SearchButton.Name = "SearchButton";
             SearchButton.Size = new System.Drawing.Size(77, 33);
@@ -60,7 +60,7 @@
             // 
             BtnExport.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             BtnExport.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            BtnExport.Location = new System.Drawing.Point(276, 15);
+            BtnExport.Location = new System.Drawing.Point(301, 16);
             BtnExport.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             BtnExport.Name = "BtnExport";
             BtnExport.Size = new System.Drawing.Size(98, 32);

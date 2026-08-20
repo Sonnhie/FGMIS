@@ -53,6 +53,8 @@
             packingListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             warehouseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             panel2 = new System.Windows.Forms.Panel();
+            minimize = new System.Windows.Forms.PictureBox();
+            closebutton = new System.Windows.Forms.PictureBox();
             TimeLbl = new System.Windows.Forms.Label();
             DateLbl = new System.Windows.Forms.Label();
             LblUser = new System.Windows.Forms.Label();
@@ -64,6 +66,8 @@
             panel1 = new System.Windows.Forms.Panel();
             menuStrip1.SuspendLayout();
             panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)minimize).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)closebutton).BeginInit();
             SuspendLayout();
             // 
             // menuStrip1
@@ -230,6 +234,8 @@
             // panel2
             // 
             panel2.BackColor = System.Drawing.Color.RoyalBlue;
+            panel2.Controls.Add(minimize);
+            panel2.Controls.Add(closebutton);
             panel2.Controls.Add(TimeLbl);
             panel2.Controls.Add(DateLbl);
             panel2.Controls.Add(LblUser);
@@ -245,12 +251,36 @@
             panel2.TabIndex = 2;
             panel2.MouseDown += panel2_MouseDown;
             // 
+            // minimize
+            // 
+            minimize.Cursor = System.Windows.Forms.Cursors.Hand;
+            minimize.Image = (System.Drawing.Image)resources.GetObject("minimize.Image");
+            minimize.Location = new System.Drawing.Point(922, 9);
+            minimize.Name = "minimize";
+            minimize.Size = new System.Drawing.Size(20, 20);
+            minimize.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            minimize.TabIndex = 10;
+            minimize.TabStop = false;
+            minimize.Click += minimize_Click;
+            // 
+            // closebutton
+            // 
+            closebutton.Cursor = System.Windows.Forms.Cursors.Hand;
+            closebutton.Image = (System.Drawing.Image)resources.GetObject("closebutton.Image");
+            closebutton.Location = new System.Drawing.Point(948, 9);
+            closebutton.Name = "closebutton";
+            closebutton.Size = new System.Drawing.Size(20, 20);
+            closebutton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            closebutton.TabIndex = 8;
+            closebutton.TabStop = false;
+            closebutton.Click += closebutton_Click;
+            // 
             // TimeLbl
             // 
             TimeLbl.AutoSize = true;
             TimeLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             TimeLbl.ForeColor = System.Drawing.Color.White;
-            TimeLbl.Location = new System.Drawing.Point(884, 13);
+            TimeLbl.Location = new System.Drawing.Point(611, 12);
             TimeLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             TimeLbl.Name = "TimeLbl";
             TimeLbl.Size = new System.Drawing.Size(23, 17);
@@ -262,7 +292,7 @@
             DateLbl.AutoSize = true;
             DateLbl.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             DateLbl.ForeColor = System.Drawing.Color.White;
-            DateLbl.Location = new System.Drawing.Point(683, 13);
+            DateLbl.Location = new System.Drawing.Point(410, 12);
             DateLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             DateLbl.Name = "DateLbl";
             DateLbl.Size = new System.Drawing.Size(23, 17);
@@ -274,7 +304,7 @@
             LblUser.AutoSize = true;
             LblUser.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             LblUser.ForeColor = System.Drawing.Color.White;
-            LblUser.Location = new System.Drawing.Point(485, 13);
+            LblUser.Location = new System.Drawing.Point(212, 12);
             LblUser.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             LblUser.Name = "LblUser";
             LblUser.Size = new System.Drawing.Size(23, 17);
@@ -286,7 +316,7 @@
             label4.AutoSize = true;
             label4.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             label4.ForeColor = System.Drawing.Color.White;
-            label4.Location = new System.Drawing.Point(822, 13);
+            label4.Location = new System.Drawing.Point(549, 12);
             label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(39, 17);
@@ -298,7 +328,7 @@
             label3.AutoSize = true;
             label3.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             label3.ForeColor = System.Drawing.Color.White;
-            label3.Location = new System.Drawing.Point(625, 13);
+            label3.Location = new System.Drawing.Point(352, 12);
             label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(38, 17);
@@ -310,7 +340,7 @@
             label2.AutoSize = true;
             label2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             label2.ForeColor = System.Drawing.Color.White;
-            label2.Location = new System.Drawing.Point(417, 12);
+            label2.Location = new System.Drawing.Point(144, 11);
             label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(38, 17);
@@ -365,6 +395,8 @@
             menuStrip1.PerformLayout();
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)minimize).EndInit();
+            ((System.ComponentModel.ISupportInitialize)closebutton).EndInit();
             ResumeLayout(false);
             PerformLayout();
 
@@ -404,5 +436,7 @@
         private System.Windows.Forms.ToolStripMenuItem incomingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem outgoingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem warehouseReturnToolStripMenuItem1;
+        private System.Windows.Forms.PictureBox closebutton;
+        private System.Windows.Forms.PictureBox minimize;
     }
 }

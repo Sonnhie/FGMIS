@@ -23,7 +23,7 @@ namespace FGScanner.Forms.Reports
     public partial class InventoryControl : UserControl
     {
         private readonly Queries _queries;
-        private readonly Dbcontext _dbContext;
+        private readonly InventoryDbContext _dbContext;
         private readonly ExcelService _excelService;
         private int page = 1;
         private int pageSize = 50;
@@ -78,7 +78,7 @@ namespace FGScanner.Forms.Reports
                             dt.Rows.Add
                             (
                                 item.Partnumber,
-                                item.CustomerId,
+                                item.Customer,
                                 item.ProdDate.ToString("MM/dd/yyyy"),
                                 item.ProdVer,
                                 item.TotalBox.ToString(),
@@ -308,7 +308,7 @@ namespace FGScanner.Forms.Reports
                 string dateString = Convert.ToString(selectedRow.Cells["Production Date"].Value);
 
                 // If the date is invalid or blank, show an error and exit this block of code
-                if (!DateTime.TryParse(dateString, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime ProductionDate))
+                if (!DateOnly.TryParse(dateString, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateOnly ProductionDate))
                 {
                     MessageBox.Show("The selected row does not contain a valid Production Date.", "Invalid Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
