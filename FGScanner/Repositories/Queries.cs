@@ -95,11 +95,11 @@ namespace FGScanner.Repositories
         }
 
         public async Task<(bool isSuccess, string Message)> TransferInventoryAsync(
-      string warehouseId,
-      string currLocation,
-      string newLocation,
-      List<ActualInventory> inventories,
-      string userId)
+          string warehouseId,
+          string currLocation,
+          string newLocation,
+          List<ActualInventory> inventories,
+          string userId)
         {
             // 1. INPUT VALIDATION & CASE STANDARDIZATION
             if (inventories == null || !inventories.Any())
@@ -116,7 +116,6 @@ namespace FGScanner.Repositories
             }
 
             // 2. DEDUPLICATE & AGGREGATE PAYLOAD 
-            // Prevents duplicate list items from bypassing balance checks
             var aggregatedRequests = inventories
                 .GroupBy(i => new { i.Partnumber, i.ProdDate, i.ProdVer, Customer = i.Customer ?? string.Empty })
                 .Select(g => new
@@ -132,7 +131,7 @@ namespace FGScanner.Repositories
 
             var partNumbers = aggregatedRequests.Select(r => r.Partnumber).Distinct().ToList();
 
-            // 3. BATCH MASTER PRODUCT CHECK (Fixes N+1 Database Call Bottleneck)
+            // 3. BATCH MASTER PRODUCT CHECK
             var validPartNumbers = await _context.Products
                 .Where(p => partNumbers.Contains(p.Partnumber))
                 .Select(p => p.Partnumber)
@@ -148,13 +147,10 @@ namespace FGScanner.Repositories
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Fetch source and destination inventory records
+                // Query source inventory ONLY to validate available balance (AsNoTracking avoids EF tracking issues)
                 var sourceInventories = await _context.ActualInventories
+                    .AsNoTracking()
                     .Where(x => partNumbers.Contains(x.Partnumber) && x.Location == currLocation)
-                    .ToListAsync();
-
-                var destInventories = await _context.ActualInventories
-                    .Where(x => partNumbers.Contains(x.Partnumber) && x.Location == newLocation)
                     .ToListAsync();
 
                 var now = DateTime.Now;
@@ -171,44 +167,16 @@ namespace FGScanner.Repositories
                         return (false, $"Item {req.Partnumber} (ProdDate: {req.ProdDate:yyyy-MM-dd}) does not exist in location {currLocation}.");
                     }
 
-                    // Check available quantity
+                    // Check available quantity limit
                     if (sourceItem.Quantity < req.TotalQuantity)
                     {
                         await transaction.RollbackAsync();
                         return (false, $"Transfer quantity ({req.TotalQuantity}) exceeds available stock ({sourceItem.Quantity}) for item {req.Partnumber}.");
                     }
 
-                    // 5. UPDATE SOURCE ACTUAL STOCK (Deduct)
-                    sourceItem.Quantity -= req.TotalQuantity;
+                    // 5. CREATE AUDIT HISTORIES (SQL Trigger will automatically update ActualInventory on Save)
 
-                    // 6. UPDATE OR INSERT DESTINATION ACTUAL STOCK (Add)
-                    var destItem = destInventories
-                        .FirstOrDefault(x => x.Partnumber == req.Partnumber && x.ProdDate == req.ProdDate);
-
-                    if (destItem != null)
-                    {
-                        destItem.Quantity += req.TotalQuantity;
-                    }
-                    else
-                    {
-                        var newDestItem = new ActualInventory
-                        {
-                            Partnumber = req.Partnumber,
-                            ProdDate = req.ProdDate,
-                            Quantity = req.TotalQuantity,
-                            Location = newLocation,
-                            StorageLocation = sourceItem.StorageLocation,
-                            Customer = req.Customer,
-                            ProdVer = req.ProdVer,
-                            TotalBox = req.TotalBox
-                        };
-                        _context.ActualInventories.Add(newDestItem);
-
-                        // Track in memory in case the loop processes another item with the same target specs
-                        destInventories.Add(newDestItem);
-                    }
-
-                    // 7. CREATE AUDIT HISTORIES
+                    // OUT Transaction from Current Location
                     _context.TransactionHistories.Add(new TransactionHistory
                     {
                         TransactionId = Guid.NewGuid(),
@@ -229,6 +197,7 @@ namespace FGScanner.Repositories
                         InCharge = userId
                     });
 
+                    // IN Transaction to New Location
                     _context.TransactionHistories.Add(new TransactionHistory
                     {
                         TransactionId = Guid.NewGuid(),
@@ -250,10 +219,10 @@ namespace FGScanner.Repositories
                     });
                 }
 
-                // 8. SAVE CHANGES & RUN DEPENDENT LOGIC BEFORE COMMIT
+                // 6. SAVE CHANGES -> THIS FIRES YOUR SQL TRIGGER TO RECALCULATE ACTUAL INVENTORY
                 await _context.SaveChangesAsync();
 
-                // Run post-transfer processes INSIDE transaction to prevent orphan records on failure
+                // Run movement classification inside transaction
                 await UpdateMovementClassification();
 
                 await transaction.CommitAsync();
@@ -262,7 +231,8 @@ namespace FGScanner.Repositories
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return (false, $"SQL Error: {ex.Message}");
+                string innerErr = ex.InnerException != null ? $" -> {ex.InnerException.Message}" : string.Empty;
+                return (false, $"SQL Error: {ex.Message}{innerErr}");
             }
         }
 
@@ -367,17 +337,62 @@ namespace FGScanner.Repositories
             return await _context.ActualInventories.Where(x => x.Partnumber == partnumber && x.Location == location && x.ProdDate == proddate).FirstOrDefaultAsync();
         }
 
-        public async Task<(bool isSuccess, string Message)> InsertFGOutgoingItems(List<ScannedData> Items, string warehouseId, string id, string transaction_type, string userid, string remarks, string marketcode)
+        public async Task<(bool isSuccess, string Message)> InsertFGOutgoingItems(List<ScannedData> items, string warehouseId, string id, string transactionType, string userId, string marketcode, string remarks)
         {
+            if (items == null || !items.Any())
+            {
+                return (false, "No shipment items provided.");
+            }
+
+            if (items.Any(item => string.IsNullOrWhiteSpace(item.PartNumber) || item.Quantity <= 0 ||
+                                  string.IsNullOrWhiteSpace(item.Location) || string.IsNullOrWhiteSpace(item.ProductionVersion)))
+            {
+                return (false, "Shipment items must have a part number, production version, location, and a quantity greater than zero.");
+            }
+
+            static string GetStockKey(string partNo, DateOnly prodDate, string prodVer, string wh, string loc)
+                => $"{partNo.Trim().ToUpperInvariant()}|{prodDate:yyyy-MM-dd}|{prodVer.Trim().ToUpperInvariant()}|{wh.Trim().ToUpperInvariant()}|{loc.Trim().ToUpperInvariant()}";
+
+            string normalizedWarehouseId = warehouseId?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(normalizedWarehouseId))
+            {
+                return (false, "Please select a warehouse.");
+            }
+
+            var requestedQuantities = items
+                .GroupBy(item => GetStockKey(item.PartNumber, item.ProductionDate, item.ProductionVersion, normalizedWarehouseId, item.Location))
+                .ToDictionary(group => group.Key, group => group.Sum(item => item.Quantity));
+
             try
             {
+                await using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+
+                var partNumbers = items.Select(item => item.PartNumber.Trim()).Distinct().ToList();
+                var inventory = await _context.ActualInventories
+                    .Where(item => partNumbers.Contains(item.Partnumber) && item.WhId == normalizedWarehouseId)
+                    .ToListAsync();
+
+                var availableQuantities = inventory
+                    .GroupBy(item => GetStockKey(item.Partnumber, item.ProdDate, item.ProdVer, item.WhId, item.Location))
+                    .ToDictionary(group => group.Key, group => group.Sum(item => item.Quantity));
+
+                foreach (var request in requestedQuantities)
+                {
+                    availableQuantities.TryGetValue(request.Key, out int availableQuantity);
+                    if (request.Value > availableQuantity)
+                    {
+                        await transaction.RollbackAsync();
+                        return (false, $"Shipment quantity ({request.Value}) exceeds available stock ({availableQuantity}) for {request.Key}.");
+                    }
+                }
+
                 var TransactionItems = new List<TransactionHistory>();
 
                 var newShipment = new ShipmentTable
                 {
                     TransactionId = id,
                     EntryDate = DateTime.Now,
-                    WhId = warehouseId,
+                    WhId = normalizedWarehouseId,
                     Status = "",
                     Customer = marketcode,
                     ShipmentId = Guid.NewGuid(),
@@ -386,7 +401,7 @@ namespace FGScanner.Repositories
                 };
                 _context.ShipmentTables.Add(newShipment);
 
-                foreach (var item in Items)
+                foreach (var item in items)
                 {
                     TransactionItems.Add(new TransactionHistory
                     {
@@ -397,21 +412,22 @@ namespace FGScanner.Repositories
                         Box = 1,
                         ProdVer = item.ProductionVersion,
                         EntryDate = DateTime.Now,
-                        TransactionType = transaction_type,
+                        TransactionType = transactionType,
                         Location = item.Location.ToUpper(),
                         Remarks = remarks,
                         StorageLocation = item.StorageLocation ?? "9151",
                         Status = "",
-                        WhId = warehouseId,
+                        WhId = normalizedWarehouseId,
                         ControlNumber = id,
                         TransactionId = Guid.NewGuid(),
                         IsSynced = false,
-                        InCharge = userid
+                        InCharge = userId
                     });
                 }
                 _context.TransactionHistories.AddRange(TransactionItems);
                 await _context.SaveChangesAsync();
                 await UpdateMovementClassification();
+                await transaction.CommitAsync();
                 return (true, "Items successfully inserted to database.");
             }
             catch (Exception ex)
@@ -433,14 +449,56 @@ namespace FGScanner.Repositories
                 return (false, "No scanned items provided to insert.");
             }
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            if (items.Any(item => string.IsNullOrWhiteSpace(item.PartNumber) || item.Quantity <= 0 ||
+                                  string.IsNullOrWhiteSpace(item.Location) || string.IsNullOrWhiteSpace(item.ProductionVersion)))
+            {
+                return (false, "Return items must have a part number, production version, location, and a quantity greater than zero.");
+            }
+
+            string normalizedWarehouseId = warehouseId?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(normalizedWarehouseId))
+            {
+                return (false, "Please select a warehouse.");
+            }
+
+            static string GetStockKey(string partNo, DateOnly prodDate, string prodVer, string wh, string loc)
+                => $"{partNo.Trim().ToUpperInvariant()}|{prodDate:yyyy-MM-dd}|{prodVer.Trim().ToUpperInvariant()}|{wh.Trim().ToUpperInvariant()}|{loc.Trim().ToUpperInvariant()}";
+
+            var requestedQuantities = items
+                .GroupBy(item => GetStockKey(item.PartNumber, item.ProductionDate, item.ProductionVersion, normalizedWarehouseId, item.Location))
+                .ToDictionary(group => group.Key, group => group.Sum(item => item.Quantity));
+
+            await using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
             try
             {
+                var partNumbers = items.Select(item => item.PartNumber.Trim()).Distinct().ToList();
+                var inventory = await _context.ActualInventories
+                    .Where(item => partNumbers.Contains(item.Partnumber) && item.WhId == normalizedWarehouseId)
+                    .ToListAsync();
+
+                var availableQuantities = inventory
+                    .GroupBy(item => GetStockKey(item.Partnumber, item.ProdDate, item.ProdVer, item.WhId, item.Location))
+                    .ToDictionary(group => group.Key, group => group.Sum(item => item.Quantity));
+
+                foreach (var request in requestedQuantities)
+                {
+                    availableQuantities.TryGetValue(request.Key, out int availableQuantity);
+                    if (request.Value > availableQuantity)
+                    {
+                        await transaction.RollbackAsync();
+                        return (false, $"Return quantity ({request.Value}) exceeds available stock ({availableQuantity}) for item: {request.Key}.");
+                    }
+                }
+
+                var productDict = await _context.Products
+                    .Where(p => partNumbers.Contains(p.Partnumber))
+                    .ToDictionaryAsync(p => p.Partnumber, p => p.Pps);
+
                 var newReturn = new ReturnTable
                 {
                     TransactionId = id,
                     EntryDate = DateTime.Now,
-                    WhId = warehouseId,
+                    WhId = normalizedWarehouseId,
                     FromLocation = "9151",
                     ToLocation = (location ?? string.Empty).Trim().ToUpper(),
                     ReturnId = Guid.NewGuid(),
@@ -455,6 +513,12 @@ namespace FGScanner.Repositories
 
                 foreach (var item in items)
                 {
+                    int pps = 1;
+                    if (productDict.TryGetValue(item.PartNumber, out int dbPps) && dbPps > 0)
+                    {
+                        pps = dbPps;
+                    }
+
                     transactionItems.Add(new TransactionHistory
                     {
                         TransactionId = Guid.NewGuid(),
@@ -463,15 +527,15 @@ namespace FGScanner.Repositories
                         ProdDate = item.ProductionDate,
                         CustomerId = item.CustomerId,
                         Quantity = item.Quantity,
-                        Box = 1,
+                        Box = (int)Math.Ceiling((double)item.Quantity / pps),
                         ProdVer = item.ProductionVersion,
                         EntryDate = now,
                         TransactionType = transactionType,
                         Location = (item.Location ?? string.Empty).Trim().ToUpper(),
                         Remarks = remarks,
-                        StorageLocation = !string.IsNullOrWhiteSpace(location) ? location : (item.StorageLocation ?? string.Empty),
+                        StorageLocation = item.StorageLocation ?? "9151",
                         Status = "Active",
-                        WhId = warehouseId,
+                        WhId = normalizedWarehouseId,
                         IsSynced = false,
                         InCharge = userId
                     });
@@ -535,12 +599,13 @@ namespace FGScanner.Repositories
             }
             if (start.HasValue)
             {
-                query = query.Where(x => x.EntryDate >= start.Value);
+                query = query.Where(x => x.EntryDate >= start.Value.Date);
             }
 
             if (end.HasValue)
             {
-                query = query.Where(x => x.EntryDate <= end.Value);
+                var nextDay = end.Value.Date.AddDays(1);
+                query = query.Where(x => x.EntryDate < nextDay);
             }
 
             var result = await query
@@ -640,12 +705,13 @@ namespace FGScanner.Repositories
 
             if (start.HasValue)
             {
-                query = query.Where(x => x.EntryDate >= start.Value);
+                query = query.Where(x => x.EntryDate >= start.Value.Date);
             }
 
             if (end.HasValue)
             {
-                query = query.Where(x => x.EntryDate <= end.Value);
+                var nextDay = end.Value.Date.AddDays(1);
+                query = query.Where(x => x.EntryDate < nextDay);
             }
 
             var result = await query
@@ -865,19 +931,39 @@ namespace FGScanner.Repositories
         {
             try
             {
-                var scanPartnumbers = data.Select(x => x.PartNumber).Distinct().ToList();
+                if (data == null || !data.Any())
+                    return new Dictionary<string, int>();
+
+                var scanPartnumbers = data
+                    .Select(x => x.PartNumber)
+                    .Where(p => !string.IsNullOrWhiteSpace(p))
+                    .Distinct()
+                    .ToList();
 
                 var inventoryList = await _context.ActualInventories
-                                 .Where(x => scanPartnumbers.Contains(x.Partnumber))
-                                 .ToListAsync();
+                    .AsNoTracking()
+                    .Where(x => scanPartnumbers.Contains(x.Partnumber))
+                    .ToListAsync();
+
+                // Standardize key string formatting: ISO Date (yyyy-MM-dd) + Uppercase strings
                 var result = inventoryList
-                            .GroupBy(x => $"{x.Partnumber}|{x.ProdDate}|{x.ProdVer}|{x.WhId}|{x.Location}")
-                            .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
+                    .GroupBy(x =>
+                        $"{x.Partnumber?.Trim().ToUpper()}|" +
+                        $"{x.ProdDate:yyyy-MM-dd}|" +
+                        $"{x.ProdVer?.Trim().ToUpper()}|" +
+                        $"{x.WhId?.Trim().ToUpper()}|" +
+                        $"{x.Location?.Trim().ToUpper()}")
+                    .ToDictionary(
+                        g => g.Key,
+                        g => Convert.ToInt32(g.Sum(x => x.Quantity))
+                    );
+
                 return result;
             }
-            catch
+            catch (Exception ex)
             {
-                return new Dictionary<string, int>();
+                // Log ex here if you have a logger instance
+                throw new Exception($"Failed to retrieve stock inventory levels: {ex.Message}", ex);
             }
         }
 
@@ -1006,27 +1092,69 @@ namespace FGScanner.Repositories
             }
         }
 
-        public async Task<List<ShipmentReport>> GetShipmentData(DateTime? startDate, DateTime? endDate)
+        public async Task<List<Models.ShipmentReport>> GetShipmentData(DateTime? startDate, DateTime? endDate)
         {
             try
             {
-                var result = await _context.TransactionHistories
-                            .Include(s => s.ShipmentTable)
-                            .Where(s => s.ControlNumber.Contains("SHIPID") && s.Remarks != "Cancelled Shipment" && s.Status != "Cancelled" && s.EntryDate >= startDate && s.EntryDate <= endDate)
-                            .GroupBy(s => new { s.Partnumber, s.ControlNumber, s.ProdDate, s.ProdVer, s.CustomerId, s.EntryDate })
-                            .Select(s => new ShipmentReport
-                            {
-                                ControlNumber = s.Key.ControlNumber,
-                                Partnumber = s.Key.Partnumber,
-                                Customer = s.FirstOrDefault().ShipmentTable.Customer,
-                                ProdDate = s.Key.ProdDate,
-                                ProdVersion = s.Key.ProdVer,
-                                Quantity = s.Sum(x => x.Quantity),
-                                Box  = s.Sum(x => x.Box) ?? 0,
-                                EntryDate = s.Key.EntryDate,
-                            })
-                            .ToListAsync();
-                return result;
+                //var result = await _context.TransactionHistories
+                //            .Where(s => s.ControlNumber.Contains("SHIPID") && s.Remarks != "Cancelled Shipment" && s.Status != "Cancelled" && s.EntryDate >= startDate && s.EntryDate <= endDate)
+                //            .GroupBy(s => new { s.Partnumber, s.ControlNumber, s.ProdDate, s.ProdVer, s.CustomerId, s.EntryDate})
+                //            .Select(async s => new ShipmentReport
+                //            {
+                //                ControlNumber = s.Key.ControlNumber,
+                //                Partnumber = s.Key.Partnumber,
+                //                Customer = await _context.ShipmentTables.Where(t => t.TransactionId.Contains(s.Key.ControlNumber)).Select(t => t.Customer).FirstOrDefaultAsync(),
+                //                ProdDate = s.Key.ProdDate,
+                //                ProdVersion = s.Key.ProdVer,
+                //                Quantity = s.Sum(x => x.Quantity),
+                //                Box  = s.Sum(x => x.Box) ?? 0,
+                //                EntryDate = s.Key.EntryDate,
+                //            })
+                //            .ToListAsync();
+
+                var groupedData = await _context.TransactionHistories
+                                .Where(s => s.ControlNumber.Contains("SHIPID")
+                                         && s.Remarks != "Cancelled Shipment"
+                                         && s.Status != "Cancelled"
+                                         && s.EntryDate >= startDate
+                                         && s.EntryDate <= endDate)
+                                .GroupBy(s => new { s.Partnumber, s.ControlNumber, s.ProdDate, s.ProdVer, s.CustomerId, s.EntryDate })
+                                .Select(s => new
+                                {
+                                    s.Key.ControlNumber,
+                                    s.Key.Partnumber,
+                                    s.Key.ProdDate,
+                                    ProdVersion = s.Key.ProdVer,
+                                    Quantity = s.Sum(x => x.Quantity),
+                                    Box = s.Sum(x => x.Box) ?? 0,
+                                    s.Key.EntryDate,
+                                })
+                                .ToListAsync();
+
+                                            // 2. Fetch customers sequentially or perform an in-memory lookup
+                                            var result = new List<ShipmentReport>();
+
+                                            foreach (var item in groupedData)
+                                            {
+                                                var customer = await _context.ShipmentTables
+                                                    .Where(t => t.TransactionId.Contains(item.ControlNumber))
+                                                    .Select(t => t.Customer)
+                                                    .FirstOrDefaultAsync();
+
+                                                result.Add(new ShipmentReport
+                                                {
+                                                    ControlNumber = item.ControlNumber,
+                                                    Partnumber = item.Partnumber,
+                                                    Customer = customer,
+                                                    ProdDate = item.ProdDate,
+                                                    ProdVersion = item.ProdVersion,
+                                                    Quantity = item.Quantity,
+                                                    Box = item.Box,
+                                                    EntryDate = item.EntryDate
+                                                });
+                                            }
+
+               return result;
             }catch 
             {
                 return [];

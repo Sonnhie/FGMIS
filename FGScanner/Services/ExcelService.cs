@@ -97,7 +97,9 @@ namespace FGScanner.Services
                 productionVersion = leftPart[4];
             }
 
-            if (!DateOnly.TryParseExact(productionDate, "dd-MM-yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var ProdDate))
+            string[] formats = { "yyyy-MM-dd", "MM-dd-yy", "MM-dd-yyyy", "dd-MM-yy" };
+
+            if (!DateOnly.TryParseExact(productionDate, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var ProdDate))
             {
                 return (false, "Invalid production date format.", null);
             }
@@ -148,36 +150,34 @@ namespace FGScanner.Services
             string initial = "";
 
 
-            //Convert the QR code to uppercase and split it into parts
-            var toUpperQRCode = QRCode.ToUpper();
-            var SlashedPart = toUpperQRCode.Split('/');
-            var leftPart = SlashedPart[0].Split('-');
-            var rightPart = SlashedPart[1].Split('-');
-            initial = rightPart[0].Substring(1);
-            quantity = initial.Substring(0, initial.Length - 2);
-            productionDate = rightPart[0].Substring(rightPart[0].Length - 2) + "-" + rightPart[1] + "-" + rightPart[2];
-
-
             //Check if the QR code format is valid
+            if (string.IsNullOrWhiteSpace(QRCode))
+            {
+                return (false, "Invalid QR Code format.", null);
+            }
+
+            // Convert the QR code to uppercase and validate its structure before indexing its parts.
+            var toUpperQRCode = QRCode.Trim().ToUpperInvariant();
+            var SlashedPart = toUpperQRCode.Split('/');
             if (SlashedPart.Length != 2)
             {
                 return (false, "Invalid QR Code format.", null);
             }
 
-            if (leftPart.Length < 2)
+            var leftPart = SlashedPart[0].Split('-');
+            var rightPart = SlashedPart[1].Split('-');
+
+            if (leftPart.Length < 2 || leftPart.Length > 5 || rightPart.Length != 3 ||
+                string.IsNullOrWhiteSpace(rightPart[0]) || rightPart[0].Length < 4 ||
+                string.IsNullOrWhiteSpace(rightPart[1]) || string.IsNullOrWhiteSpace(rightPart[2]) ||
+                !rightPart[0].StartsWith('O'))
             {
                 return (false, "Invalid QR Code format.", null);
             }
 
-            else if (rightPart.Length != 3)
-            {
-                return (false, "Invalid QR Code format.", null);
-            }
-
-            else if (!rightPart[0].StartsWith('O'))
-            {
-                return (false, "Invalid QR Code format.", null);
-            }
+            initial = rightPart[0].Substring(1);
+            quantity = initial.Substring(0, initial.Length - 2);
+            productionDate = rightPart[0].Substring(rightPart[0].Length - 2) + "-" + rightPart[1] + "-" + rightPart[2];
 
 
             //Parse the QR Code data of left part to get the part number and production version
@@ -210,9 +210,9 @@ namespace FGScanner.Services
                 return (false, "Invalid production date format.", null);
             }
 
-            if (!int.TryParse(quantity, out int Quantity))
+            if (!int.TryParse(quantity, out int Quantity) || Quantity <= 0)
             {
-                return (false, "Invalid quantity format.", null);
+                return (false, "Quantity must be greater than zero.", null);
             }
 
             if (string.IsNullOrWhiteSpace(partNumber))
@@ -232,12 +232,6 @@ namespace FGScanner.Services
             {
                 return (false, "Customer ID not found for the part number.", null);
             }
-
-            if (product.Pps != Quantity)
-            {
-                return (false, "Invalid PPS.", null);
-            }
-
 
             //Create a new ScannedModel object to store the scanned item
             var scannedItem = new ScannedData
@@ -398,20 +392,22 @@ namespace FGScanner.Services
                                     return (false, $"{ScanItem.PartNumber} with Lot date: {ScanItem.ProductionDate} does not exist on location {ScanItem.Location}", null);
                                 }
 
-                                var currentScanQty = validScan.Where(x => x.PartNumber == reference.Partnumber && x.ProductionDate == reference.ProdDate).Sum(x => x.Quantity);
-                                var projectedQty = currentScanQty + ScanItem.Quantity;
-                                if (projectedQty <= reference.Quantity)
-                                {
-                                    validScan.Add(ScanItem);
-                                }
-                                else
-                                {
-                                    return (false,
-                                             $"Stock overflow for {ScanItem.PartNumber}!\n" +
-                                             $"Available Stock: {reference.Quantity} \n" +
-                                             $"Currently Scanned: {currentScanQty} \n" +
-                                             $"Attempted to add: {ScanItem.Quantity}", null);
-                                }
+                                //var currentScanQty = validScan.Where(x => x.PartNumber == reference.Partnumber && x.ProductionDate == reference.ProdDate).Sum(x => x.Quantity);
+                                //var projectedQty = currentScanQty + ScanItem.Quantity;
+                                //if (projectedQty <= reference.Quantity)
+                                //{
+                                //    validScan.Add(ScanItem);
+                                //}
+                                //else
+                                //{
+                                //    return (false,
+                                //             $"Stock overflow for {ScanItem.PartNumber}!\n" +
+                                //             $"Available Stock: {reference.Quantity} \n" +
+                                //             $"Currently Scanned: {currentScanQty} \n" +
+                                //             $"Attempted to add: {ScanItem.Quantity}", null);
+                                //}
+
+                                validScan.Add(ScanItem);
                             }
                             else
                             {
@@ -673,7 +669,7 @@ namespace FGScanner.Services
                                     return (false, $"{ScanItem.PartNumber} with Lot date: {ScanItem.ProductionDate} does not exist on location {ScanItem.Location}", null);
                                 }
 
-                                var currentScanQty = validScan.Where(x => x.PartNumber == reference.Partnumber && x.ProductionDate == reference.ProdDate).Sum(x => x.Quantity);
+                                var currentScanQty = validScan.Where(x => x.PartNumber == reference.Partnumber && x.ProductionDate == reference.ProdDate && x.Location == reference.Location).Sum(x => x.Quantity);
                                 var projectedQty = currentScanQty + ScanItem.Quantity;
                                 if (projectedQty <= reference.Quantity)
                                 {

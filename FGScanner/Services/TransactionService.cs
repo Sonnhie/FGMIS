@@ -128,10 +128,10 @@ namespace FGScanner.Services
                         return (false, "Partnumber not exist in database.");
                     }
 
-                    if (isExist.Pps != data.Quantity)
-                    {
-                        return (false, "Invalid PPS Quantity");
-                    }
+                    //if (isExist.Pps != data.Quantity)
+                    //{
+                    //    return (false, "Invalid PPS Quantity");
+                    //}
                 }
 
                 return await _queries.InsertFGOutgoingItems(ScanItem, warehouseid, id, transaction_type, userid, marketcode, remarks);
@@ -145,13 +145,13 @@ namespace FGScanner.Services
 
 
         public async Task<(bool isSuccess, string Message, List<ScannedData> ValidItems, List<string> OverflowWarnings)> InsertReturns(
-      List<ScannedData> scanItems,
-      string warehouseId,
-      string id,
-      string transactionType,
-      string userId,
-      string remarks,
-      string location)
+          List<ScannedData> scanItems,
+          string warehouseId,
+          string id,
+          string transactionType,
+          string userId,
+          string remarks,
+          string location)
         {
             try
             {
@@ -173,17 +173,9 @@ namespace FGScanner.Services
                 foreach (var item in scanItems)
                 {
                     if (string.IsNullOrWhiteSpace(item.PartNumber)) continue;
-
-                    // FIX for CS0019 & CS1061: Use TryGetValue or check default KeyValuePair
                     if (!masterProducts.TryGetValue(item.PartNumber, out var product) || product == null)
                     {
                         return (false, $"Partnumber '{item.PartNumber}' does not exist in database.", new List<ScannedData>(), new List<string>());
-                    }
-
-                    // FIX: Product is now properly extracted from the dictionary value
-                    if (product.Pps != item.Quantity)
-                    {
-                        return (false, $"Invalid PPS Quantity for Partnumber '{item.PartNumber}'. Expected: {product.Pps}, Got: {item.Quantity}", new List<ScannedData>(), new List<string>());
                     }
                 }
 
@@ -194,7 +186,7 @@ namespace FGScanner.Services
                 var overflowWarnings = new List<string>();
 
                 string GetCompositeKey(string partNo, DateOnly prodDate, string prodVer, string wh, string loc)
-                    => $"{partNo}|{prodDate:yyyy-MM-dd}|{prodVer}|{wh}|{loc}";
+                        => $"{partNo?.Trim().ToUpper()}|{prodDate:yyyy-MM-dd}|{prodVer?.Trim().ToUpper()}|{wh?.Trim().ToUpper()}|{loc?.Trim().ToUpper()}";
 
                 foreach (var item in scanItems)
                 {
@@ -225,9 +217,20 @@ namespace FGScanner.Services
                     runningTotals[compositeKey] = projectedQty;
                 }
 
-                if (!validItems.Any())
+                // All-or-Nothing check: If any item exceeds available stock, abort the entire transaction
+                if (overflowWarnings.Count > 0)
                 {
-                    return (false, "All items were skipped due to stock overflow limits.", validItems, overflowWarnings);
+                    string warningList = string.Join("\n- ", overflowWarnings.Take(10));
+                    if (overflowWarnings.Count > 10)
+                    {
+                        warningList += "\n...and " + (overflowWarnings.Count - 10) + " more.";
+                    }
+                    return (false, $"Validation Failed. No items were uploaded due to stock overflow limits:\n\n- {warningList}", new List<ScannedData>(), overflowWarnings);
+                }
+
+                if (validItems.Count == 0)
+                {
+                    return (false, "No valid items to return.", validItems, overflowWarnings);
                 }
 
                 // 3. Save Valid Items to Database
@@ -245,34 +248,6 @@ namespace FGScanner.Services
                 return (false, $"Error: {ex.Message}", new List<ScannedData>(), new List<string>());
             }
         }
-
-
-        //public async Task<(bool isSuccess, string Message)> InsertReturns(List<ScannedData> ScanItem, string warehouseid, string id, string transaction_type, string userid, string remarks, string location)
-        //{
-        //    try
-        //    {
-        //        foreach (var data in ScanItem)
-        //        {
-        //            var isExist = await _queries.GetProductInfo(data.PartNumber);
-        //            if (isExist == null)
-        //            {
-        //                return (false, "Partnumber not exist in database.");
-        //            }
-
-        //            if (isExist.Pps != data.Quantity)
-        //            {
-        //                return (false, "Invalid PPS Quantity");
-        //            }
-        //        }
-
-        //        return await _queries.InsertReturnItems(ScanItem, warehouseid, id, transaction_type, userid, remarks, location);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        string errorMessage = ex.Message;
-        //        return (false, $"Error: {errorMessage}");
-        //    }
-        //}
 
         public async Task<List<TransactionHistory>> getItemsByReturns(string docnum)
         {

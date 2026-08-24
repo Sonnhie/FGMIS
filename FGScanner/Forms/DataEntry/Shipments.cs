@@ -28,7 +28,9 @@ namespace FGScanner.Forms.DataEntry
         private string _userid;
         private List<ScannedData> validScan = new List<ScannedData>();
         private BindingList<DPIList> DPIItems = new BindingList<DPIList>();
-        private Dictionary<string, DPIList> DPIDict = new Dictionary<string, DPIList>();
+        private Dictionary<string, DPIList> DPIDict = new(StringComparer.OrdinalIgnoreCase);
+
+        private static string NormalizePartNumber(string partNumber) => partNumber?.Trim() ?? string.Empty;
 
         public Shipments(string userid)
         {
@@ -58,14 +60,15 @@ namespace FGScanner.Forms.DataEntry
             }
 
             DPIDict = DPIItems
-                .GroupBy(x => x.Partnumber)
+                .Where(x => !string.IsNullOrWhiteSpace(x.Partnumber))
+                .GroupBy(x => NormalizePartNumber(x.Partnumber), StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x.Key, x => new DPIList
                 {
                     Partnumber = x.Key,
                     Quantity = x.Sum(s => s.Quantity),
                     PPS = x.First().PPS,
                     Box = x.Sum(m => m.Box)
-                });
+                }, StringComparer.OrdinalIgnoreCase);
         }
 
         private void LoadDPITable()
@@ -263,134 +266,152 @@ namespace FGScanner.Forms.DataEntry
 
         private async void SelectFileButton_Click(object sender, EventArgs e)
         {
-            string warehouse = WarehouseComboBox.Text;
+            string warehouse = WarehouseComboBox.Text.Trim();
             if (string.IsNullOrWhiteSpace(warehouse))
             {
-                MessageBox.Show("Please select a warehouse.");
+                MessageBox.Show("Please select a warehouse.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
             using OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Excel Files|*.xlsx;*.xls";
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+
+            string filePath = openFileDialog.FileName;
+            FileTextbox.Text = filePath;
+            FileInfo fileInfo = new(filePath);
+
+            var progress = new Progress<int>(value =>
             {
+                toolStripProgressBar1.Value = value;
+                toolStripStatusLabel1.Text = $"Processing: {value}%";
+            });
 
-                string filePath = openFileDialog.FileName;
-                FileTextbox.Text = filePath;
-                FileInfo fileinfo = new(filePath);
-                var progress = new Progress<int>(value =>
+            validScan.Clear();
+
+            try
+            {
+                toolStripProgressBar1.Visible = true;
+                toolStripStatusLabel1.Visible = true;
+                toolStripStatusLabel1.Text = "Processing: 0%";
+
+                var result = await _excelService.ProcessFgShipmentUpload(fileInfo, progress, warehouse);
+
+                if (result.isSuccess && result.ScanItem != null)
                 {
-                    toolStripProgressBar1.Value = value;
-                    toolStripStatusLabel1.Text = $"Processing: {value}%";
-                });
-                validScan.Clear();
-                try
-                {
-                    toolStripProgressBar1.Visible = true;
-                    toolStripStatusLabel1.Visible = true;
-                    toolStripStatusLabel1.Text = "Processing: 0%";
-                    var result = await _excelService.ProcessFgShipmentUpload(fileinfo, progress, warehouse);
-                    if (result.isSuccess)
+                    HashSet<string> missingDpiItems = new();
+                    Dictionary<string, string> excessItems = new();
+                    Dictionary<string, string> stockOverflowItems = new();
+
+                    // DPI limits apply per part; stock limits apply per exact inventory record.
+                    Dictionary<string, int> dpiRunningTotals = new(StringComparer.OrdinalIgnoreCase);
+                    Dictionary<string, int> stockRunningTotals = new();
+
+                    var stockDICT = await _queries.GetStocks(result.ScanItem);
+
+                    static string GetKey(string partNo, DateOnly prodDate, string prodVer, string wh, string loc)
+                        => $"{partNo?.Trim().ToUpper()}|{prodDate:yyyy-MM-dd}|{prodVer?.Trim().ToUpper()}|{wh?.Trim().ToUpper()}|{loc?.Trim().ToUpper()}";
+
+                    foreach (var item in result.ScanItem)
                     {
+                        if (string.IsNullOrWhiteSpace(item.PartNumber)) continue;
 
-                        if (result.ScanItem != null)
+                        string dpiKey = NormalizePartNumber(item.PartNumber);
+                        string stockKey = GetKey(item.PartNumber, item.ProductionDate, item.ProductionVersion, warehouse, item.Location);
+
+                        // Check DPI Master Plan existence
+                        if (!DPIDict.TryGetValue(dpiKey, out var reference))
                         {
-                            HashSet<string> missingDpiItems = [];
-                            Dictionary<string, string> excessItems = [];
-                            Dictionary<string, int> runningTotals = validScan
-                                                .GroupBy(x => $"{x.PartNumber}|{x.ProductionDate}|{x.ProductionVersion}|{warehouse}|{x.Location}")
-                                                .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
-                            Dictionary<string, string> stockOverflowItems = [];
-                            
-                            var stockDICT = await _queries.GetStocks(result.ScanItem);
-
-
-                            foreach (var item in result.ScanItem)
-                            {
-                                if (string.IsNullOrWhiteSpace(item.PartNumber)) continue;
-
-                                string stockKey = $"{item.PartNumber}|{item.ProductionDate}|{item.ProductionVersion}|{warehouse}|{item.Location}";
-                                stockDICT.TryGetValue(stockKey, out int stockCount);
-                              
-
-                                if (!DPIDict.TryGetValue(item.PartNumber, out var reference))
-                                {
-                                    missingDpiItems.Add(item.PartNumber);
-                                    continue;
-                                }
-
-                                string key = $"{item.PartNumber}|{item.ProductionDate}|{item.ProductionVersion}|{warehouse}|{Location}";
-                                runningTotals.TryGetValue(key, out int currentScan);
-                                var projectedQty = currentScan + item.Quantity;
-
-                                if (projectedQty > reference.Quantity)
-                                {
-                                    excessItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedQty}, Limit: {reference.Quantity}, Production: {item.ProductionDate}, Rack: {item.Location})";
-                                    continue;
-                                }
-
-                                if (projectedQty > stockCount)
-                                {
-                                    stockOverflowItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedQty}, Stock: {stockCount}, Production: {item.ProductionDate}, Rack: {item.Location})";
-                                    continue;
-                                }
-
-                                validScan.Add(item);
-                                runningTotals[item.PartNumber] = projectedQty;
-                            }
-
-                            if (missingDpiItems.Count > 0 || excessItems.Count > 0 || stockOverflowItems.Count > 0)
-                            {
-                                string warningMessage = "Upload finished, but some items were skipped:\n\n";
-
-                                if (missingDpiItems.Count > 0)
-                                    warningMessage += $"Missing from DPI Plan: {missingDpiItems.Count} items.\n";
-
-                                if (excessItems.Count > 0)
-                                {
-                                    var excessToDisplay = excessItems.Values.Take(10);
-                                    warningMessage += $"Exceeded DPI Limits:\n{string.Join("\n", excessToDisplay)}";
-                                    if (excessItems.Count > 10)
-                                        warningMessage += $"\n...and {excessItems.Count - 10} more.";
-                                }
-
-                                if (stockOverflowItems.Count > 0)
-                                {
-                                    var overflowToDisplay = stockOverflowItems.Values;
-                                    warningMessage += $"Stock Overflows:\n- {string.Join("\n- ", overflowToDisplay)}";
-                                }
-                                MessageBox.Show(warningMessage, "Partial Success", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                return;
-                            }
-                            else
-                            {
-                                MessageBox.Show(result.Message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            }
+                            missingDpiItems.Add(item.PartNumber);
+                            continue;
                         }
 
-                        MessageBox.Show(result.Message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        dpiRunningTotals.TryGetValue(dpiKey, out int currentDpiScan);
+                        stockRunningTotals.TryGetValue(stockKey, out int currentStockScan);
+
+                        int projectedDpiQty = currentDpiScan + item.Quantity;
+                        int projectedStockQty = currentStockScan + item.Quantity;
+
+                        if (projectedDpiQty > reference.Quantity)
+                        {
+                            excessItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedDpiQty}, Limit: {reference.Quantity}, Production: {item.ProductionDate:yyyy-MM-dd}, Rack: {item.Location})";
+                            continue;
+                        }
+
+                        stockDICT.TryGetValue(stockKey, out int stockCount);
+                        if (projectedStockQty > stockCount)
+                        {
+                            stockOverflowItems[item.PartNumber] = $"- {item.PartNumber} (Attempted: {projectedStockQty}, Stock: {stockCount}, Production: {item.ProductionDate:yyyy-MM-dd}, Rack: {item.Location})";
+                            continue;
+                        }
+
+                        // Accept item and update accumulated totals
+                        validScan.Add(item);
+                        dpiRunningTotals[dpiKey] = projectedDpiQty;
+                        stockRunningTotals[stockKey] = projectedStockQty;
+                    }
+
+                    // A shipment must be completely valid. Do not allow a partial file to be uploaded.
+                    if (missingDpiItems.Count > 0 || excessItems.Count > 0 || stockOverflowItems.Count > 0)
+                    {
+                        string warningMessage = "Shipment validation failed. No items were loaded for upload:\n\n";
+
+                        if (missingDpiItems.Count > 0)
+                        {
+                            var missingToDisplay = missingDpiItems.Take(10);
+                            warningMessage += $"Missing from DPI Plan ({missingDpiItems.Count} item(s)):\n- {string.Join("\n- ", missingToDisplay)}";
+                            if (missingDpiItems.Count > 10)
+                                warningMessage += $"\n...and {missingDpiItems.Count - 10} more.";
+                            warningMessage += "\n";
+                        }
+
+                        if (excessItems.Count > 0)
+                        {
+                            var excessToDisplay = excessItems.Values.Take(10);
+                            warningMessage += $"Exceeded DPI Limits:\n{string.Join("\n", excessToDisplay)}";
+                            if (excessItems.Count > 10)
+                                warningMessage += $"\n...and {excessItems.Count - 10} more.";
+                            warningMessage += "\n";
+                        }
+
+                        if (stockOverflowItems.Count > 0)
+                        {
+                            var overflowToDisplay = stockOverflowItems.Values;
+                            warningMessage += $"Stock Overflows:\n{string.Join("\n", overflowToDisplay)}";
+                            //if (stockOverflowItems.Count > 10)
+                            //    warningMessage += $"\n...and {stockOverflowItems.Count - 10} more.";
+                        }
+
+                        validScan.Clear();
+                        MessageBox.Show(warningMessage, "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
                     }
                     else
                     {
-
-                        MessageBox.Show(result.Message, "Upload Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("File validated and loaded successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"Error processing file: {ex.Message}");
+                    MessageBox.Show(result.Message, "Upload Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
-                finally
-                {
-                    LoadInventoryTable();
-                    DPITable.Refresh();
-                    toolStripProgressBar1.Value = 0;
-                    toolStripStatusLabel1.Text = "Ready";
-                    toolStripProgressBar1.Visible = false;
-                    toolStripStatusLabel1.Visible = false;
-                    UploadItemButton.Enabled = true;
-
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error processing file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            finally
+            {
+                LoadInventoryTable();
+                DPITable.Refresh();
+                toolStripProgressBar1.Value = 0;
+                toolStripStatusLabel1.Text = "Ready";
+                toolStripProgressBar1.Visible = false;
+                toolStripStatusLabel1.Visible = false;
+                UploadItemButton.Enabled = validScan.Count > 0;
             }
         }
 

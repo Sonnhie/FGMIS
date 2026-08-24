@@ -259,21 +259,14 @@ namespace FGScanner.Forms.DataEntry
 
                 if (isSuccess)
                 {
-                    if (overflowWarnings.Count > 0)
-                    {
-                        string warningMessage = "Upload finished, but some items were skipped due to stock limits:\n\n" +
-                                               $"Stock Overflows:\n- {string.Join("\n- ", overflowWarnings)}";
-                        MessageBox.Show(warningMessage, "Partial Success", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
-                    else
-                    {
-                        MessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                    MessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                     // Post-success cleanup
                     GenerateReturnSlipBtn.Enabled = true;
                     validScan.Clear(); // Clear memory buffer to prevent double uploads
-                    LoadReturnTable(); // Refresh UI table
+                    ReturnTable.DataSource = null;
+                    FileTextbox.Text = string.Empty;
+                    RemarkTextbox.Text = string.Empty;
                 }
                 else
                 {
