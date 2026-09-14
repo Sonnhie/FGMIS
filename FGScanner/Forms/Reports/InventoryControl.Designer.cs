@@ -65,7 +65,7 @@
             BtnExport.Name = "BtnExport";
             BtnExport.Size = new System.Drawing.Size(98, 32);
             BtnExport.TabIndex = 26;
-            BtnExport.Text = "Export to CSV";
+            BtnExport.Text = "Export to Excel";
             BtnExport.UseVisualStyleBackColor = true;
             BtnExport.Click += BtnExport_Click;
             // 

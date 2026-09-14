@@ -1,6 +1,7 @@
 ﻿using FGScanner.Database;
 using FGScanner.Forms.DataEntry;
 using FGScanner.Models;
+using FGScanner.Util;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System;
@@ -887,8 +888,16 @@ namespace FGScanner.Repositories
             return MappedList;
         }
 
+        private string GenerateTransactionNumber()
+        {
+            var Method = new TransactionRepo();
+            int seq = Method.GetNextDocumentId();
+            return $"{DateTime.Now:yyMMdd}{seq:D2}";
+        }
+
         public async Task<List<InventoryCardData>> GetInventoryCardDataByLocation(string location, string warehouseid, string userid)
         {
+            string CtrlNumber = GenerateTransactionNumber();
             var rawData = await _context.ActualInventories
                             .Where(x => x.Location == location && x.WhId == warehouseid)
                             .OrderBy(x => x.Partnumber)
@@ -908,6 +917,8 @@ namespace FGScanner.Repositories
                                int totalQuantity = cardRows.Sum(x => x.TotalQty);
                                int pps = GetProductPPS(group.Key);
                                int id = GetProductID(group.Key);
+                               
+
 
                                return new InventoryCardData
                                {
@@ -920,7 +931,8 @@ namespace FGScanner.Repositories
                                    GrandTotalBoxes = totalBox,
                                    GrandTotalQuantity = totalQuantity,
                                    PPS = pps,
-                                   PreparedBy = userid
+                                   PreparedBy = userid,
+                                   ControlNumber = CtrlNumber
                                };
                            })
                            .ToList();
@@ -1190,104 +1202,206 @@ namespace FGScanner.Repositories
         }
 
       
-        public async Task<StockCardHeader> GetStockLedger(string partnumber, DateTime startDate, DateTime endDate, string prodver, string warehouseid)
+        public Task<StockCardHeader> GetStockLedger(
+            string partnumber,
+            DateTime startDate,
+            DateTime endDate,
+            string prodver,
+            string warehouseid)
         {
+            return GetStockLedgerInternal(partnumber, startDate, endDate, prodver, warehouseid, detailed: false);
+        }
+
+        public Task<StockCardHeader> GetDetailedStockLedger(
+            string partnumber,
+            DateTime startDate,
+            DateTime endDate,
+            string prodver,
+            string warehouseid)
+        {
+            return GetStockLedgerInternal(partnumber, startDate, endDate, prodver, warehouseid, detailed: true);
+        }
+
+        private async Task<StockCardHeader> GetStockLedgerInternal(
+            string partnumber,
+            DateTime startDate,
+            DateTime endDate,
+            string prodver,
+            string warehouseid,
+            bool detailed)
+        {
+            if (string.IsNullOrWhiteSpace(partnumber) ||
+                string.IsNullOrWhiteSpace(prodver) ||
+                string.IsNullOrWhiteSpace(warehouseid))
+            {
+                return null;
+            }
+
+            DateTime periodStart = startDate.Date;
+            DateTime periodEnd = endDate.Date;
+            if (periodEnd < periodStart)
+            {
+                return null;
+            }
+
+            DateTime periodEndExclusive = periodEnd.AddDays(1);
+            string normalizedPartnumber = partnumber.Trim();
+            string normalizedProdver = prodver.Trim();
+            string normalizedWarehouse = warehouseid.Trim();
+
             try
             {
-                var beginningBalance = await _context.TransactionHistories
-                    .Where(t => t.Partnumber == partnumber && t.EntryDate < startDate && t.ProdVer == prodver && t.WhId == warehouseid)
-                    .SumAsync(t => t.TransactionType == "IN" ? t.Quantity : t.TransactionType == "OUT" ? -t.Quantity : 0);
+                var filteredTransactions = _context.TransactionHistories
+                    .AsNoTracking()
+                    .Where(transaction =>
+                        transaction.Partnumber == normalizedPartnumber &&
+                        transaction.ProdVer == normalizedProdver &&
+                        transaction.WhId == normalizedWarehouse &&
+                        transaction.Quantity > 0 &&
+                        (transaction.TransactionType == "IN" || transaction.TransactionType == "OUT"));
 
-                var dailyTransaction = await _context.TransactionHistories
-                    .Where(t => t.Partnumber == partnumber
-                             && t.ProdVer == prodver
-                             && t.EntryDate >= startDate
-                             && t.EntryDate < endDate.AddDays(1)
-                             && t.Quantity > 0
-                             && t.WhId == warehouseid)
-                    .GroupBy(t => new { TransactionDate = t.EntryDate.Date, t.InCharge, t.Remarks })
-                    .Select(t => new
+                int beginningBalance = await filteredTransactions
+                    .Where(transaction => transaction.EntryDate < periodStart)
+                    .SumAsync(transaction => transaction.TransactionType == "IN"
+                        ? transaction.Quantity
+                        : -transaction.Quantity);
+
+                var transactions = await filteredTransactions
+                    .Where(transaction =>
+                        transaction.EntryDate >= periodStart &&
+                        transaction.EntryDate < periodEndExclusive)
+                    .OrderBy(transaction => transaction.EntryDate)
+                    .ThenBy(transaction => transaction.Id)
+                    .Select(transaction => new
                     {
-                        TransactionDay = t.Key.TransactionDate,
-                        ExactTime = t.Max(x => x.EntryDate),
-                        Incharge = t.Key.InCharge,
-                        TotalIN = t.Where(x => x.TransactionType == "IN").Sum(x => x.Quantity),
-                        TotalOUT = t.Where(x => x.TransactionType == "OUT" && (
-                                   x.ControlNumber.Contains("AS-") ||
-                                   x.ControlNumber.Contains("SHIP-") ||
-                                   x.Remarks.Contains("Transfer to") ||
-                                   x.Remarks.Contains("Transfer from") ||
-                                   x.Remarks.Contains("Cancelled") ||
-                                   x.Remarks == "Manual Deduction - Excess Scan" ||
-                                   x.Remarks == "Manual Deduction - Damaged Goods" ||
-                                   x.Remarks == "Quality Control Testing - OUT" ||
-                                   x.Remarks == "Manual Deduction - Cycle Count Adjustment"
-                        )).Sum(x => x.Quantity),
-                        OutTransaction = t.Where(x => x.TransactionType == "OUT").FirstOrDefault(),
-                        InTransaction = t.Where(x => x.TransactionType == "IN").FirstOrDefault(),
+                        transaction.Id,
+                        transaction.EntryDate,
+                        transaction.TransactionType,
+                        transaction.Quantity,
+                        transaction.ControlNumber,
+                        transaction.Remarks,
+                        transaction.InCharge
                     })
-                    .OrderBy(x => x.TransactionDay)
-                    .ThenBy(x => x.ExactTime)
                     .ToListAsync();
-                
+
                 var stockCard = new StockCardHeader
                 {
-                    PartNumber = partnumber,
-                    PartName = GetProductPartName(partnumber),
-                    Customer = GetProductCustomer(partnumber),
-                    Ledgers = new List<StockLedger>()
+                    PartNumber = normalizedPartnumber,
+                    PartName = GetProductPartName(normalizedPartnumber),
+                    Customer = GetProductCustomer(normalizedPartnumber)
                 };
 
-                int currentStock = beginningBalance;
-
-                foreach (var item in dailyTransaction)
+                var ledgerRows = transactions.Select(transaction => new
                 {
-                    int startingStockForDay = currentStock;
-                    currentStock += (item.TotalIN - item.TotalOUT);
+                    transaction.Id,
+                    transaction.EntryDate,
+                    transaction.TransactionType,
+                    transaction.Quantity,
+                    ControlNumber = transaction.ControlNumber ?? string.Empty,
+                    Remarks = transaction.Remarks ?? string.Empty,
+                    InCharge = transaction.InCharge ?? string.Empty,
+                    Category = GetLedgerCategory(
+                        transaction.TransactionType,
+                        transaction.ControlNumber,
+                        transaction.Remarks)
+                });
 
-                    string finalRemarks = "";
-
-                    if (item.OutTransaction != null)
+                var rows = detailed
+                    ? ledgerRows.Select(transaction => new
                     {
-                        finalRemarks = item.OutTransaction.Remarks ?? string.Empty;
-                    }
-
-                    if (item.InTransaction != null)
-                    {
-                        string inRemarks = item.InTransaction.Remarks ?? string.Empty;
-
-                        if (inRemarks.StartsWith("Transfer") ||
-                            inRemarks.StartsWith("Cancelled Returns") ||
-                            inRemarks.StartsWith("Cancelled Shipment"))
+                        InventoryDate = transaction.EntryDate,
+                        ExactTime = transaction.EntryDate,
+                        transaction.Id,
+                        transaction.Category,
+                        transaction.ControlNumber,
+                        transaction.Remarks,
+                        transaction.InCharge,
+                        In = transaction.TransactionType == "IN" ? transaction.Quantity : 0,
+                        Out = transaction.TransactionType == "OUT" ? transaction.Quantity : 0
+                    })
+                    : ledgerRows
+                        .GroupBy(transaction => new
                         {
-                            finalRemarks = inRemarks;
-                        }
-                    }
+                            TransactionDay = transaction.EntryDate.Date,
+                            transaction.Category,
+                            transaction.InCharge
+                        })
+                        .Select(group => new
+                        {
+                            InventoryDate = group.Key.TransactionDay,
+                            ExactTime = group.Min(transaction => transaction.EntryDate),
+                            Id = group.Min(transaction => transaction.Id),
+                            group.Key.Category,
+                            ControlNumber = string.Join(", ", group
+                                .Select(transaction => transaction.ControlNumber)
+                                .Where(value => !string.IsNullOrWhiteSpace(value))
+                                .Distinct(StringComparer.OrdinalIgnoreCase)),
+                            Remarks = string.Join(", ", group
+                                .Select(transaction => transaction.Remarks)
+                                .Where(value => !string.IsNullOrWhiteSpace(value))
+                                .Distinct(StringComparer.OrdinalIgnoreCase)),
+                            group.Key.InCharge,
+                            In = group.Where(transaction => transaction.TransactionType == "IN").Sum(transaction => transaction.Quantity),
+                            Out = group.Where(transaction => transaction.TransactionType == "OUT").Sum(transaction => transaction.Quantity)
+                        });
 
-                  
+                int currentStock = beginningBalance;
+                foreach (var row in rows.OrderBy(row => row.ExactTime).ThenBy(row => row.Id))
+                {
+                    int rowBeginningStock = currentStock;
+                    currentStock += row.In - row.Out;
+
                     stockCard.Ledgers.Add(new StockLedger
                     {
-                        InventoryDate = item.TransactionDay,
-                        BeginningStock = startingStockForDay, 
-                        In = item.TotalIN,
-                        Out = item.TotalOUT,
+                        InventoryDate = row.InventoryDate,
+                        BeginningStock = rowBeginningStock,
+                        In = row.In,
+                        Out = row.Out,
                         RunningStock = currentStock,
-                        Incharge = item.Incharge ?? string.Empty,
-                        Remarks = finalRemarks
-                        
+                        Category = row.Category,
+                        ControlNumber = row.ControlNumber,
+                        Incharge = row.InCharge,
+                        Remarks = row.Remarks
                     });
                 }
 
-               
                 stockCard.EndingStock = currentStock;
-
-               
                 return stockCard;
             }
             catch
             {
                 return null;
             }
+        }
+
+        private static string GetLedgerCategory(string transactionType, string controlNumber, string remarks)
+        {
+            string normalizedControlNumber = controlNumber ?? string.Empty;
+            string normalizedRemarks = remarks ?? string.Empty;
+
+            if (normalizedRemarks.StartsWith("Transfer", StringComparison.OrdinalIgnoreCase))
+                return "Transfer";
+
+            if (normalizedRemarks.StartsWith("Cancelled", StringComparison.OrdinalIgnoreCase))
+                return "Cancellation";
+
+            if (normalizedRemarks.StartsWith("Manual Deduction", StringComparison.OrdinalIgnoreCase) ||
+                normalizedRemarks.Equals("Quality Control Testing - OUT", StringComparison.OrdinalIgnoreCase))
+                return "Stock Adjustment";
+
+            if (normalizedControlNumber.StartsWith("SHIPID-", StringComparison.OrdinalIgnoreCase))
+                return "Shipment";
+
+            if (normalizedControlNumber.StartsWith("AS-", StringComparison.OrdinalIgnoreCase))
+                return "Warehouse Return";
+
+            if (normalizedRemarks.Equals("BPPS", StringComparison.OrdinalIgnoreCase))
+                return "BPPS";
+
+            if (normalizedRemarks.Equals("FG", StringComparison.OrdinalIgnoreCase))
+                return "Finished Goods";
+
+            return transactionType == "IN" ? "Other IN" : "Other OUT";
         }
 
         public async Task<PagedResult<Product>> GetFilteredProductList(string partnumber = null, int pageNumber = 1, int pageSize = 50)
@@ -1386,35 +1500,24 @@ namespace FGScanner.Repositories
 
         public async Task<List<CustomerStock>> GetCustomerStocksAsync()
         {
-            try
-            {
-                using var dbContext = new InventoryDbContext();
-                var stocks = new List<CustomerStock>();
-                var result = await dbContext.TransactionHistories
-                                  .GroupBy(x => x.CustomerId)
-                                  .Select(x => new
-                                  {
-                                      Customer = x.Key,
-                                      TotalIn = x.Where(x => x.TransactionType == "IN").Sum(x => x.Quantity),
-                                      TotalOUT = x.Where(x => x.TransactionType == "OUT").Sum(x => x.Quantity)
-                                  })
-                                  .ToListAsync();
-                foreach(var item in result)
+            var totals = await _context.ActualInventories
+                .AsNoTracking()
+                .Where(item => item.Customer != null && item.Customer.Trim() != string.Empty)
+                .GroupBy(item => item.Customer.Trim())
+                .Select(group => new
                 {
-                    int totalStock = item.TotalIn - item.TotalOUT;
-                    stocks.Add(new CustomerStock
-                    {
-                        Customer = item.Customer,
-                        Stock = totalStock
-                    });
-                }
+                    Customer = group.Key,
+                    Stock = group.Sum(item => (long)item.Quantity)
+                })
+                .Where(item => item.Stock > 0)
+                .OrderByDescending(item => item.Stock)
+                .ToListAsync();
 
-                return stocks;
-            }
-            catch
+            return totals.Select(item => new CustomerStock
             {
-                return [];
-            }
+                Customer = item.Customer,
+                Stock = item.Stock
+            }).ToList();
         }
 
         public async Task<List<MonthlyShipments>> GetMonthlyShipment(int year)

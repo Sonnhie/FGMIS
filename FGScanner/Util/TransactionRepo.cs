@@ -595,6 +595,30 @@ namespace FGScanner.Util
             return result;
         }
 
+        public int GetNextDocumentId()
+        {
+            int result = 0;
+            try
+            {
+                using (SqlConnection conn = _Connection.Getconnection())
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand("GetNextDocumentId", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        result = (int)(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "SQL Error");
+            }
+
+            return result;
+        }
+
         public string GetPartname(string partnumber)
         {
             string partName = string.Empty;

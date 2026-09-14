@@ -253,11 +253,12 @@
             // 
             // minimize
             // 
+            minimize.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             minimize.Cursor = System.Windows.Forms.Cursors.Hand;
             minimize.Image = (System.Drawing.Image)resources.GetObject("minimize.Image");
-            minimize.Location = new System.Drawing.Point(922, 9);
+            minimize.Location = new System.Drawing.Point(908, 7);
             minimize.Name = "minimize";
-            minimize.Size = new System.Drawing.Size(20, 20);
+            minimize.Size = new System.Drawing.Size(28, 28);
             minimize.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             minimize.TabIndex = 10;
             minimize.TabStop = false;
@@ -265,11 +266,12 @@
             // 
             // closebutton
             // 
+            closebutton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             closebutton.Cursor = System.Windows.Forms.Cursors.Hand;
             closebutton.Image = (System.Drawing.Image)resources.GetObject("closebutton.Image");
-            closebutton.Location = new System.Drawing.Point(948, 9);
+            closebutton.Location = new System.Drawing.Point(944, 7);
             closebutton.Name = "closebutton";
-            closebutton.Size = new System.Drawing.Size(20, 20);
+            closebutton.Size = new System.Drawing.Size(28, 28);
             closebutton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             closebutton.TabIndex = 8;
             closebutton.TabStop = false;

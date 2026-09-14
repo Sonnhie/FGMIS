@@ -70,9 +70,9 @@
             button1.Location = new System.Drawing.Point(426, 317);
             button1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             button1.Name = "button1";
-            button1.Size = new System.Drawing.Size(88, 27);
+            button1.Size = new System.Drawing.Size(86, 27);
             button1.TabIndex = 8;
-            button1.Text = "Out";
+            button1.Text = "Deduct Stock";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 

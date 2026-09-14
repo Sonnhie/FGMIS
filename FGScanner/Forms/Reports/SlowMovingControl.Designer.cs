@@ -72,7 +72,7 @@
             TxtPartnumber.Location = new System.Drawing.Point(28, 22);
             TxtPartnumber.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             TxtPartnumber.Name = "TxtPartnumber";
-            TxtPartnumber.PlaceholderText = "Search Partnumber. customer, production version";
+            TxtPartnumber.PlaceholderText = "Search by part number, customer, or production version";
             TxtPartnumber.Size = new System.Drawing.Size(207, 23);
             TxtPartnumber.TabIndex = 32;
             // 

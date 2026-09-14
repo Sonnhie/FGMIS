@@ -1,93 +1,81 @@
-﻿using FGScanner.Util;
-using OfficeOpenXml;
-using OfficeOpenXml.Configuration;
-using System;
-using System.Collections.Generic;
+using FGScanner.Util;
 using Microsoft.Data.SqlClient;
-using System.Linq;
-using System.Runtime.CompilerServices;
+using OfficeOpenXml;
+using System;
+using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using FGScanner.Database;
-
 
 namespace FGScanner
 {
     internal static class Program
     {
-        private static readonly Util.db_connection _Connection = new Util.db_connection();
-
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
 
-            SplashScreen splash = new SplashScreen();
-            splash.Show();
-            splash.Refresh();
-            LoadResources(splash);
-            //Task.Run(() => LoadResources(splash))
-            //    .ContinueWith(test =>
-            //    {
-            //        splash.Invoke(new Action(() =>
-            //        {
-            //            warehousemenu menu = new warehousemenu();
-            //            menu.Show();
-            //            splash.Close();
-            //        }));
-            //    });
-            splash.Close();
+            using (SplashScreen splash = new())
+            {
+                splash.Show();
+                splash.Refresh();
+
+                try
+                {
+                    LoadResources(splash);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"FGIMS could not start.\n\n{ex.Message}",
+                        "Startup error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                splash.Close();
+            }
 
             Application.Run(new login());
         }
 
         static void LoadResources(SplashScreen splash)
         {
-            splash.UpdateProgress(10, "Loading configuration...");
-            Thread.Sleep(500);
+            Stopwatch minimumDisplayTime = Stopwatch.StartNew();
 
-            splash.UpdateProgress(20, "Initializing database...");
-            DatabaseTest();
-            Thread.Sleep(500);
+            splash.UpdateProgress(10, "Reading secure database configuration...");
+            db_connection connection = new();
 
-            splash.UpdateProgress(40,"Loading Excel library...");
-            Thread.Sleep(500);
+            splash.UpdateProgress(35, "Connecting to the inventory database...");
+            DatabaseTest(connection);
 
-            splash.UpdateProgress(60, "Loading Rack location...");
-            Thread.Sleep(500);
+            splash.UpdateProgress(65, "Initializing spreadsheet and reporting services...");
+            ExcelPackage.License.SetNonCommercialPersonal("NIDEC");
 
-            splash.UpdateProgress(80, "Finalizing...");
-            Thread.Sleep(300);
+            splash.UpdateProgress(85, "Checking application templates and resources...");
+            string templatePath = System.IO.Path.Combine(AppContext.BaseDirectory, "Templates");
+            if (!System.IO.Directory.Exists(templatePath))
+                throw new System.IO.DirectoryNotFoundException("The application Templates folder is missing.");
 
-            splash.UpdateProgress(100, "Starting system...");
-            Thread.Sleep(300);
+            splash.UpdateProgress(100, "Ready. Opening secure sign-in...");
+
+            int remainingMs = 900 - (int)minimumDisplayTime.ElapsedMilliseconds;
+            if (remainingMs > 0)
+                Thread.Sleep(remainingMs);
         }
 
-        static void DatabaseTest()
+        static void DatabaseTest(db_connection connection)
         {
-            using (SqlConnection conn = _Connection.Getconnection())
-            {
-               if(conn == null)
-                    throw new Exception("Failed to create database connection.");
-                try
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = new SqlCommand("SELECT TOP 1 * FROM actual_inventory", conn))
-                    {
-                        cmd.ExecuteScalar();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Database connection failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Environment.Exit(1);
-                }
-            }
+            using SqlConnection conn = connection.Getconnection();
+            conn.Open();
+            using SqlCommand cmd = new(
+                "SELECT CASE WHEN OBJECT_ID('dbo.actual_inventory','U') IS NULL THEN 0 ELSE 1 END",
+                conn);
+            int exists = Convert.ToInt32(cmd.ExecuteScalar());
+            if (exists != 1)
+                throw new Exception("The configured database does not contain the inventory tables required by FGIMS.");
         }
     }
 }

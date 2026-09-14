@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FGScanner.UI;
 
 namespace FGScanner
 {
@@ -30,6 +31,7 @@ namespace FGScanner
         public Viewer(string warehouse, string userid)
         {
             InitializeComponent();
+            EnterpriseTheme.Apply(this);
             LoadViewer(warehouse, userid);
             _warehouseName = warehouse;
             _userid = userid;
@@ -54,6 +56,7 @@ namespace FGScanner
 
         private void DisplayForm(Form forms)
         {
+            EnterpriseTheme.Apply(forms);
             panel1.Controls.Clear();
             forms.TopLevel = false;
             forms.Dock = DockStyle.Fill;
@@ -63,6 +66,7 @@ namespace FGScanner
 
         private void DisplayUsercontrol(UserControl forms)
         {
+            EnterpriseTheme.Apply(forms);
             panel1.Controls.Clear();
             forms.Dock = DockStyle.Fill;
             panel1.Controls.Add(forms);

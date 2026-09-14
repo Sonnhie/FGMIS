@@ -33,6 +33,19 @@ namespace FGScanner.Forms.Reports
             _dbContext = new();
             _queries = new(_dbContext);
             _excelService = new(_queries);
+            LedgerViewComboBox.SelectedIndex = 0;
+        }
+
+        private Task<StockCardHeader> FetchStockLedger(
+            string partnumber,
+            DateTime startDate,
+            DateTime endDate,
+            string prodver,
+            string warehouseid)
+        {
+            return LedgerViewComboBox.SelectedIndex == 1
+                ? _queries.GetDetailedStockLedger(partnumber, startDate, endDate, prodver, warehouseid)
+                : _queries.GetStockLedger(partnumber, startDate, endDate, prodver, warehouseid);
         }
 
         private async Task LoadData()
@@ -45,7 +58,7 @@ namespace FGScanner.Forms.Reports
                 DateTime postingDate2 = PostingDate2.Value.Date;
                 string prodver = ProdVerComboButton.Text;
 
-                var data = await _queries.GetStockLedger(partnumber, postingDate1, postingDate2, prodver, warehouseid);
+                var data = await FetchStockLedger(partnumber, postingDate1, postingDate2, prodver, warehouseid);
 
 
                 if (data == null || data.Ledgers.Count == 0)
@@ -57,12 +70,15 @@ namespace FGScanner.Forms.Reports
                 partnumberlbl.Text = data.PartNumber;
                 partnamelbl.Text = data.PartName;
                 customerlbl.Text = data.Customer;
+                endstocklbl.Text = data.Ledgers.First().BeginningStock.ToString();
 
                 if (data != null)
                 {
                     DataTable dt = new();
 
                     dt.Columns.Add("Inventory Date", typeof(DateTime));
+                    dt.Columns.Add("Category", typeof(string));
+                    dt.Columns.Add("Control Number", typeof(string));
                     dt.Columns.Add("IN", typeof(string));
                     dt.Columns.Add("OUT", typeof(string));
                     dt.Columns.Add("Running Stock", typeof(string));
@@ -80,6 +96,8 @@ namespace FGScanner.Forms.Reports
                         dt.Rows.Add
                         (
                            item.InventoryDate,
+                           item.Category,
+                           item.ControlNumber,
                            item.In,
                            item.Out,
                            item.RunningStock,
@@ -94,6 +112,8 @@ namespace FGScanner.Forms.Reports
                     StockCardtable.ReadOnly = true;
 
                     StockCardtable.Columns["Inventory Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    StockCardtable.Columns["Category"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    StockCardtable.Columns["Control Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     StockCardtable.Columns["IN"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     StockCardtable.Columns["OUT"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     StockCardtable.Columns["Running Stock"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -120,7 +140,7 @@ namespace FGScanner.Forms.Reports
             DateTime postingDate2 = PostingDate2.Value.Date;
             string prodver = ProdVerComboButton.Text;
             string Filename = $@"StockCard_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
-            var data = await _queries.GetStockLedger(partnumber, postingDate1, postingDate2, prodver, warehouseid);
+            var data = await FetchStockLedger(partnumber, postingDate1, postingDate2, prodver, warehouseid);
 
 
             if (data == null || data.Ledgers.Count == 0)

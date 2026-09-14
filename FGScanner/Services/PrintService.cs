@@ -1,5 +1,6 @@
 ﻿using FGScanner.Models;
 using FGScanner.Repositories;
+using FGScanner.Util;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -325,6 +326,7 @@ namespace FGScanner.Services
             int maxRowsPerPage = 8;
             int rowsDrawnOnThisPage = 0;
 
+
             g.DrawRectangle(borderPen, startX, startY, width, mainHeight);
 
             int currentY = startY;
@@ -352,7 +354,7 @@ namespace FGScanner.Services
 
             rowH = 80;
             g.DrawString("Control no.", bodyFont, textBrush, new Rectangle(startX + 5, currentY, midX - startX, rowH), leftFmt);
-            g.DrawString($"{data.ControlNo} - ({data.location})", largeDataFont, textBrush, new Rectangle(midX, currentY, (startX + width) - midX, rowH), centerFmt);
+            g.DrawString($"{data.ControlNumber} - ({data.location})", largeDataFont, textBrush, new Rectangle(midX, currentY, (startX + width) - midX, rowH), centerFmt);
             g.DrawLine(linePen, midX, currentY, midX, currentY + rowH * 2);
             currentY += rowH; g.DrawLine(linePen, startX, currentY, startX + width, currentY);
 
@@ -433,7 +435,7 @@ namespace FGScanner.Services
                     g.DrawString("Part No.", smallFont, textBrush, sx + 2, stubY + 32);
                     g.DrawString("Quantity", smallFont, textBrush, sx + 2, stubY + 58);
 
-                    g.DrawString(data.ControlNo.ToString(), smallFont, textBrush, new Rectangle(sx + labelW, stubY, dataW, 26), centerFmt);
+                    g.DrawString(data.ControlNumber, smallFont, textBrush, new Rectangle(sx + labelW, stubY, dataW, 26), centerFmt);
                     g.DrawString(data.PartNo, smallFont, textBrush, new Rectangle(sx + labelW, stubY + 26, dataW, 26), centerFmt);
                     g.DrawString(data.GrandTotalQuantity.ToString(), smallFont, textBrush, new Rectangle(sx + labelW, stubY + 52, dataW, 26), centerFmt);
 

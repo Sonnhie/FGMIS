@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             groupBox1 = new System.Windows.Forms.GroupBox();
+            label9 = new System.Windows.Forms.Label();
+            LedgerViewComboBox = new System.Windows.Forms.ComboBox();
             label8 = new System.Windows.Forms.Label();
             warehouseidcmb = new System.Windows.Forms.ComboBox();
             label7 = new System.Windows.Forms.Label();
@@ -62,6 +64,8 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(label9);
+            groupBox1.Controls.Add(LedgerViewComboBox);
             groupBox1.Controls.Add(label8);
             groupBox1.Controls.Add(warehouseidcmb);
             groupBox1.Controls.Add(label7);
@@ -80,7 +84,28 @@
             groupBox1.TabIndex = 3;
             groupBox1.TabStop = false;
             groupBox1.Text = "Filters";
-            // 
+            //
+            // label9
+            //
+            label9.AutoSize = true;
+            label9.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            label9.Location = new System.Drawing.Point(252, 127);
+            label9.Name = "label9";
+            label9.Size = new System.Drawing.Size(31, 18);
+            label9.TabIndex = 19;
+            label9.Text = "View:";
+            //
+            // LedgerViewComboBox
+            //
+            LedgerViewComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            LedgerViewComboBox.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            LedgerViewComboBox.FormattingEnabled = true;
+            LedgerViewComboBox.Items.AddRange(new object[] { "By Category", "Detailed" });
+            LedgerViewComboBox.Location = new System.Drawing.Point(289, 119);
+            LedgerViewComboBox.Name = "LedgerViewComboBox";
+            LedgerViewComboBox.Size = new System.Drawing.Size(116, 26);
+            LedgerViewComboBox.TabIndex = 18;
+            //
             // label8
             // 
             label8.AutoSize = true;
@@ -295,7 +320,7 @@
             BtnExport.Name = "BtnExport";
             BtnExport.Size = new System.Drawing.Size(91, 31);
             BtnExport.TabIndex = 17;
-            BtnExport.Text = "Export Csv";
+            BtnExport.Text = "Export to Excel";
             BtnExport.UseVisualStyleBackColor = true;
             BtnExport.Click += BtnExport_Click;
             // 
@@ -359,6 +384,8 @@
         #endregion
 
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.ComboBox LedgerViewComboBox;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ComboBox warehouseidcmb;
         private System.Windows.Forms.Label label7;

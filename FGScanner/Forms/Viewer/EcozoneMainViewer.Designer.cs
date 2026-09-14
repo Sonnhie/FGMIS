@@ -86,12 +86,12 @@
             // 
             button2.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             button2.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            button2.Location = new System.Drawing.Point(420, 542);
+            button2.Location = new System.Drawing.Point(350, 542);
             button2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             button2.Name = "button2";
-            button2.Size = new System.Drawing.Size(113, 46);
+            button2.Size = new System.Drawing.Size(183, 46);
             button2.TabIndex = 34;
-            button2.Text = "Generate Ledger";
+            button2.Text = "Preview Inventory Cards";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
@@ -105,6 +105,7 @@
             label10.Size = new System.Drawing.Size(78, 19);
             label10.TabIndex = 32;
             label10.Text = "Rack Details:";
+            label10.Visible = false;
             // 
             // RackDataGridView
             // 
@@ -195,6 +196,7 @@
             // 
             label7.AutoSize = true;
             label7.BackColor = System.Drawing.Color.White;
+            label7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             label7.Font = new System.Drawing.Font("Bahnschrift Condensed", 9.75F);
             label7.ForeColor = System.Drawing.Color.Black;
             label7.Location = new System.Drawing.Point(19, 44);
@@ -209,7 +211,7 @@
             LblRack.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             LblRack.AutoSize = true;
             LblRack.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            LblRack.Location = new System.Drawing.Point(114, 290);
+            LblRack.Location = new System.Drawing.Point(135, 290);
             LblRack.Name = "LblRack";
             LblRack.Size = new System.Drawing.Size(27, 19);
             LblRack.TabIndex = 15;
@@ -239,7 +241,7 @@
             label2.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             label2.AutoSize = true;
             label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            label2.Location = new System.Drawing.Point(17, 1108);
+            label2.Location = new System.Drawing.Point(22, 290);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(107, 21);
             label2.TabIndex = 11;

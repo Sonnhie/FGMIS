@@ -291,6 +291,7 @@ namespace FGScanner.Models
     public class InventoryCardData
     {
         public int id { get; set; }
+        public string ControlNumber { get; set; }
         public string MonthYear { get; set; }
         public string ErpLocation { get; set; }
         public string PreparedBy { get; set; }
@@ -388,6 +389,8 @@ namespace FGScanner.Models
         public int Out { get; set; }
         public int BeginningStock { get; set; }
         public int RunningStock { get; set; }
+        public string Category { get; set; } = string.Empty;
+        public string ControlNumber { get; set; } = string.Empty;
         public string Incharge { get; set; } = string.Empty;
         public string Remarks { get; set; } = string.Empty;
 
@@ -415,7 +418,7 @@ namespace FGScanner.Models
     public class CustomerStock
     {
         public string Customer { get; set; }
-        public int Stock { get; set; }
+        public long Stock { get; set; }
     }
 
     public class MonthlyShipments

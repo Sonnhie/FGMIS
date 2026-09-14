@@ -11,9 +11,13 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.DataVisualization.Charting;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 
 namespace FGScanner.Forms.DataEntry
 {
@@ -22,19 +26,80 @@ namespace FGScanner.Forms.DataEntry
         private Dictionary<int, MonthlyInventorySummary> MonthlyStocksCache = [];
         private readonly Queries _queries;
         private readonly InventoryDbContext _dbContext;
+        private readonly SemaphoreSlim _refreshLock = new(1, 1);
+        private bool _isInitializing;
 
         public Dashboard()
         {
             InitializeComponent();
             _dbContext = new();
             _queries = new(_dbContext);
+            ApplyModernStyling();
+        }
+
+        private void ApplyModernStyling()
+        {
+            // Modern card styling with accent bars
+            panel2.Paint += (s, e) => DrawCard(e.Graphics, panel2.ClientRectangle, Color.FromArgb(37, 99, 235));
+            panel3.Paint += (s, e) => DrawCard(e.Graphics, panel3.ClientRectangle, Color.FromArgb(16, 185, 129));
+            panel4.Paint += (s, e) => DrawCard(e.Graphics, panel4.ClientRectangle, Color.FromArgb(245, 158, 11));
+            panel5.Paint += (s, e) => DrawCard(e.Graphics, panel5.ClientRectangle, Color.FromArgb(239, 68, 68));
+
+            // Modern label typography
+            label3.Font = new Font("Segoe UI Semibold", 9.5F, FontStyle.Bold);
+            label3.ForeColor = Color.FromArgb(100, 116, 139);
+            monthstock_lbl.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
+            monthstock_lbl.ForeColor = Color.FromArgb(15, 23, 42);
+
+            label6.Font = new Font("Segoe UI Semibold", 9.5F, FontStyle.Bold);
+            label6.ForeColor = Color.FromArgb(100, 116, 139);
+            ship_lbl.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
+            ship_lbl.ForeColor = Color.FromArgb(15, 23, 42);
+
+            label8.Font = new Font("Segoe UI Semibold", 9.5F, FontStyle.Bold);
+            label8.ForeColor = Color.FromArgb(100, 116, 139);
+            return_lbl.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
+            return_lbl.ForeColor = Color.FromArgb(15, 23, 42);
+
+            label11.Font = new Font("Segoe UI Semibold", 9.5F, FontStyle.Bold);
+            label11.ForeColor = Color.FromArgb(100, 116, 139);
+            slowitem_lbl.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
+            slowitem_lbl.ForeColor = Color.FromArgb(239, 68, 68);
+
+            label2.Font = new Font("Segoe UI Semibold", 11F, FontStyle.Bold);
+            label2.ForeColor = Color.FromArgb(30, 41, 59);
+
+            label13.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
+            label13.ForeColor = Color.FromArgb(71, 85, 105);
+
+            ConfigureChartBaseStyles();
+        }
+
+        private static void DrawCard(Graphics g, Rectangle bounds, Color accentColor)
+        {
+            if (bounds.Width < 4 || bounds.Height < 4) return;
+
+            using var borderPen = new Pen(Color.FromArgb(226, 232, 240), 1);
+            g.DrawRectangle(borderPen, bounds.X, bounds.Y, bounds.Width - 1, bounds.Height - 1);
+
+            using var accentBrush = new SolidBrush(accentColor);
+            g.FillRectangle(accentBrush, bounds.X, bounds.Y, bounds.Width, 3);
+        }
+
+        private void ConfigureChartBaseStyles()
+        {
+            cartesianChart1.BackColor = Color.White;
+            pieChart1.BackColor = Color.White;
         }
 
         private async void Dashboard_Load(object sender, EventArgs e)
         {
+            _isInitializing = true;
+            timer1.Stop();
+            await _refreshLock.WaitAsync();
+
             try
             {
-                timer1.Stop();
                 await LoadCMBYearDataSource();
 
                 int selectedYear = DateTime.Now.Year;
@@ -48,11 +113,16 @@ namespace FGScanner.Forms.DataEntry
                 await PopulateStatusCards(selectedYear);
                 await PopulateCharts(selectedYear);
                 await LoadSlowMovingItems();
-                StartPollingForUpdates();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error loading report dashboard: {ex.Message}", "Loading Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                _refreshLock.Release();
+                _isInitializing = false;
+                StartPollingForUpdates();
             }
         }
 
@@ -61,8 +131,8 @@ namespace FGScanner.Forms.DataEntry
             try
             {
                 await GetTotalMonthlyStocks(year);
-                GetMonthlyShipments(year);
-                GetTotalReturns(year);
+                await GetMonthlyShipments(year);
+                await GetTotalReturns(year);
                 await GetLowStockItems();
             }
             catch (Exception ex)
@@ -116,57 +186,81 @@ namespace FGScanner.Forms.DataEntry
             }
 
             var CurrentMonthData = monthlyInventorySummaries.FirstOrDefault(d => d.Month == month);
-            monthstock_lbl.Text = CurrentMonthData != null ? CurrentMonthData.EndingStock.ToString("N0") : "0";
+            if (CurrentMonthData == null)
+            {
+                monthstock_lbl.Text = "0";
+                increase_lbl.Text = "No data";
+                increase_lbl.ForeColor = Color.FromArgb(100, 116, 139);
+                return;
+            }
+
+            monthstock_lbl.Text = CurrentMonthData.EndingStock.ToString("N0");
 
             if (CurrentMonthData.Change >= 0)
             {
-                increase_lbl.Text = $"▲{CurrentMonthData.Change:N0} (+{CurrentMonthData.ChangePercent:N2}%)";
-                increase_lbl.ForeColor = Color.Green;
+                increase_lbl.Text = $"▲ +{CurrentMonthData.Change:N0} (+{CurrentMonthData.ChangePercent:N1}%) vs prev";
+                increase_lbl.ForeColor = Color.FromArgb(16, 185, 129);
             }
             else
             {
-                increase_lbl.Text = $"▼{Math.Abs(CurrentMonthData.Change):N0} ({CurrentMonthData.ChangePercent:N2}%)";
-                increase_lbl.ForeColor = Color.Red;
+                increase_lbl.Text = $"▼ -{Math.Abs(CurrentMonthData.Change):N0} ({CurrentMonthData.ChangePercent:N1}%) vs prev";
+                increase_lbl.ForeColor = Color.FromArgb(239, 68, 68);
             }
         }
 
-        private async void GetMonthlyShipments(int year)
+        private async Task GetMonthlyShipments(int year)
         {
             int month = DateTime.Now.Month;
 
             var Data = await _queries.GetMonthlyShipment(year);
 
             var CurrentMonthData = Data.FirstOrDefault(d => d.Month == month);
-            ship_lbl.Text = CurrentMonthData != null ? CurrentMonthData.Out.ToString("N0") : "0";
+            if (CurrentMonthData == null)
+            {
+                ship_lbl.Text = "0";
+                shipanalytic_lbl.Text = "No data";
+                shipanalytic_lbl.ForeColor = Color.FromArgb(100, 116, 139);
+                return;
+            }
+
+            ship_lbl.Text = CurrentMonthData.Out.ToString("N0");
             if (CurrentMonthData.Change >= 0)
             {
-                shipanalytic_lbl.Text = $"▲{CurrentMonthData.Change:N0} (+{CurrentMonthData.ChangePercent:N2}%)";
-                shipanalytic_lbl.ForeColor = Color.Green;
+                shipanalytic_lbl.Text = $"▲ +{CurrentMonthData.Change:N0} (+{CurrentMonthData.ChangePercent:N1}%) vs prev";
+                shipanalytic_lbl.ForeColor = Color.FromArgb(16, 185, 129);
             }
             else
             {
-                shipanalytic_lbl.Text = $"▼{Math.Abs(CurrentMonthData.Change):N0} ({CurrentMonthData.ChangePercent:N2}%)";
-                shipanalytic_lbl.ForeColor = Color.Red;
+                shipanalytic_lbl.Text = $"▼ -{Math.Abs(CurrentMonthData.Change):N0} ({CurrentMonthData.ChangePercent:N1}%) vs prev";
+                shipanalytic_lbl.ForeColor = Color.FromArgb(239, 68, 68);
             }
         }
 
-        private async void GetTotalReturns(int year)
+        private async Task GetTotalReturns(int year)
         {
             int month = DateTime.Now.Month;
 
             var Data = await _queries.GetMonthlyReturns(year);
 
             var CurrentMonthData = Data.FirstOrDefault(d => d.Month == month);
-            return_lbl.Text = CurrentMonthData != null ? CurrentMonthData.Out.ToString("N0") : "0";
+            if (CurrentMonthData == null)
+            {
+                return_lbl.Text = "0";
+                returnanalytic_lbl.Text = "No data";
+                returnanalytic_lbl.ForeColor = Color.FromArgb(100, 116, 139);
+                return;
+            }
+
+            return_lbl.Text = CurrentMonthData.Out.ToString("N0");
             if (CurrentMonthData.Change >= 0)
             {
-                returnanalytic_lbl.Text = $"▲{CurrentMonthData.Change:N0} (+{CurrentMonthData.ChangePercent:N2}%)";
-                returnanalytic_lbl.ForeColor = Color.Red;
+                returnanalytic_lbl.Text = $"▲ +{CurrentMonthData.Change:N0} (+{CurrentMonthData.ChangePercent:N1}%) vs prev";
+                returnanalytic_lbl.ForeColor = Color.FromArgb(239, 68, 68);
             }
             else
             {
-                returnanalytic_lbl.Text = $"▼{Math.Abs(CurrentMonthData.Change):N0} ({CurrentMonthData.ChangePercent:N2}%)";
-                returnanalytic_lbl.ForeColor = Color.Green;
+                returnanalytic_lbl.Text = $"▼ -{Math.Abs(CurrentMonthData.Change):N0} ({CurrentMonthData.ChangePercent:N1}%) vs prev";
+                returnanalytic_lbl.ForeColor = Color.FromArgb(16, 185, 129);
             }
         }
 
@@ -239,121 +333,114 @@ namespace FGScanner.Forms.DataEntry
 
             if (Data == null || Data.Count == 0)
             {
-                chart1.Series.Clear(); // Clear the chart so it doesn't show old data
+                cartesianChart1.Series = Array.Empty<ISeries>();
                 return;
             }
 
-            int maxStock = Data.Max(d => d.EndingStock);
+            var ordered = Data.OrderBy(d => d.Month).ToList();
+            var endingStocks = ordered.Select(d => (double)d.EndingStock).ToArray();
+            var months = ordered.Select(d => CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(d.Month)).ToArray();
 
-            double yInterval = maxStock > 0 ? Math.Ceiling(maxStock / 5.0 / 30000000) * 30000000 : 30000000;
-
-            if (maxStock <= 5000000)
+            cartesianChart1.Series = new ISeries[]
             {
-                yInterval = 1000000;
-            }
-            else if (maxStock <= 10000000)
-            {
-                yInterval = 5000000;
-            }
-            else if (maxStock <= 15000000)
-            {
-                yInterval = 10000000;
-            }
-            else if (maxStock <= 30000000)
-            {
-                yInterval = 20000000;
-            }
-            else
-            {
-                yInterval = Math.Ceiling(maxStock / 5.0 / 30000000) * 30000000;
-            }
-
-
-
-            chart1.Series.Clear();
-            Series EndingStockSeries = new("Ending Stock")
-            {
-                ChartType = SeriesChartType.SplineArea,
-                BorderWidth = 3,
-                MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle,
-                MarkerSize = 8,
-                MarkerColor = Color.DarkBlue,
-                Color = Color.FromArgb(80, Color.Blue)
+                new LineSeries<double>
+                {
+                    Values = endingStocks,
+                    Name = "Ending Stock",
+                    Fill = new LinearGradientPaint(
+                        new[] { new SKColor(59, 130, 246, 110), new SKColor(59, 130, 246, 5) },
+                        new SKPoint(0.5f, 0),
+                        new SKPoint(0.5f, 1)),
+                    Stroke = new SolidColorPaint(new SKColor(37, 99, 235)) { StrokeThickness = 3 },
+                    GeometrySize = 7,
+                    GeometryFill = new SolidColorPaint(SKColors.White),
+                    GeometryStroke = new SolidColorPaint(new SKColor(37, 99, 235)) { StrokeThickness = 2 },
+                    LineSmoothness = 0.45,
+                    YToolTipLabelFormatter = point => $"{point.Coordinate.PrimaryValue:N0} pcs"
+                }
             };
-            chart1.Series.Add(EndingStockSeries);
 
-            foreach (var item in Data)
+            cartesianChart1.XAxes = new Axis[]
             {
-                string monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(item.Month);
-                int pointIndex = EndingStockSeries.Points.AddXY(item.Month, item.EndingStock);
-                var point = EndingStockSeries.Points[pointIndex];
-                point.AxisLabel = monthName;
-                point.ToolTip = $"Ending Stock: {item.EndingStock:N0}";
-            }
+                new Axis
+                {
+                    Labels = months,
+                    LabelsPaint = new SolidColorPaint(new SKColor(100, 116, 139)),
+                    TextSize = 11,
+                    SeparatorsPaint = null
+                }
+            };
 
-            var axisX = chart1.ChartAreas[0].AxisX;
-            var axisY = chart1.ChartAreas[0].AxisY;
-            var area = chart1.ChartAreas[0];
-            axisX.Minimum = 1;
-            axisX.Maximum = 12;
-            axisX.Interval = 1;
-            axisY.Minimum = 0;
-            axisY.Maximum = (maxStock == 0) ? yInterval : (maxStock + yInterval);
-            axisY.Interval = yInterval;
-            axisY.LabelStyle.Format = "N0";
-            area.RecalculateAxesScale();
+            cartesianChart1.YAxes = new Axis[]
+            {
+                new Axis
+                {
+                    LabelsPaint = new SolidColorPaint(new SKColor(100, 116, 139)),
+                    TextSize = 11,
+                    SeparatorsPaint = new SolidColorPaint(new SKColor(241, 245, 249)) { StrokeThickness = 1 },
+                    Labeler = val => val >= 1_000_000 ? $"{(val / 1_000_000):N1}M" : val >= 1_000 ? $"{(val / 1_000):N0}K" : val.ToString("N0")
+                }
+            };
+
+            cartesianChart1.TooltipPosition = LiveChartsCore.Measure.TooltipPosition.Top;
+            cartesianChart1.TooltipBackgroundPaint = new SolidColorPaint(new SKColor(30, 41, 59));
+            cartesianChart1.TooltipTextPaint = new SolidColorPaint(new SKColor(241, 245, 249));
+            cartesianChart1.TooltipTextSize = 12;
         }
 
         private async Task LoadPieChart()
         {
-            Dictionary<string, Color> customerColor = new Dictionary<string, Color>()
-            {
-                { "EPPI", Color.Yellow },
-                { "CBMP", Color.Green },
-                { "BIPH", Color.Blue },
-                { "YAZAKI", Color.Orange },
-                { "IONICS", Color.Silver },
-                { "ZAMA" , Color.LightGray},
-                { "JCM", Color.MediumPurple },
-                { "EXCELITAS", Color.Gray }
-            };
-
             var Data = await _queries.GetCustomerStocksAsync();
 
-            chart2.Series.Clear();
-            Series series = new Series("CustomerStock");
-            series.ChartType = SeriesChartType.Doughnut;
-            series["DoughnutRadius"] = "50";
-
-            chart2.Legends.Clear();
-            Legend chartLegend = new Legend("CustomerLegend");
-            chartLegend.Docking = Docking.Bottom;
-            chart2.Legends.Add(chartLegend);
-            series.Legend = "CustomerLegend";
-            series.IsVisibleInLegend = true;
-            series.IsValueShownAsLabel = false;
-            
-            chart2.Series.Add(series);
-
-            foreach (var item in Data)
+            if (Data == null || Data.Count == 0)
             {
-                int pointindex = chart2.Series["CustomerStock"].Points.AddXY(item.Customer, item.Stock);
-                chart2.Series["CustomerStock"].ToolTip =
-                "#AXISLABEL\nStock: #VALY\nPercentage: #PERCENT";
-                chart2.Series["CustomerStock"]["DoughnutLabelStyle"] = "Disabled";
-
-
-                var point = chart2.Series["CustomerStock"].Points[pointindex];
-
-                if (customerColor.TryGetValue(item.Customer, out Color value))
-                {
-                    point.Color = value;
-                }
-                else
-                {
-                    point.Color = Color.LightGray;
-                }
+                pieChart1.Series = Array.Empty<ISeries>();
+                return;
             }
+
+            Dictionary<string, SKColor> skCustomerColors = new(StringComparer.OrdinalIgnoreCase)
+            {
+                { "EPPI", new SKColor(16, 185, 129) },     // Emerald
+                { "CBMP", new SKColor(139, 92, 246) },    // Violet
+                { "BIPH", new SKColor(14, 165, 233) },     // Sky Blue
+                { "YAZAKI", new SKColor(249, 115, 22) },   // Warm Amber
+                { "IONICS", new SKColor(99, 102, 241) },   // Indigo
+                { "ZAMA" , new SKColor(244, 63, 94) },     // Rose
+                { "JCM", new SKColor(6, 182, 212) },       // Cyan
+                { "EXCELITAS", new SKColor(100, 116, 139) } // Slate
+            };
+
+            var pieSeries = new List<ISeries>();
+            var totalStock = Data.Where(item => item.Stock > 0).Sum(item => item.Stock);
+
+            foreach (var item in Data.Where(item => item.Stock > 0))
+            {
+                var customer = string.IsNullOrWhiteSpace(item.Customer) ? "Unknown" : item.Customer;
+                var stock = item.Stock;
+                var share = totalStock == 0 ? 0d : (double)stock / totalStock;
+                SKColor color = skCustomerColors.TryGetValue(customer, out var skColor) ? skColor : new SKColor(148, 163, 184);
+
+                pieSeries.Add(new PieSeries<long>
+                {
+                    Values = new[] { stock },
+                    Name = customer,
+                    Fill = new SolidColorPaint(color),
+                    Stroke = new SolidColorPaint(SKColors.White) { StrokeThickness = 2 },
+                    Pushout = 4,
+                    InnerRadius = 55,
+                    ToolTipLabelFormatter = _ => $"{customer}: {stock:N0} pcs ({share:P1})"
+                });
+            }
+
+            pieChart1.Series = pieSeries.ToArray();
+            pieChart1.LegendPosition = LiveChartsCore.Measure.LegendPosition.Bottom;
+            pieChart1.LegendTextPaint = new SolidColorPaint(new SKColor(71, 85, 105));
+            pieChart1.LegendTextSize = 11;
+            // LiveCharts pie charts only support centered tooltips.
+            pieChart1.TooltipPosition = LiveChartsCore.Measure.TooltipPosition.Center;
+            pieChart1.TooltipBackgroundPaint = new SolidColorPaint(new SKColor(30, 41, 59));
+            pieChart1.TooltipTextPaint = new SolidColorPaint(new SKColor(241, 245, 249));
+            pieChart1.TooltipTextSize = 12;
         }
 
         private async Task<Dictionary<int, MonthlyInventorySummary>> LoadMonthlyStockCache(int year)
@@ -388,15 +475,29 @@ namespace FGScanner.Forms.DataEntry
 
         private async void cmbYear_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int selectedYear = Convert.ToInt32(cmbYear.SelectedItem);
+            if (_isInitializing || cmbYear.SelectedItem == null)
+            {
+                return;
+            }
 
-            await PopulateStatusCards(selectedYear);
-            await PopulateCharts(selectedYear);
+            int selectedYear = Convert.ToInt32(cmbYear.SelectedItem);
+            await _refreshLock.WaitAsync();
+
+            try
+            {
+                await PopulateStatusCards(selectedYear);
+                await PopulateCharts(selectedYear);
+            }
+            finally
+            {
+                _refreshLock.Release();
+            }
         }
 
         private async void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Stop();
+            await _refreshLock.WaitAsync();
 
             try
             {
@@ -419,6 +520,7 @@ namespace FGScanner.Forms.DataEntry
             }
             finally
             {
+                _refreshLock.Release();
                 timer1.Start();
             }
         }

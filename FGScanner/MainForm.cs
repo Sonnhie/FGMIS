@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FGScanner.UI;
 
 namespace FGScanner
 {
@@ -31,6 +32,7 @@ namespace FGScanner
         public MainForm(string userid, int usergroup)
         {
             InitializeComponent();
+            EnterpriseTheme.Apply(this);
             LoadDashboard();
             this._userid = userid;
             this.usergroup = usergroup;
@@ -62,6 +64,7 @@ namespace FGScanner
 
         private void DisplayUsercontrol(UserControl forms)
         {
+            EnterpriseTheme.Apply(forms);
             panel1.Controls.Clear();
             forms.Dock = DockStyle.Fill;
             panel1.Controls.Add(forms);
@@ -85,9 +88,7 @@ namespace FGScanner
 
             if (result == DialogResult.Yes)
             {
-                login login = new login();
-                login.Show();
-                this.Hide();
+                SessionManager.SignOut(SessionEndReason.Manual);
             }
         }
 

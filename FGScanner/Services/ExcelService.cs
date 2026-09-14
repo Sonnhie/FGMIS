@@ -811,7 +811,7 @@ namespace FGScanner.Services
                     ws.Cells[startrow, 3].Value = item.Out;
                     ws.Cells[startrow, 4].Value = item.RunningStock;
                     ws.Cells[startrow, 5].Value = item.Incharge;
-                    ws.Cells[startrow, 6].Value = item.Remarks;
+                    ws.Cells[startrow, 6].Value = item.Category;
 
                     startrow++;
 

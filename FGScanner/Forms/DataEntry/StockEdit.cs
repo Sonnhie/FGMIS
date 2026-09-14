@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FGScanner.UI;
 
 namespace FGScanner
 {
@@ -32,6 +33,7 @@ namespace FGScanner
         public StockEdit(int pps, string partnumber, string location, string productionVersion, DateOnly productionDate, int box, int quantity, string customer, string whId, string userid)
         {
             InitializeComponent();
+            EnterpriseTheme.Apply(this);
             _dbContext = new();
             _queries = new(_dbContext);
             _partnumber = partnumber;

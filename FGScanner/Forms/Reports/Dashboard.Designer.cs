@@ -29,14 +29,6 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
             panel2 = new System.Windows.Forms.Panel();
             increase_lbl = new System.Windows.Forms.Label();
             monthstock_lbl = new System.Windows.Forms.Label();
@@ -53,24 +45,23 @@
             label12 = new System.Windows.Forms.Label();
             slowitem_lbl = new System.Windows.Forms.Label();
             label11 = new System.Windows.Forms.Label();
-            chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             label13 = new System.Windows.Forms.Label();
             cmbYear = new System.Windows.Forms.ComboBox();
-            chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             label2 = new System.Windows.Forms.Label();
+            cartesianChart1 = new LiveChartsCore.SkiaSharpView.WinForms.CartesianChart();
+            pieChart1 = new LiveChartsCore.SkiaSharpView.WinForms.PieChart();
             SlowmovingTable = new System.Windows.Forms.DataGridView();
             timer1 = new System.Windows.Forms.Timer(components);
             panel2.SuspendLayout();
             panel3.SuspendLayout();
             panel4.SuspendLayout();
             panel5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)chart2).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)chart1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)SlowmovingTable).BeginInit();
             SuspendLayout();
             // 
             // panel2
             // 
+            panel2.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
             panel2.BackColor = System.Drawing.Color.White;
             panel2.Controls.Add(increase_lbl);
             panel2.Controls.Add(monthstock_lbl);
@@ -91,7 +82,7 @@
             increase_lbl.Name = "increase_lbl";
             increase_lbl.Size = new System.Drawing.Size(94, 17);
             increase_lbl.TabIndex = 7;
-            increase_lbl.Text = "12.5% increase";
+            increase_lbl.Text = "Loading…";
             // 
             // monthstock_lbl
             // 
@@ -102,7 +93,7 @@
             monthstock_lbl.Name = "monthstock_lbl";
             monthstock_lbl.Size = new System.Drawing.Size(121, 40);
             monthstock_lbl.TabIndex = 6;
-            monthstock_lbl.Text = "498,662";
+            monthstock_lbl.Text = "—";
             // 
             // label3
             // 
@@ -117,7 +108,7 @@
             // 
             // panel3
             // 
-            panel3.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            panel3.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
             panel3.BackColor = System.Drawing.Color.White;
             panel3.Controls.Add(shipanalytic_lbl);
             panel3.Controls.Add(ship_lbl);
@@ -138,7 +129,7 @@
             shipanalytic_lbl.Name = "shipanalytic_lbl";
             shipanalytic_lbl.Size = new System.Drawing.Size(94, 17);
             shipanalytic_lbl.TabIndex = 8;
-            shipanalytic_lbl.Text = "12.5% increase";
+            shipanalytic_lbl.Text = "Loading…";
             // 
             // ship_lbl
             // 
@@ -149,7 +140,7 @@
             ship_lbl.Name = "ship_lbl";
             ship_lbl.Size = new System.Drawing.Size(116, 40);
             ship_lbl.TabIndex = 7;
-            ship_lbl.Text = "198,520";
+            ship_lbl.Text = "—";
             // 
             // label6
             // 
@@ -160,11 +151,11 @@
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(69, 20);
             label6.TabIndex = 6;
-            label6.Text = " Shipped";
+            label6.Text = "Total Shipped";
             // 
             // panel4
             // 
-            panel4.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            panel4.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
             panel4.BackColor = System.Drawing.Color.White;
             panel4.Controls.Add(returnanalytic_lbl);
             panel4.Controls.Add(return_lbl);
@@ -185,7 +176,7 @@
             returnanalytic_lbl.Name = "returnanalytic_lbl";
             returnanalytic_lbl.Size = new System.Drawing.Size(94, 17);
             returnanalytic_lbl.TabIndex = 9;
-            returnanalytic_lbl.Text = "12.5% increase";
+            returnanalytic_lbl.Text = "Loading…";
             // 
             // return_lbl
             // 
@@ -196,7 +187,7 @@
             return_lbl.Name = "return_lbl";
             return_lbl.Size = new System.Drawing.Size(116, 40);
             return_lbl.TabIndex = 8;
-            return_lbl.Text = "200,010";
+            return_lbl.Text = "—";
             // 
             // label8
             // 
@@ -207,11 +198,11 @@
             label8.Name = "label8";
             label8.Size = new System.Drawing.Size(135, 20);
             label8.TabIndex = 7;
-            label8.Text = "Warehouse Return";
+            label8.Text = "Warehouse Returns";
             // 
             // panel5
             // 
-            panel5.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            panel5.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
             panel5.BackColor = System.Drawing.Color.White;
             panel5.Controls.Add(label12);
             panel5.Controls.Add(slowitem_lbl);
@@ -232,7 +223,7 @@
             label12.Name = "label12";
             label12.Size = new System.Drawing.Size(191, 17);
             label12.TabIndex = 11;
-            label12.Text = "Requires Immediate Attention";
+            label12.Text = "Requires Attention";
             // 
             // slowitem_lbl
             // 
@@ -244,7 +235,7 @@
             slowitem_lbl.Name = "slowitem_lbl";
             slowitem_lbl.Size = new System.Drawing.Size(45, 40);
             slowitem_lbl.TabIndex = 10;
-            slowitem_lbl.Text = "10";
+            slowitem_lbl.Text = "—";
             // 
             // label11
             // 
@@ -257,44 +248,13 @@
             label11.TabIndex = 9;
             label11.Text = "Slow Moving Items";
             // 
-            // chart2
+            // pieChart1 - Stock by Customer (donut chart)
             // 
-            chartArea1.AxisX.IsLabelAutoFit = false;
-            chartArea1.AxisX.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            chartArea1.AxisX.MajorGrid.Enabled = false;
-            chartArea1.AxisX.MajorGrid.LineColor = System.Drawing.Color.LightGray;
-            chartArea1.AxisX.Title = "Customer";
-            chartArea1.AxisX.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            chartArea1.AxisY.IsLabelAutoFit = false;
-            chartArea1.AxisY.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.LightGray;
-            chartArea1.AxisY.Title = "Quantity";
-            chartArea1.AxisY.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            chartArea1.Name = "ChartArea1";
-            chartArea1.ShadowColor = System.Drawing.Color.Gainsboro;
-            chartArea1.ShadowOffset = 5;
-            chart2.ChartAreas.Add(chartArea1);
-            legend1.Enabled = false;
-            legend1.Name = "Legend1";
-            chart2.Legends.Add(legend1);
-            chart2.Location = new System.Drawing.Point(698, 180);
-            chart2.Margin = new System.Windows.Forms.Padding(12);
-            chart2.Name = "chart2";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Pie;
-            series1.IsVisibleInLegend = false;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            series1.SmartLabelStyle.Enabled = false;
-            chart2.Series.Add(series1);
-            chart2.Size = new System.Drawing.Size(265, 227);
-            chart2.TabIndex = 16;
-            chart2.Text = "chart2";
-            title1.Alignment = System.Drawing.ContentAlignment.TopLeft;
-            title1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            title1.Name = "Title1";
-            title1.Text = "Stock By Customer";
-            chart2.Titles.Add(title1);
+            pieChart1.Location = new System.Drawing.Point(677, 180);
+            pieChart1.Margin = new System.Windows.Forms.Padding(12);
+            pieChart1.Name = "pieChart1";
+            pieChart1.Size = new System.Drawing.Size(286, 230);
+            pieChart1.TabIndex = 16;
             // 
             // label13
             // 
@@ -318,43 +278,13 @@
             cmbYear.TabIndex = 17;
             cmbYear.SelectedIndexChanged += cmbYear_SelectedIndexChanged;
             // 
-            // chart1
+            // cartesianChart1 - Monthly Inventory Trend (line chart)
             // 
-            chartArea2.AxisX.IsLabelAutoFit = false;
-            chartArea2.AxisX.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            chartArea2.AxisX.MajorGrid.Enabled = false;
-            chartArea2.AxisX.MajorGrid.LineColor = System.Drawing.Color.LightGray;
-            chartArea2.AxisX.Title = "Month";
-            chartArea2.AxisX.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            chartArea2.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
-            chartArea2.AxisY.IsLabelAutoFit = false;
-            chartArea2.AxisY.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            chartArea2.AxisY.MajorGrid.LineColor = System.Drawing.Color.LightGray;
-            chartArea2.AxisY.Title = "Quantity";
-            chartArea2.AxisY.TitleFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            chartArea2.Name = "ChartArea1";
-            chartArea2.ShadowColor = System.Drawing.Color.Gainsboro;
-            chartArea2.ShadowOffset = 5;
-            chart1.ChartAreas.Add(chartArea2);
-            legend2.Enabled = false;
-            legend2.Name = "Legend1";
-            chart1.Legends.Add(legend2);
-            chart1.Location = new System.Drawing.Point(21, 180);
-            chart1.Margin = new System.Windows.Forms.Padding(12);
-            chart1.Name = "chart1";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            chart1.Series.Add(series2);
-            chart1.Size = new System.Drawing.Size(664, 227);
-            chart1.TabIndex = 19;
-            chart1.Text = "chart1";
-            title2.Alignment = System.Drawing.ContentAlignment.TopLeft;
-            title2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            title2.Name = "Title1";
-            title2.Text = "Monthly Inventory";
-            chart1.Titles.Add(title2);
+            cartesianChart1.Location = new System.Drawing.Point(21, 180);
+            cartesianChart1.Margin = new System.Windows.Forms.Padding(12);
+            cartesianChart1.Name = "cartesianChart1";
+            cartesianChart1.Size = new System.Drawing.Size(642, 230);
+            cartesianChart1.TabIndex = 19;
             // 
             // label2
             // 
@@ -369,7 +299,7 @@
             // 
             // SlowmovingTable
             // 
-            SlowmovingTable.AllowUserToResizeColumns = false;
+            SlowmovingTable.AllowUserToResizeColumns = true;
             SlowmovingTable.AllowUserToResizeRows = false;
             SlowmovingTable.BackgroundColor = System.Drawing.Color.White;
             SlowmovingTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -388,10 +318,10 @@
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             Controls.Add(label2);
             Controls.Add(SlowmovingTable);
-            Controls.Add(chart1);
+            Controls.Add(cartesianChart1);
             Controls.Add(label13);
             Controls.Add(cmbYear);
-            Controls.Add(chart2);
+            Controls.Add(pieChart1);
             Controls.Add(panel2);
             Controls.Add(panel3);
             Controls.Add(panel4);
@@ -407,8 +337,6 @@
             panel4.PerformLayout();
             panel5.ResumeLayout(false);
             panel5.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)chart2).EndInit();
-            ((System.ComponentModel.ISupportInitialize)chart1).EndInit();
             ((System.ComponentModel.ISupportInitialize)SlowmovingTable).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -432,11 +360,11 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label slowitem_lbl;
         private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.ComboBox cmbYear;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.Label label2;
+        private LiveChartsCore.SkiaSharpView.WinForms.CartesianChart cartesianChart1;
+        private LiveChartsCore.SkiaSharpView.WinForms.PieChart pieChart1;
         private System.Windows.Forms.DataGridView SlowmovingTable;
         private System.Windows.Forms.Timer timer1;
     }

@@ -21,6 +21,7 @@ namespace FGScanner.Forms.Viewer
     public partial class MainWarehouseViewer : UserControl
     {
         private readonly SemaphoreSlim _dbLock = new SemaphoreSlim(1, 1);
+        private bool _isInitializing;
         private readonly TransactionService _service;
         private readonly Queries _queries;
         private readonly InventoryDbContext _dbContext;
@@ -218,6 +219,7 @@ namespace FGScanner.Forms.Viewer
             {
                 btn.BackColor = Color.White;
             }
+            btn.ForeColor = Color.Black;
         }
 
         private async Task LoadCache()
@@ -328,9 +330,26 @@ namespace FGScanner.Forms.Viewer
 
         private async void MainWarehouseViewer_Load(object sender, EventArgs e)
         {
-            await LoadCache();
-            InitializeRackViews(Racks);
-            timer1.Start();
+            _isInitializing = true;
+            timer1.Stop();
+            await _dbLock.WaitAsync();
+
+            try
+            {
+                await LoadCache();
+                InitializeRackViews(Racks);
+                await LoadChangeRacks();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Unable to load warehouse viewer: {ex.Message}", "Loading Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                _dbLock.Release();
+                _isInitializing = false;
+                timer1.Start();
+            }
         }
 
         private async void timer1_Tick(object sender, EventArgs e)
@@ -360,6 +379,11 @@ namespace FGScanner.Forms.Viewer
 
         private async void TxtPartnumber_TextChanged(object sender, EventArgs e)
         {
+            if (_isInitializing)
+            {
+                return;
+            }
+
             string partnumber = TxtPartnumber.Text;
             timer1.Stop();
 

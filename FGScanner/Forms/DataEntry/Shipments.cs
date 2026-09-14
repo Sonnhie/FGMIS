@@ -508,7 +508,7 @@ namespace FGScanner.Forms.DataEntry
 
                 if (result == DialogResult.Yes)
                 {
-                    var (isSuccess, Message) = await _service.InsertFGOutgoing(validScan, warehouse, shipmentId, transactionType, _userid, "FG", marketcode);
+                    var (isSuccess, Message) = await _service.InsertFGOutgoing(validScan, warehouse, shipmentId, transactionType, _userid, marketcode, "FG");
                     if (isSuccess)
                     {
                         MessageBox.Show(Message);

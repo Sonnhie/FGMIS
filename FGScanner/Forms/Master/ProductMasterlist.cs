@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FGScanner.UI;
 
 namespace FGScanner
 {
@@ -28,6 +29,7 @@ namespace FGScanner
         public ProductMasterlist()
         {
             InitializeComponent();
+            EnterpriseTheme.Apply(this);
         }
 
         private void ProductMasterlist_MouseDown(object sender, MouseEventArgs e)

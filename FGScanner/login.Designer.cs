@@ -75,44 +75,47 @@
             // 
             // BtnSignIn
             // 
-            this.BtnSignIn.Location = new System.Drawing.Point(108, 254);
+            this.BtnSignIn.Location = new System.Drawing.Point(30, 254);
             this.BtnSignIn.Name = "BtnSignIn";
-            this.BtnSignIn.Size = new System.Drawing.Size(102, 35);
-            this.BtnSignIn.TabIndex = 17;
-            this.BtnSignIn.Text = "Login";
+            this.BtnSignIn.Size = new System.Drawing.Size(255, 40);
+            this.BtnSignIn.TabIndex = 2;
+            this.BtnSignIn.Text = "Sign in";
             this.BtnSignIn.UseVisualStyleBackColor = true;
             this.BtnSignIn.Click += new System.EventHandler(this.BtnSignIn_Click_1);
             // 
             // TxtPassword
             // 
+            this.TxtPassword.AutoSize = false;
             this.TxtPassword.Location = new System.Drawing.Point(30, 200);
             this.TxtPassword.Name = "TxtPassword";
             this.TxtPassword.PasswordChar = '*';
-            this.TxtPassword.Size = new System.Drawing.Size(255, 22);
-            this.TxtPassword.TabIndex = 16;
+            this.TxtPassword.Size = new System.Drawing.Size(255, 27);
+            this.TxtPassword.TabIndex = 1;
             // 
             // TxtUserId
             // 
+            this.TxtUserId.AutoSize = false;
             this.TxtUserId.Location = new System.Drawing.Point(30, 115);
             this.TxtUserId.Name = "TxtUserId";
-            this.TxtUserId.Size = new System.Drawing.Size(255, 22);
-            this.TxtUserId.TabIndex = 15;
+            this.TxtUserId.Size = new System.Drawing.Size(255, 27);
+            this.TxtUserId.TabIndex = 0;
             // 
             // version_lbl
             // 
             this.version_lbl.AutoSize = true;
-            this.version_lbl.Location = new System.Drawing.Point(9, 7);
+            this.version_lbl.Location = new System.Drawing.Point(30, 309);
             this.version_lbl.Name = "version_lbl";
             this.version_lbl.Size = new System.Drawing.Size(38, 13);
-            this.version_lbl.TabIndex = 14;
+            this.version_lbl.TabIndex = 3;
             this.version_lbl.Text = "label4";
             // 
             // CloseBtn
             // 
             this.CloseBtn.Image = ((System.Drawing.Image)(resources.GetObject("CloseBtn.Image")));
-            this.CloseBtn.Location = new System.Drawing.Point(292, 5);
+            this.CloseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.CloseBtn.Location = new System.Drawing.Point(276, 8);
             this.CloseBtn.Name = "CloseBtn";
-            this.CloseBtn.Size = new System.Drawing.Size(15, 15);
+            this.CloseBtn.Size = new System.Drawing.Size(24, 24);
             this.CloseBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.CloseBtn.TabIndex = 13;
             this.CloseBtn.TabStop = false;
@@ -142,11 +145,11 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(114, 33);
+            this.label1.Location = new System.Drawing.Point(30, 33);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(69, 30);
+            this.label1.Size = new System.Drawing.Size(183, 30);
             this.label1.TabIndex = 7;
-            this.label1.Text = "Login";
+            this.label1.Text = "Sign in to FGIMS";
             // 
             // login
             // 

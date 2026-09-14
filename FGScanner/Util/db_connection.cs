@@ -30,35 +30,13 @@ namespace FGScanner.Util
             if (string.IsNullOrWhiteSpace(server))
                 throw new Exception("Database server not found.");
 
-            string connection = $"Data Source={server};Initial Catalog={db};User ID={user};Password={pass};Encrypt=False";
-
-            if (!CanConnect(connection))
-            {
-                throw new Exception($"Unable to connect to the databaser server: {server}");
-            }
-            Console.WriteLine($"{connection}");
-            _dbConnectionString = connection;
+            _dbConnectionString = $"Data Source={server};Initial Catalog={db};User ID={user};Password={pass};Encrypt=False";
         }
 
         public SqlConnection Getconnection()
         {
             var conn = new SqlConnection(_dbConnectionString);
             return conn;
-        }
-
-        private bool CanConnect(string connectionString)
-        {
-            try
-            {
-                using(SqlConnection  conn = new SqlConnection(connectionString))
-                {
-                    return true;
-                }
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }

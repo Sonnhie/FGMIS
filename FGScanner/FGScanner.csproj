@@ -42,6 +42,7 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WinForms" Version="2.0.5" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Security" />
@@ -167,6 +168,17 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Update="Templates\WithdrawalSlip.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
