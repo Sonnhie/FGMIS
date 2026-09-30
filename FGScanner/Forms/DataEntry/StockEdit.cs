@@ -52,8 +52,19 @@ namespace FGScanner
 
         private async Task LoadStockInformation()
         {
-            var stock = new ActualInventory();
-            stock = await _queries.GetStockInfo(_partnumber, _productionDate, _productionVersion, _location, _whId);
+            var stock = await _queries.GetStockInfo(_partnumber, _productionDate, _productionVersion, _location, _whId);
+
+            if (stock == null)
+            {
+                button1.Enabled = false;
+                MessageBox.Show(
+                    "The selected stock record no longer exists in the current inventory.",
+                    "Stock Not Found",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                BeginInvoke(new Action(Close));
+                return;
+            }
 
             partnumberlbl.Text = stock.Partnumber.ToString();
             customerlbl.Text = stock.Customer.ToString();

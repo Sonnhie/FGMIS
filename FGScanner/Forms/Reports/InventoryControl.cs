@@ -57,16 +57,17 @@ namespace FGScanner.Forms.Reports
 
                     dt.Columns.Add("Part Number", typeof(string));
                     dt.Columns.Add("Customer", typeof(string));
-                    dt.Columns.Add("Production Date", typeof(string));
+                    dt.Columns.Add("PPS Type", typeof(string));
+                    dt.Columns.Add("Production Date", typeof(DateTime));
                     dt.Columns.Add("Production Version", typeof(string));
-                    dt.Columns.Add("Total Box", typeof(string));
-                    dt.Columns.Add("Total Quantity", typeof(string));
-                    dt.Columns.Add("PPS", typeof(string));
+                    dt.Columns.Add("Total Box", typeof(int));
+                    dt.Columns.Add("Total Quantity", typeof(int));
+                    dt.Columns.Add("PPS", typeof(decimal));
                     dt.Columns.Add("Location", typeof(string));
                     dt.Columns.Add("Storage location", typeof(string));
                     dt.Columns.Add("Warehouse Id", typeof(string));
-                    dt.Columns.Add("Updated Inventory Date", typeof(string));
-                    dt.Columns.Add("Movement Clsasification", typeof(string));
+                    dt.Columns.Add("Updated Inventory Date", typeof(DateTime));
+                    dt.Columns.Add("Movement Classification", typeof(string));
 
                     LblPage.Text = $"Page {page} of {totalPage}";
 
@@ -74,20 +75,26 @@ namespace FGScanner.Forms.Reports
                     {
                         if (item.Quantity != 0)
                         {
-                            int pps = _queries.GetProductPPS(item.Partnumber);
+                            int exactPps = _queries.GetProductPPS(item.Partnumber);
+                            decimal displayedPps = InventoryPpsUtility.CalculateDisplayedPps(
+                                item.Remarks,
+                                item.Quantity,
+                                item.TotalBox,
+                                exactPps);
                             dt.Rows.Add
                             (
                                 item.Partnumber,
                                 item.Customer,
-                                item.ProdDate.ToString("MM/dd/yyyy"),
+                                item.Remarks,
+                                item.ProdDate.ToDateTime(TimeOnly.MinValue),
                                 item.ProdVer,
-                                item.TotalBox.ToString(),
-                                item.Quantity.ToString(),
-                                pps,
+                                item.TotalBox,
+                                item.Quantity,
+                                displayedPps,
                                 item.Location,
                                 item.StorageLocation,
                                 item.WhId,
-                                item.UpdatedDate,
+                                item.UpdatedDate ?? (object)DBNull.Value,
                                 item.MovementClassification
                             );
                         }
@@ -96,6 +103,7 @@ namespace FGScanner.Forms.Reports
                     LogsTable.DataSource = dt;
                     LogsTable.Columns["Part Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Customer"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    LogsTable.Columns["PPS Type"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     LogsTable.Columns["Production Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     LogsTable.Columns["Production Version"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     LogsTable.Columns["Total Box"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -105,11 +113,30 @@ namespace FGScanner.Forms.Reports
                     LogsTable.Columns["Storage location"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     LogsTable.Columns["Warehouse Id"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     LogsTable.Columns["Updated Inventory Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                    LogsTable.Columns["Movement Clsasification"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    LogsTable.Columns["Movement Classification"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+                    LogsTable.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    LogsTable.Columns["PPS Type"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    LogsTable.Columns["Production Date"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    LogsTable.Columns["Production Date"].DefaultCellStyle.Format = "MM/dd/yyyy";
+                    LogsTable.Columns["Production Version"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    LogsTable.Columns["Total Box"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                    LogsTable.Columns["Total Box"].DefaultCellStyle.Format = "N0";
+                    LogsTable.Columns["Total Quantity"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                    LogsTable.Columns["Total Quantity"].DefaultCellStyle.Format = "N0";
+                    LogsTable.Columns["PPS"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                    LogsTable.Columns["PPS"].DefaultCellStyle.Format = "0.##";
+                    LogsTable.Columns["Location"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    LogsTable.Columns["Storage location"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    LogsTable.Columns["Warehouse Id"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    LogsTable.Columns["Updated Inventory Date"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    LogsTable.Columns["Updated Inventory Date"].DefaultCellStyle.Format = "MM/dd/yyyy HH:mm";
+                    LogsTable.Columns["Movement Classification"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
 
                     LogsTable.Columns["Part Number"].ReadOnly = true;
                     LogsTable.Columns["Customer"].ReadOnly = true;
+                    LogsTable.Columns["PPS Type"].ReadOnly = true;
                     LogsTable.Columns["Production Date"].ReadOnly = true;
                     LogsTable.Columns["Production Version"].ReadOnly = true;
                     LogsTable.Columns["Total Box"].ReadOnly = true;
@@ -119,7 +146,7 @@ namespace FGScanner.Forms.Reports
                     LogsTable.Columns["Storage location"].ReadOnly = true;
                     LogsTable.Columns["Warehouse Id"].ReadOnly = true;
                     LogsTable.Columns["Updated Inventory Date"].ReadOnly = true;
-                    LogsTable.Columns["Movement Clsasification"].ReadOnly = true;
+                    LogsTable.Columns["Movement Classification"].ReadOnly = true;
 
                     if (_userid.Contains("N. Marquez"))
                     {
@@ -305,10 +332,22 @@ namespace FGScanner.Forms.Reports
                 string location = selectedRow.Cells["Location"].Value.ToString();
                 string customer = selectedRow.Cells["Customer"].Value.ToString();
                 string productionVersion = selectedRow.Cells["Production Version"].Value.ToString();
-                string dateString = Convert.ToString(selectedRow.Cells["Production Date"].Value);
+                object productionDateValue = selectedRow.Cells["Production Date"].Value;
+                DateOnly productionDate;
 
-                // If the date is invalid or blank, show an error and exit this block of code
-                if (!DateOnly.TryParse(dateString, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateOnly ProductionDate))
+                if (productionDateValue is DateTime dateTime)
+                {
+                    productionDate = DateOnly.FromDateTime(dateTime);
+                }
+                else if (productionDateValue is DateOnly dateOnly)
+                {
+                    productionDate = dateOnly;
+                }
+                else if (!DateOnly.TryParse(
+                    Convert.ToString(productionDateValue),
+                    System.Globalization.CultureInfo.CurrentCulture,
+                    System.Globalization.DateTimeStyles.None,
+                    out productionDate))
                 {
                     MessageBox.Show("The selected row does not contain a valid Production Date.", "Invalid Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
@@ -318,7 +357,25 @@ namespace FGScanner.Forms.Reports
                 int PPS = Convert.ToInt32(selectedRow.Cells["PPS"].Value);
                 string whId = selectedRow.Cells["Warehouse Id"].Value.ToString();
 
-                StockEdit stockEdit = new(PPS, partnumber, location, productionVersion, ProductionDate, box, quantity, customer, whId, _userid);
+                var currentStock = await _queries.GetStockInfo(
+                    partnumber,
+                    productionDate,
+                    productionVersion,
+                    location,
+                    whId);
+
+                if (currentStock == null)
+                {
+                    MessageBox.Show(
+                        "This stock record no longer exists in the current inventory. The table will now be refreshed.",
+                        "Stock Not Found",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    await FilterData(TxtPartnumber.Text);
+                    return;
+                }
+
+                StockEdit stockEdit = new(PPS, partnumber, location, productionVersion, productionDate, box, quantity, customer, whId, _userid);
                 stockEdit.ShowDialog();
                 await FilterData(TxtPartnumber.Text);
             }

@@ -1022,8 +1022,8 @@ namespace FGScanner.Repositories
                     transaction.TransactionType,
                     transaction.ControlNumber,
                     transaction.Remarks);
-                int boxes = GetLedgerBoxQuantity(movementCategory, transaction.Box);
-                string ppsType = GetPpsType(
+                int boxes = InventoryPpsUtility.GetLedgerBoxQuantity(movementCategory, transaction.Box);
+                string ppsType = InventoryPpsUtility.GetPpsType(
                     transaction.Quantity,
                     boxes,
                     pps,
@@ -1110,8 +1110,8 @@ namespace FGScanner.Repositories
                     transaction.TransactionType,
                     transaction.ControlNumber,
                     transaction.Remarks);
-                int boxes = GetLedgerBoxQuantity(movementCategory, transaction.Box);
-                string ppsType = GetPpsType(
+                int boxes = InventoryPpsUtility.GetLedgerBoxQuantity(movementCategory, transaction.Box);
+                string ppsType = InventoryPpsUtility.GetPpsType(
                     transaction.Quantity,
                     boxes,
                     pps,
@@ -1245,20 +1245,125 @@ namespace FGScanner.Repositories
 
         public async Task<PagedResult<ActualInventory>> GetFilteredInventory(string partnumber = null, int pageNumber = 1, int pageSize = 50)
         {
-            IQueryable<ActualInventory> query = _context.ActualInventories.AsNoTracking();
+            var transactionQuery = _context.TransactionHistories
+                .AsNoTracking()
+                .Where(transaction =>
+                    transaction.Quantity > 0 &&
+                    (transaction.TransactionType == "IN" || transaction.TransactionType == "OUT"));
 
-            if (!string.IsNullOrEmpty(partnumber))
+            if (!string.IsNullOrWhiteSpace(partnumber))
             {
-                query = query.Where(x => x.Partnumber.Contains(partnumber));
+                string filter = partnumber.Trim();
+                transactionQuery = transactionQuery.Where(transaction => transaction.Partnumber.Contains(filter));
             }
 
-            int totalCount = await query.CountAsync();
+            var movements =
+                from transaction in transactionQuery
+                join product in _context.Products.AsNoTracking()
+                    on transaction.Partnumber equals product.Partnumber into products
+                from product in products.DefaultIfEmpty()
+                let isScanBased = transaction.Remarks == "BPPS" ||
+                                  transaction.Remarks == "FG" ||
+                                  transaction.ControlNumber.StartsWith("SHIPID-") ||
+                                  transaction.ControlNumber.StartsWith("AS-")
+                let boxes = isScanBased ? 1 : transaction.Box ?? 0
+                let ppsType = transaction.Remarks == "BPPS"
+                    ? "BPPS"
+                    : product != null && product.Pps > 0 && transaction.Quantity == boxes * product.Pps
+                        ? "Exact PPS"
+                        : "BPPS"
+                let direction = transaction.TransactionType == "IN" ? 1 : -1
+                select new
+                {
+                    transaction.Partnumber,
+                    transaction.CustomerId,
+                    transaction.ProdDate,
+                    transaction.ProdVer,
+                    transaction.Location,
+                    transaction.StorageLocation,
+                    transaction.WhId,
+                    PpsType = ppsType,
+                    Quantity = direction * transaction.Quantity,
+                    Boxes = direction * boxes
+                };
 
-            var items = await query
-                        .OrderBy(x => x.Partnumber)
-                        .Skip((pageNumber - 1) * pageSize)
-                        .Take(pageSize)
-                        .ToListAsync();
+            var balances = movements
+                .GroupBy(movement => new
+                {
+                    movement.Partnumber,
+                    movement.CustomerId,
+                    movement.ProdDate,
+                    movement.ProdVer,
+                    movement.Location,
+                    movement.StorageLocation,
+                    movement.WhId,
+                    movement.PpsType
+                })
+                .Select(group => new
+                {
+                    group.Key.Partnumber,
+                    group.Key.CustomerId,
+                    group.Key.ProdDate,
+                    group.Key.ProdVer,
+                    group.Key.Location,
+                    group.Key.StorageLocation,
+                    group.Key.WhId,
+                    group.Key.PpsType,
+                    Quantity = group.Sum(movement => movement.Quantity),
+                    TotalBox = group.Sum(movement => movement.Boxes)
+                })
+                .Where(item =>
+                    item.Quantity > 0 &&
+                    _context.ActualInventories.Any(inventory =>
+                        inventory.Quantity > 0 &&
+                        inventory.Partnumber == item.Partnumber &&
+                        inventory.ProdDate == item.ProdDate &&
+                        inventory.ProdVer == item.ProdVer &&
+                        inventory.Location == item.Location &&
+                        inventory.WhId == item.WhId));
+
+            int totalCount = await balances.CountAsync();
+
+            var pageRows = await balances
+                .OrderBy(item => item.Partnumber)
+                .ThenBy(item => item.ProdDate)
+                .ThenBy(item => item.Location)
+                .ThenBy(item => item.PpsType)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var pagePartnumbers = pageRows.Select(item => item.Partnumber).Distinct().ToList();
+            var inventoryMetadata = await _context.ActualInventories
+                .AsNoTracking()
+                .Where(item => pagePartnumbers.Contains(item.Partnumber))
+                .ToListAsync();
+
+            var items = pageRows.Select(row =>
+            {
+                var metadata = inventoryMetadata.FirstOrDefault(item =>
+                    item.Partnumber == row.Partnumber &&
+                    item.ProdDate == row.ProdDate &&
+                    item.ProdVer == row.ProdVer &&
+                    item.Location == row.Location &&
+                    item.WhId == row.WhId);
+
+                return new ActualInventory
+                {
+                    Partnumber = row.Partnumber,
+                    Customer = row.CustomerId,
+                    ProdDate = row.ProdDate,
+                    ProdVer = row.ProdVer,
+                    Quantity = row.Quantity,
+                    TotalBox = Math.Max(row.TotalBox, 0),
+                    Location = row.Location,
+                    StorageLocation = row.StorageLocation,
+                    WhId = row.WhId,
+                    Remarks = row.PpsType,
+                    UpdatedDate = metadata?.UpdatedDate,
+                    MovementClassification = metadata?.MovementClassification
+                };
+            }).ToList();
 
             var result = new PagedResult<ActualInventory>
             {
@@ -1604,7 +1709,7 @@ namespace FGScanner.Repositories
                         transaction.TransactionType,
                         transaction.ControlNumber,
                         transaction.Remarks);
-                    int ledgerBoxes = GetLedgerBoxQuantity(category, transaction.Box);
+                    int ledgerBoxes = InventoryPpsUtility.GetLedgerBoxQuantity(category, transaction.Box);
 
                     return new
                     {
@@ -1616,7 +1721,7 @@ namespace FGScanner.Repositories
                         ControlNumber = transaction.ControlNumber ?? string.Empty,
                         Remarks = transaction.Remarks ?? string.Empty,
                         InCharge = transaction.InCharge ?? string.Empty,
-                        PpsType = GetPpsType(
+                        PpsType = InventoryPpsUtility.GetPpsType(
                             transaction.Quantity,
                             ledgerBoxes,
                             productPps,
@@ -1667,7 +1772,7 @@ namespace FGScanner.Repositories
                             Out = group.Where(transaction => transaction.TransactionType == "OUT").Sum(transaction => transaction.Quantity),
                             BoxIn = group.Where(transaction => transaction.TransactionType == "IN").Sum(transaction => transaction.Boxes),
                             BoxOut = group.Where(transaction => transaction.TransactionType == "OUT").Sum(transaction => transaction.Boxes),
-                            PpsType = GetGroupedPpsType(group.Select(transaction => transaction.PpsType))
+                            PpsType = InventoryPpsUtility.GetGroupedPpsType(group.Select(transaction => transaction.PpsType))
                         });
 
                 int currentStock = beginningBalance;
@@ -1706,42 +1811,6 @@ namespace FGScanner.Repositories
             {
                 return null;
             }
-        }
-
-        private static string GetPpsType(int quantity, int boxes, int productPps, string remarks)
-        {
-            if (string.Equals(remarks, "BPPS", StringComparison.OrdinalIgnoreCase))
-                return "BPPS";
-
-            if (boxes > 0 && productPps > 0 && quantity == boxes * productPps)
-                return "Exact PPS";
-
-            return boxes > 0 ? "BPPS" : string.Empty;
-        }
-
-        private static int GetLedgerBoxQuantity(string category, int? storedBoxes)
-        {
-            bool isScanBased = category == "BPPS" ||
-                               category == "Finished Goods" ||
-                               category == "Shipment" ||
-                               category == "Warehouse Return";
-
-            return isScanBased ? 1 : Math.Max(storedBoxes ?? 0, 0);
-        }
-
-        private static string GetGroupedPpsType(IEnumerable<string> ppsTypes)
-        {
-            var distinctTypes = ppsTypes
-                .Where(type => !string.IsNullOrWhiteSpace(type))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            return distinctTypes.Count switch
-            {
-                0 => string.Empty,
-                1 => distinctTypes[0],
-                _ => "Mixed"
-            };
         }
 
         private static string GetLedgerCategory(string transactionType, string controlNumber, string remarks)
