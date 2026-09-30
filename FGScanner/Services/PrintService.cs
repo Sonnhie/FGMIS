@@ -301,6 +301,46 @@ namespace FGScanner.Services
             }
         }
 
+        private static void DrawStringToFit(
+            Graphics graphics,
+            string value,
+            Font preferredFont,
+            Brush brush,
+            RectangleF area,
+            StringFormat format,
+            float minimumFontSize = 7f)
+        {
+            string text = value ?? string.Empty;
+            if (string.IsNullOrEmpty(text) || area.Width <= 0 || area.Height <= 0)
+            {
+                return;
+            }
+
+            const float horizontalPadding = 6f;
+            const float verticalPadding = 4f;
+            float availableWidth = Math.Max(area.Width - horizontalPadding, 1f);
+            float availableHeight = Math.Max(area.Height - verticalPadding, 1f);
+
+            using StringFormat fittedFormat = new(format)
+            {
+                FormatFlags = format.FormatFlags | StringFormatFlags.NoWrap,
+                Trimming = StringTrimming.EllipsisCharacter
+            };
+
+            SizeF measured = graphics.MeasureString(text, preferredFont, int.MaxValue, fittedFormat);
+            float widthScale = measured.Width > 0 ? availableWidth / measured.Width : 1f;
+            float heightScale = measured.Height > 0 ? availableHeight / measured.Height : 1f;
+            float scale = Math.Min(1f, Math.Min(widthScale, heightScale));
+            float fittedSize = Math.Max(minimumFontSize, preferredFont.Size * scale);
+
+            using Font fittedFont = new(
+                preferredFont.FontFamily,
+                fittedSize,
+                preferredFont.Style,
+                GraphicsUnit.Point);
+            graphics.DrawString(text, fittedFont, brush, area, fittedFormat);
+        }
+
         private void DrawInventoryCard(Graphics g, int width, int height, int startX, int startY, InventoryCardData data, PrintPageEventArgs e, string _userId)
         {
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -331,11 +371,14 @@ namespace FGScanner.Services
 
             int currentY = startY;
             int rowH = 50;
-            g.DrawString("Inventory Card", bodyFont, textBrush, new Rectangle(startX, currentY, width, rowH), centerFmt);
+            string cardTitle = string.IsNullOrWhiteSpace(data.Category)
+                ? "Inventory Card"
+                : $"Inventory Card - {data.Category}";
+            g.DrawString(cardTitle, bodyFont, textBrush, new Rectangle(startX, currentY, width, rowH), centerFmt);
             currentY += rowH; g.DrawLine(borderPen, startX, currentY, startX + width, currentY);
 
             rowH = 50;
-            g.DrawString(data.MonthYear, headerFont, textBrush, new Rectangle(startX, currentY, width, rowH), centerFmt);
+            DrawStringToFit(g, data.MonthYear, headerFont, textBrush, new RectangleF(startX, currentY, width, rowH), centerFmt);
             currentY += rowH; g.DrawLine(linePen, startX, currentY, startX + width, currentY);
 
             rowH = 80;
@@ -343,9 +386,9 @@ namespace FGScanner.Services
             int midX2 = startX + (int)(width * 0.50);
             int midX3 = startX + (int)(width * 0.75);
             g.DrawString("ERP Location:", bodyFont, textBrush, new Rectangle(startX + 5, currentY, midX - startX, rowH), leftFmt);
-            g.DrawString(data.ErpLocation, headerFont, textBrush, new Rectangle(midX, currentY, midX2 - midX, rowH), centerFmt);
+            DrawStringToFit(g, data.ErpLocation, headerFont, textBrush, new RectangleF(midX, currentY, midX2 - midX, rowH), centerFmt);
             g.DrawString("Prepared by:", bodyFont, textBrush, new Rectangle(midX2 + 5, currentY, midX3 - midX2, rowH), leftFmt);
-            g.DrawString(data.PreparedBy, headerFont, textBrush, new Rectangle(midX3, currentY, (startX + width) - midX3, rowH), centerFmt);
+            DrawStringToFit(g, data.PreparedBy, headerFont, textBrush, new RectangleF(midX3, currentY, (startX + width) - midX3, rowH), centerFmt);
 
             g.DrawLine(linePen, midX, currentY, midX, currentY + rowH);
             g.DrawLine(linePen, midX2, currentY, midX2, currentY + rowH);
@@ -353,13 +396,23 @@ namespace FGScanner.Services
             currentY += rowH; g.DrawLine(linePen, startX, currentY, startX + width, currentY);
 
             rowH = 80;
-            g.DrawString("Control no.", bodyFont, textBrush, new Rectangle(startX + 5, currentY, midX - startX, rowH), leftFmt);
-            g.DrawString($"{data.ControlNumber} - ({data.location})", largeDataFont, textBrush, new Rectangle(midX, currentY, (startX + width) - midX, rowH), centerFmt);
-            g.DrawLine(linePen, midX, currentY, midX, currentY + rowH * 2);
+            int controlLabelEnd = startX + (int)(width * 0.20);
+            int controlValueEnd = startX + (int)(width * 0.50);
+            int rackLabelEnd = startX + (int)(width * 0.70);
+
+            DrawStringToFit(g, "Control no.", bodyFont, textBrush, new RectangleF(startX + 5, currentY, controlLabelEnd - startX - 5, rowH), leftFmt, 9f);
+            DrawStringToFit(g, data.ControlNumber, largeDataFont, textBrush, new RectangleF(controlLabelEnd, currentY, controlValueEnd - controlLabelEnd, rowH), centerFmt);
+            DrawStringToFit(g, "Rack Location:", bodyFont, textBrush, new RectangleF(controlValueEnd + 5, currentY, rackLabelEnd - controlValueEnd - 5, rowH), leftFmt, 9f);
+            DrawStringToFit(g, data.location, largeDataFont, textBrush, new RectangleF(rackLabelEnd, currentY, startX + width - rackLabelEnd, rowH), centerFmt);
+
+            g.DrawLine(linePen, controlLabelEnd, currentY, controlLabelEnd, currentY + rowH);
+            g.DrawLine(linePen, controlValueEnd, currentY, controlValueEnd, currentY + rowH);
+            g.DrawLine(linePen, rackLabelEnd, currentY, rackLabelEnd, currentY + rowH);
             currentY += rowH; g.DrawLine(linePen, startX, currentY, startX + width, currentY);
 
             g.DrawString("Part No.", bodyFont, textBrush, new Rectangle(startX + 5, currentY, midX - startX, rowH), leftFmt);
-            g.DrawString(data.PartNo, largeDataFont, textBrush, new Rectangle(midX, currentY, (startX + width) - midX, rowH), centerFmt);
+            DrawStringToFit(g, data.PartNo, largeDataFont, textBrush, new RectangleF(midX, currentY, (startX + width) - midX, rowH), centerFmt);
+            g.DrawLine(linePen, midX, currentY, midX, currentY + rowH);
             currentY += rowH; g.DrawLine(linePen, startX, currentY, startX + width, currentY);
 
             rowH = 70;
@@ -378,10 +431,10 @@ namespace FGScanner.Services
             {
                 var row = data.Rows[_currentRowIndex];
                 cx = startX;
-                g.DrawString(row.LotNo, largeDataFont, textBrush, new RectangleF(cx, currentY, colW[0], rowH), centerFmt); cx += colW[0];
-                g.DrawString(row.Boxes.ToString(), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[1], rowH), centerFmt); cx += colW[1];
-                g.DrawString(row.Quantity.ToString(), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[2], rowH), centerFmt); cx += colW[2];
-                g.DrawString(row.TotalQty.ToString("N0"), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[3], rowH), centerFmt);
+                DrawStringToFit(g, row.LotNo, largeDataFont, textBrush, new RectangleF(cx, currentY, colW[0], rowH), centerFmt); cx += colW[0];
+                DrawStringToFit(g, row.Boxes.ToString("N0"), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[1], rowH), centerFmt); cx += colW[1];
+                DrawStringToFit(g, row.Quantity.ToString("N0"), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[2], rowH), centerFmt); cx += colW[2];
+                DrawStringToFit(g, row.TotalQty.ToString("N0"), largeDataFont, textBrush, new RectangleF(cx, currentY, colW[3], rowH), centerFmt);
 
                 currentY += rowH;
                 g.DrawLine(linePen, startX, currentY, startX + width, currentY);
@@ -401,8 +454,8 @@ namespace FGScanner.Services
                 }
 
                 g.DrawString("Grand Total", headerFont, textBrush, new Rectangle(startX + 5, currentY, (int)colW[0], rowH), leftFmt);
-                g.DrawString(data.GrandTotalBoxes.ToString(), largeDataFont, textBrush, new RectangleF(startX + colW[0], currentY, colW[1], rowH), centerFmt);
-                g.DrawString(data.GrandTotalQuantity.ToString("N0"), largeDataFont, textBrush, new RectangleF(startX + colW[0] + colW[1] + colW[2], currentY, colW[3], rowH), centerFmt);
+                DrawStringToFit(g, data.GrandTotalBoxes.ToString("N0"), largeDataFont, textBrush, new RectangleF(startX + colW[0], currentY, colW[1], rowH), centerFmt);
+                DrawStringToFit(g, data.GrandTotalQuantity.ToString("N0"), largeDataFont, textBrush, new RectangleF(startX + colW[0] + colW[1] + colW[2], currentY, colW[3], rowH), centerFmt);
             }
 
             int footerY = startY + mainHeight + 2;
@@ -435,9 +488,9 @@ namespace FGScanner.Services
                     g.DrawString("Part No.", smallFont, textBrush, sx + 2, stubY + 32);
                     g.DrawString("Quantity", smallFont, textBrush, sx + 2, stubY + 58);
 
-                    g.DrawString(data.ControlNumber, smallFont, textBrush, new Rectangle(sx + labelW, stubY, dataW, 26), centerFmt);
-                    g.DrawString(data.PartNo, smallFont, textBrush, new Rectangle(sx + labelW, stubY + 26, dataW, 26), centerFmt);
-                    g.DrawString(data.GrandTotalQuantity.ToString(), smallFont, textBrush, new Rectangle(sx + labelW, stubY + 52, dataW, 26), centerFmt);
+                    DrawStringToFit(g, data.ControlNumber, smallFont, textBrush, new RectangleF(sx + labelW, stubY, dataW, 26), centerFmt, 5f);
+                    DrawStringToFit(g, data.PartNo, smallFont, textBrush, new RectangleF(sx + labelW, stubY + 26, dataW, 26), centerFmt, 5f);
+                    DrawStringToFit(g, data.GrandTotalQuantity.ToString("N0"), smallFont, textBrush, new RectangleF(sx + labelW, stubY + 52, dataW, 26), centerFmt, 5f);
 
                     if (data.QrCode != null)
                         g.DrawImage(data.QrCode, sx + labelW + dataW + 5, stubY + 5, qrSize, qrSize);

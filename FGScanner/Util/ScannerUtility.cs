@@ -19,6 +19,12 @@ namespace FGScanner.Util
             itemModel = null;
             error = null;
 
+            if (string.IsNullOrWhiteSpace(QRData))
+            {
+                error = "Invalid QR Code!";
+                return false;
+            }
+
             string Partnumber = "";
             string ProductionVer = "";
             string date;
@@ -26,7 +32,6 @@ namespace FGScanner.Util
             string Quantity;
 
             var SlashedPart = QRData.Split('/');
-            var Check = new TransactionRepo();
 
             if (SlashedPart.Length != 2)
             {
@@ -72,6 +77,12 @@ namespace FGScanner.Util
             }
 
             if (!RightPart[0].StartsWith("O"))
+            {
+                error = "Invalid order format!";
+                return false;
+            }
+
+            if (RightPart[0].Length < 4)
             {
                 error = "Invalid order format!";
                 return false;

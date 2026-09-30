@@ -4,6 +4,7 @@ using FGScanner.Models;
 using FGScanner.Util;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -643,54 +644,117 @@ namespace FGScanner.Repositories
 
         public async Task<(bool isSuccess, string Message)> CancelShipment(string controlnumber, string userid)
         {
+            await using var dbTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+
             try
             {
-                var isExist = await _context.ShipmentTables.FirstOrDefaultAsync(x => x.TransactionId == controlnumber);
-                if (isExist == null)
+                var shipment = await _context.ShipmentTables.SingleOrDefaultAsync(x => x.TransactionId == controlnumber);
+                if (shipment == null)
                 {
-                    return (false, "Shipment ID is not exist on the record.");
+                    return (false, "Shipment does not exist.");
                 }
 
-                isExist.Status = "Cancelled";
-                var result = await _context.TransactionHistories.Where(x => x.ControlNumber.Equals(controlnumber)).ToListAsync();
-                if (result.Count == 0)
+                if(string.Equals(shipment.Status, "Cancelled",StringComparison.OrdinalIgnoreCase))
                 {
-                    return (false, "No transaction history.");
+                    return (false, "Shipment has already been cancelled.");
                 }
 
-                foreach(var transaction in result)
+                var originalRows = await _context.TransactionHistories
+                                        .Where(x => x.ControlNumber == controlnumber)
+                                        .ToListAsync();
+                if(originalRows.Count == 0)
                 {
-                    var ShipmentItems = new TransactionHistory
+                    return (false, "No Transaction history found.");
+                }
+
+                foreach (var original in originalRows)
+                {
+                    _context.TransactionHistories.Add(new TransactionHistory
                     {
-                        Partnumber = transaction.Partnumber,
-                        ProdDate = transaction.ProdDate,
-                        CustomerId = transaction.CustomerId,
-                        Quantity = transaction.Quantity,
-                        Box = transaction.Box,
-                        ProdVer = transaction.ProdVer,
-                        EntryDate = DateTime.Now,
-                        Location = transaction.Location,
-                        TransactionType = "IN",
-                        Remarks = "Cancelled Shipment",
-                        Status = "",
-                        StorageLocation = "9151",
-                        ControlNumber = "",
-                        WhId = "WH1",
-                        InCharge = userid,
                         TransactionId = Guid.NewGuid(),
+                        Partnumber = original.Partnumber,
+                        ProdDate = original.ProdDate,
+                        ProdVer = original.ProdVer,
+                        CustomerId = original.CustomerId,
+                        Quantity = original.Quantity,
+                        Box = original.Box,
+
+                        // Copy the original inventory identity
+                        WhId = original.WhId,
+                        Location = original.Location,
+                        StorageLocation = original.StorageLocation,
+
+                        TransactionType =
+                            original.TransactionType == "OUT" ? "IN" : "OUT",
+
+                        EntryDate = DateTime.Now,
+                        Remarks = "Cancelled Shipment",
+                        Status = "Active",
+                        InCharge = userid,
                         IsSynced = false,
                         SyncStatus = 0
-                    };
-
-                    _context.TransactionHistories.Add(ShipmentItems);
+                    });
                 }
+
+                shipment.Status = "Cancelled";
                 await _context.SaveChangesAsync();
-                return (true, $"Shipment cancelled successfully, Shipment ID: {controlnumber}");
+                await dbTransaction.CommitAsync();
+                return (true, "Shipment cancelled successfully.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return(false, ex.Message);
+                await dbTransaction.RollbackAsync();
+                return (false, $"Cancellation failed: {ex.Message}");
             }
+
+            //try
+            //{
+            //    var isExist = await _context.ShipmentTables.FirstOrDefaultAsync(x => x.TransactionId == controlnumber);
+            //    if (isExist == null)
+            //    {
+            //        return (false, "Shipment ID is not exist on the record.");
+            //    }
+
+            //    isExist.Status = "Cancelled";
+            //    var result = await _context.TransactionHistories.Where(x => x.ControlNumber.Equals(controlnumber)).ToListAsync();
+            //    if (result.Count == 0)
+            //    {
+            //        return (false, "No transaction history.");
+            //    }
+
+            //    foreach(var transaction in result)
+            //    {
+            //        var ShipmentItems = new TransactionHistory
+            //        {
+            //            Partnumber = transaction.Partnumber,
+            //            ProdDate = transaction.ProdDate,
+            //            CustomerId = transaction.CustomerId,
+            //            Quantity = transaction.Quantity,
+            //            Box = transaction.Box,
+            //            ProdVer = transaction.ProdVer,
+            //            EntryDate = DateTime.Now,
+            //            Location = transaction.Location,
+            //            TransactionType = "IN",
+            //            Remarks = "Cancelled Shipment",
+            //            Status = "",
+            //            StorageLocation = "9151",
+            //            ControlNumber = "",
+            //            WhId = "WH1",
+            //            InCharge = userid,
+            //            TransactionId = Guid.NewGuid(),
+            //            IsSynced = false,
+            //            SyncStatus = 0
+            //        };
+
+            //        _context.TransactionHistories.Add(ShipmentItems);
+            //    }
+            //    await _context.SaveChangesAsync();
+            //    return (true, $"Shipment cancelled successfully, Shipment ID: {controlnumber}");
+            //}
+            //catch(Exception ex)
+            //{
+            //    return(false, ex.Message);
+            //}
         }
 
         public async Task<List<ReturnTable>> GetFilteredReturn(string location, DateTime? start = null, DateTime? end = null)
@@ -751,57 +815,121 @@ namespace FGScanner.Repositories
 
         public async Task<(bool isSuccess, string Message)> CancelReturn(string controlnumber, string userid)
         {
+            await using var dbTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+
             try
             {
-                var isExist = await _context.ReturnTables.FirstOrDefaultAsync(x => x.TransactionId == controlnumber);
-                if (isExist == null)
+                var returns = await _context.ReturnTables.SingleOrDefaultAsync(x => x.TransactionId == controlnumber);
+                if (returns == null)
                 {
-                    return (false, "Return ID is not exist on the record.");
+                    return (false, "Warehouse Return does not exist.");
                 }
 
-                isExist.Status = "Cancelled";
-
-                var result = await _context.TransactionHistories.Where(x => x.ControlNumber.Equals(controlnumber)).ToListAsync();
-
-                if (result.Count == 0)
+                if (string.Equals(returns.Status, "Cancelled", StringComparison.OrdinalIgnoreCase))
                 {
-                    return (false, "No transaction history.");
+                    return (false, "Warehouse Return has already been cancelled.");
                 }
 
-                foreach (var transaction in result)
+                var originalRows = await _context.TransactionHistories
+                                        .Where(x => x.ControlNumber == controlnumber)
+                                        .ToListAsync();
+                if (originalRows.Count == 0)
                 {
-                    var returnItems = new TransactionHistory
+                    return (false, "No Transaction history found.");
+                }
+
+                foreach (var original in originalRows)
+                {
+                    _context.TransactionHistories.Add(new TransactionHistory
                     {
-                        Partnumber = transaction.Partnumber,
-                        ProdDate = transaction.ProdDate,
-                        CustomerId = transaction.CustomerId,
-                        Quantity = transaction.Quantity,
-                        Box = transaction.Box,
-                        ProdVer = transaction.ProdVer,
-                        EntryDate = DateTime.Now,
-                        Location = transaction.Location,
-                        TransactionType = "IN",
-                        Remarks = "Cancelled Returns",
-                        Status = "",
-                        StorageLocation = "9151",
-                        ControlNumber = "",
-                        WhId = "WH1",
-                        InCharge = userid,
                         TransactionId = Guid.NewGuid(),
+                        Partnumber = original.Partnumber,
+                        ProdDate = original.ProdDate,
+                        ProdVer = original.ProdVer,
+                        CustomerId = original.CustomerId,
+                        Quantity = original.Quantity,
+                        Box = original.Box,
+
+                        // Copy the original inventory identity
+                        WhId = original.WhId,
+                        Location = original.Location,
+                        StorageLocation = original.StorageLocation,
+
+                        TransactionType =
+                            original.TransactionType == "OUT" ? "IN" : "OUT",
+
+                        EntryDate = DateTime.Now,
+                        Remarks = "Cancelled Return",
+                        Status = "Active",
+                        InCharge = userid,
                         IsSynced = false,
                         SyncStatus = 0
-                    };
-
-                    _context.TransactionHistories.Add(returnItems);
+                    });
                 }
 
+                returns.Status = "Cancelled";
                 await _context.SaveChangesAsync();
-                return (true, $"Return cancelled successfully, Return ID: {controlnumber}");
+                await dbTransaction.CommitAsync();
+                return (true, "Warehouse Return cancelled successfully.");
             }
             catch (Exception ex)
             {
-                return (false, ex.Message);
+                await dbTransaction.RollbackAsync();
+                return (false, $"Cancellation failed: {ex.Message}");
             }
+
+
+            //try
+            //{
+            //    var isExist = await _context.ReturnTables.FirstOrDefaultAsync(x => x.TransactionId == controlnumber);
+            //    if (isExist == null)
+            //    {
+            //        return (false, "Return ID is not exist on the record.");
+            //    }
+
+            //    isExist.Status = "Cancelled";
+
+            //    var result = await _context.TransactionHistories.Where(x => x.ControlNumber.Equals(controlnumber)).ToListAsync();
+
+            //    if (result.Count == 0)
+            //    {
+            //        return (false, "No transaction history.");
+            //    }
+
+            //    foreach (var transaction in result)
+            //    {
+            //        var returnItems = new TransactionHistory
+            //        {
+            //            Partnumber = transaction.Partnumber,
+            //            ProdDate = transaction.ProdDate,
+            //            CustomerId = transaction.CustomerId,
+            //            Quantity = transaction.Quantity,
+            //            Box = transaction.Box,
+            //            ProdVer = transaction.ProdVer,
+            //            EntryDate = DateTime.Now,
+            //            Location = transaction.Location,
+            //            TransactionType = "IN",
+            //            Remarks = "Cancelled Returns",
+            //            Status = "",
+            //            StorageLocation = "9151",
+            //            ControlNumber = "",
+            //            WhId = "WH1",
+            //            InCharge = userid,
+            //            TransactionId = Guid.NewGuid(),
+            //            IsSynced = false,
+            //            SyncStatus = 0
+            //        };
+
+            //        _context.TransactionHistories.Add(returnItems);
+            //    }
+
+            //    await _context.SaveChangesAsync();
+            //    return (true, $"Return cancelled successfully, Return ID: {controlnumber}");
+            //}
+            //catch (Exception ex)
+            //{
+            //    return (false, ex.Message);
+            //}
         }
 
         public async Task<List<ActualInventory>> GetRackQuantity(string warehouseid)
@@ -869,23 +997,78 @@ namespace FGScanner.Repositories
 
         public async Task<List<ActualInventory>> GetItemByLocation(string location, string warehouseid)
         {
-            var MappedList = await _context.ActualInventories
-                            .Where(x => x.Location == location && x.WhId == warehouseid)
-                            .GroupBy(x => new { x.Partnumber, x.ProdDate, x.ProdVer })
-                            .Select(x => new ActualInventory
-                            {
-                                Partnumber = x.Key.Partnumber,
-                                ProdDate = x.Key.ProdDate,
-                                ProdVer = x.Key.ProdVer,
-                                Customer = x.First().Customer,
-                                Quantity = x.Sum(x => x.Quantity),
-                                TotalBox = x.Sum(x => x.TotalBox),
-                                WhId = x.Max(x => x.WhId)
-                            })
-                            .OrderBy(x => x.ProdDate)
-                            .ToListAsync();
+            var transactions = await _context.TransactionHistories
+                .AsNoTracking()
+                .Where(transaction =>
+                    transaction.Location == location &&
+                    transaction.WhId == warehouseid &&
+                    transaction.Quantity > 0 &&
+                    (transaction.TransactionType == "IN" || transaction.TransactionType == "OUT"))
+                .ToListAsync();
 
-            return MappedList;
+            var partnumbers = transactions
+                .Select(transaction => transaction.Partnumber)
+                .Distinct()
+                .ToList();
+            var productPps = await _context.Products
+                .AsNoTracking()
+                .Where(product => partnumbers.Contains(product.Partnumber))
+                .ToDictionaryAsync(product => product.Partnumber, product => product.Pps);
+
+            var movements = transactions.Select(transaction =>
+            {
+                productPps.TryGetValue(transaction.Partnumber, out int pps);
+                string movementCategory = GetLedgerCategory(
+                    transaction.TransactionType,
+                    transaction.ControlNumber,
+                    transaction.Remarks);
+                int boxes = GetLedgerBoxQuantity(movementCategory, transaction.Box);
+                string ppsType = GetPpsType(
+                    transaction.Quantity,
+                    boxes,
+                    pps,
+                    transaction.Remarks);
+                int direction = transaction.TransactionType == "IN" ? 1 : -1;
+
+                return new
+                {
+                    transaction.Partnumber,
+                    transaction.ProdDate,
+                    transaction.ProdVer,
+                    transaction.CustomerId,
+                    transaction.WhId,
+                    PpsType = string.IsNullOrWhiteSpace(ppsType) ? "BPPS" : ppsType,
+                    Quantity = direction * transaction.Quantity,
+                    Boxes = direction * boxes
+                };
+            });
+
+            return movements
+                .GroupBy(movement => new
+                {
+                    movement.Partnumber,
+                    movement.ProdDate,
+                    movement.ProdVer,
+                    movement.CustomerId,
+                    movement.WhId,
+                    movement.PpsType
+                })
+                .Select(group => new ActualInventory
+                {
+                    Partnumber = group.Key.Partnumber,
+                    ProdDate = group.Key.ProdDate,
+                    ProdVer = group.Key.ProdVer,
+                    Customer = group.Key.CustomerId,
+                    Quantity = group.Sum(movement => movement.Quantity),
+                    TotalBox = Math.Max(group.Sum(movement => movement.Boxes), 0),
+                    Remarks = group.Key.PpsType,
+                    WhId = group.Key.WhId
+                })
+                .Where(item => item.Quantity > 0)
+                .OrderBy(item => item.ProdDate)
+                .ThenBy(item => item.Partnumber)
+                .ThenBy(item => item.Remarks)
+                .ToList();
         }
 
         private string GenerateTransactionNumber()
@@ -898,32 +1081,113 @@ namespace FGScanner.Repositories
         public async Task<List<InventoryCardData>> GetInventoryCardDataByLocation(string location, string warehouseid, string userid)
         {
             string CtrlNumber = GenerateTransactionNumber();
-            var rawData = await _context.ActualInventories
-                            .Where(x => x.Location == location && x.WhId == warehouseid)
-                            .OrderBy(x => x.Partnumber)
-                            .ToListAsync();
-            var allCards = rawData
-                           .GroupBy(item => item.Partnumber)
+            var rawData = await _context.TransactionHistories
+                .AsNoTracking()
+                .Where(transaction =>
+                    transaction.Location == location &&
+                    transaction.WhId == warehouseid &&
+                    transaction.Quantity > 0 &&
+                    (transaction.TransactionType == "IN" || transaction.TransactionType == "OUT"))
+                .OrderBy(transaction => transaction.Partnumber)
+                .ThenBy(transaction => transaction.ProdDate)
+                .ThenBy(transaction => transaction.EntryDate)
+                .ToListAsync();
+
+            var partnumbers = rawData
+                .Select(transaction => transaction.Partnumber)
+                .Distinct()
+                .ToList();
+            var productInfo = await _context.Products
+                .AsNoTracking()
+                .Where(product => partnumbers.Contains(product.Partnumber))
+                .ToDictionaryAsync(product => product.Partnumber);
+
+            var categorizedMovements = rawData.Select(transaction =>
+            {
+                productInfo.TryGetValue(transaction.Partnumber, out var product);
+                int pps = product?.Pps ?? 0;
+                string movementCategory = GetLedgerCategory(
+                    transaction.TransactionType,
+                    transaction.ControlNumber,
+                    transaction.Remarks);
+                int boxes = GetLedgerBoxQuantity(movementCategory, transaction.Box);
+                string ppsType = GetPpsType(
+                    transaction.Quantity,
+                    boxes,
+                    pps,
+                    transaction.Remarks);
+                int direction = transaction.TransactionType == "IN" ? 1 : -1;
+
+                return new
+                {
+                    transaction.Partnumber,
+                    transaction.ProdDate,
+                    transaction.ProdVer,
+                    transaction.StorageLocation,
+                    Pps = pps,
+                    ProductId = product?.Id ?? 0,
+                    Category = string.IsNullOrWhiteSpace(ppsType) ? "BPPS" : ppsType,
+                    Boxes = direction * boxes,
+                    Quantity = direction * transaction.Quantity
+                };
+            }).ToList();
+
+            var categorizedInventory = categorizedMovements
+                .GroupBy(movement => new
+                {
+                    movement.Partnumber,
+                    movement.ProdDate,
+                    movement.ProdVer,
+                    movement.StorageLocation,
+                    movement.Pps,
+                    movement.ProductId,
+                    movement.Category
+                })
+                .Select(group => new
+                {
+                    group.Key.Partnumber,
+                    group.Key.ProdDate,
+                    group.Key.ProdVer,
+                    group.Key.StorageLocation,
+                    group.Key.Pps,
+                    group.Key.ProductId,
+                    group.Key.Category,
+                    TotalBox = group.Sum(movement => movement.Boxes),
+                    Quantity = group.Sum(movement => movement.Quantity)
+                })
+                .Where(item => item.Quantity > 0)
+                .ToList();
+
+            var allCards = categorizedInventory
+                           .GroupBy(item => new { item.Partnumber, item.Category })
                            .Select(group =>
                            {
                                var cardRows = group.Select(row => new InventoryRow
                                {
                                    LotNo = row.ProdDate.ToString("MM-dd-yy"),
-                                   Boxes = row.TotalBox,
-                                   Quantity = GetProductPPS(row.Partnumber)
+                                   Boxes = Math.Max(row.TotalBox, 0),
+                                   Quantity = row.Category == "Exact PPS" && row.Pps > 0
+                                       ? row.Pps
+                                       : row.TotalBox > 0
+                                           ? row.Quantity / row.TotalBox
+                                           : row.Quantity,
+                                   CalculatedTotalQuantity = row.Category == "Exact PPS"
+                                       ? Math.Max(row.TotalBox, 0) * row.Pps
+                                       : row.Quantity
                                }).ToList();
 
                                int totalBox = cardRows.Sum(x => x.Boxes);
                                int totalQuantity = cardRows.Sum(x => x.TotalQty);
-                               int pps = GetProductPPS(group.Key);
-                               int id = GetProductID(group.Key);
+                               int pps = group.First().Pps;
+                               int id = group.First().ProductId;
                                
 
 
                                return new InventoryCardData
                                {
                                    id = id,
-                                   PartNo = group.Key,
+                                   PartNo = group.Key.Partnumber,
+                                   Category = group.Key.Category,
                                    ErpLocation = group.First().StorageLocation ?? string.Empty,
                                    MonthYear = DateTime.Now.ToString("yyyy MMMM").ToUpper(),
                                    location = location,
@@ -1036,11 +1300,30 @@ namespace FGScanner.Repositories
 
         public async Task<(bool isSuccess, string Message)> ManualDeduction(TransactionHistory transaction)
         {
+            if (transaction == null)
+                return (false, "No inventory was supplied.");
+
+            if (transaction.Quantity <= 0)
+                return (false, "Deduction quantity must be greater than zero.");
+
+            await using var dbTransaction =
+                        await _context.Database.BeginTransactionAsync(
+                            IsolationLevel.Serializable);
+
             try
             {
-                if(transaction ==  null)
+                var inventory = await _context.ActualInventories
+                                        .SingleOrDefaultAsync(x =>
+                                        x.Partnumber == transaction.Partnumber &&
+                                        x.ProdDate == transaction.ProdDate &&
+                                        x.ProdVer == transaction.ProdVer &&
+                                        x.Location == transaction.Location &&
+                                        x.WhId == transaction.WhId);
+                if (inventory == null) return (false, "The inventory record no longer exists.");
+
+                if(transaction.Quantity > inventory.Quantity)
                 {
-                    return (false, "No invntory to deduct");
+                    return (false, $"Only {inventory.Quantity} pieces are available.");
                 }
 
                 var newItem = new TransactionHistory
@@ -1266,6 +1549,29 @@ namespace FGScanner.Repositories
                         ? transaction.Quantity
                         : -transaction.Quantity);
 
+                int beginningBoxBalance = await filteredTransactions
+                    .Where(transaction => transaction.EntryDate < periodStart)
+                    .SumAsync(transaction =>
+                        transaction.TransactionType == "IN"
+                            ? transaction.Remarks == "BPPS" ||
+                              transaction.Remarks == "FG" ||
+                              transaction.ControlNumber.StartsWith("SHIPID-") ||
+                              transaction.ControlNumber.StartsWith("AS-")
+                                ? 1
+                                : transaction.Box ?? 0
+                            : -(transaction.Remarks == "BPPS" ||
+                                transaction.Remarks == "FG" ||
+                                transaction.ControlNumber.StartsWith("SHIPID-") ||
+                                transaction.ControlNumber.StartsWith("AS-")
+                                    ? 1
+                                    : transaction.Box ?? 0));
+
+                int productPps = await _context.Products
+                    .AsNoTracking()
+                    .Where(product => product.Partnumber == normalizedPartnumber)
+                    .Select(product => product.Pps)
+                    .FirstOrDefaultAsync();
+
                 var transactions = await filteredTransactions
                     .Where(transaction =>
                         transaction.EntryDate >= periodStart &&
@@ -1278,6 +1584,7 @@ namespace FGScanner.Repositories
                         transaction.EntryDate,
                         transaction.TransactionType,
                         transaction.Quantity,
+                        transaction.Box,
                         transaction.ControlNumber,
                         transaction.Remarks,
                         transaction.InCharge
@@ -1291,19 +1598,31 @@ namespace FGScanner.Repositories
                     Customer = GetProductCustomer(normalizedPartnumber)
                 };
 
-                var ledgerRows = transactions.Select(transaction => new
+                var ledgerRows = transactions.Select(transaction =>
                 {
-                    transaction.Id,
-                    transaction.EntryDate,
-                    transaction.TransactionType,
-                    transaction.Quantity,
-                    ControlNumber = transaction.ControlNumber ?? string.Empty,
-                    Remarks = transaction.Remarks ?? string.Empty,
-                    InCharge = transaction.InCharge ?? string.Empty,
-                    Category = GetLedgerCategory(
+                    string category = GetLedgerCategory(
                         transaction.TransactionType,
                         transaction.ControlNumber,
-                        transaction.Remarks)
+                        transaction.Remarks);
+                    int ledgerBoxes = GetLedgerBoxQuantity(category, transaction.Box);
+
+                    return new
+                    {
+                        transaction.Id,
+                        transaction.EntryDate,
+                        transaction.TransactionType,
+                        transaction.Quantity,
+                        Boxes = ledgerBoxes,
+                        ControlNumber = transaction.ControlNumber ?? string.Empty,
+                        Remarks = transaction.Remarks ?? string.Empty,
+                        InCharge = transaction.InCharge ?? string.Empty,
+                        PpsType = GetPpsType(
+                            transaction.Quantity,
+                            ledgerBoxes,
+                            productPps,
+                            transaction.Remarks),
+                        Category = category
+                    };
                 });
 
                 var rows = detailed
@@ -1317,7 +1636,10 @@ namespace FGScanner.Repositories
                         transaction.Remarks,
                         transaction.InCharge,
                         In = transaction.TransactionType == "IN" ? transaction.Quantity : 0,
-                        Out = transaction.TransactionType == "OUT" ? transaction.Quantity : 0
+                        Out = transaction.TransactionType == "OUT" ? transaction.Quantity : 0,
+                        BoxIn = transaction.TransactionType == "IN" ? transaction.Boxes : 0,
+                        BoxOut = transaction.TransactionType == "OUT" ? transaction.Boxes : 0,
+                        transaction.PpsType
                     })
                     : ledgerRows
                         .GroupBy(transaction => new
@@ -1342,14 +1664,20 @@ namespace FGScanner.Repositories
                                 .Distinct(StringComparer.OrdinalIgnoreCase)),
                             group.Key.InCharge,
                             In = group.Where(transaction => transaction.TransactionType == "IN").Sum(transaction => transaction.Quantity),
-                            Out = group.Where(transaction => transaction.TransactionType == "OUT").Sum(transaction => transaction.Quantity)
+                            Out = group.Where(transaction => transaction.TransactionType == "OUT").Sum(transaction => transaction.Quantity),
+                            BoxIn = group.Where(transaction => transaction.TransactionType == "IN").Sum(transaction => transaction.Boxes),
+                            BoxOut = group.Where(transaction => transaction.TransactionType == "OUT").Sum(transaction => transaction.Boxes),
+                            PpsType = GetGroupedPpsType(group.Select(transaction => transaction.PpsType))
                         });
 
                 int currentStock = beginningBalance;
+                int currentBoxes = beginningBoxBalance;
                 foreach (var row in rows.OrderBy(row => row.ExactTime).ThenBy(row => row.Id))
                 {
                     int rowBeginningStock = currentStock;
+                    int rowBeginningBoxes = currentBoxes;
                     currentStock += row.In - row.Out;
+                    currentBoxes += row.BoxIn - row.BoxOut;
 
                     stockCard.Ledgers.Add(new StockLedger
                     {
@@ -1358,6 +1686,11 @@ namespace FGScanner.Repositories
                         In = row.In,
                         Out = row.Out,
                         RunningStock = currentStock,
+                        BoxIn = row.BoxIn,
+                        BoxOut = row.BoxOut,
+                        BeginningBoxes = rowBeginningBoxes,
+                        RunningBoxes = currentBoxes,
+                        PpsType = row.PpsType,
                         Category = row.Category,
                         ControlNumber = row.ControlNumber,
                         Incharge = row.InCharge,
@@ -1366,12 +1699,49 @@ namespace FGScanner.Repositories
                 }
 
                 stockCard.EndingStock = currentStock;
+                stockCard.EndingBoxes = currentBoxes;
                 return stockCard;
             }
             catch
             {
                 return null;
             }
+        }
+
+        private static string GetPpsType(int quantity, int boxes, int productPps, string remarks)
+        {
+            if (string.Equals(remarks, "BPPS", StringComparison.OrdinalIgnoreCase))
+                return "BPPS";
+
+            if (boxes > 0 && productPps > 0 && quantity == boxes * productPps)
+                return "Exact PPS";
+
+            return boxes > 0 ? "BPPS" : string.Empty;
+        }
+
+        private static int GetLedgerBoxQuantity(string category, int? storedBoxes)
+        {
+            bool isScanBased = category == "BPPS" ||
+                               category == "Finished Goods" ||
+                               category == "Shipment" ||
+                               category == "Warehouse Return";
+
+            return isScanBased ? 1 : Math.Max(storedBoxes ?? 0, 0);
+        }
+
+        private static string GetGroupedPpsType(IEnumerable<string> ppsTypes)
+        {
+            var distinctTypes = ppsTypes
+                .Where(type => !string.IsNullOrWhiteSpace(type))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            return distinctTypes.Count switch
+            {
+                0 => string.Empty,
+                1 => distinctTypes[0],
+                _ => "Mixed"
+            };
         }
 
         private static string GetLedgerCategory(string transactionType, string controlNumber, string remarks)

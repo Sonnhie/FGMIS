@@ -177,7 +177,7 @@ namespace FGScanner.Forms.Reports
                 string qty = selectedRow.Cells["Quantity"].Value.ToString();
 
 
-                if (status == "Cancelled Return")
+                if (status == "Cancelled")
                 {
                     CancelReturnButton.Enabled = false;
                 }

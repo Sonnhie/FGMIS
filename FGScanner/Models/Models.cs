@@ -297,6 +297,7 @@ namespace FGScanner.Models
         public string PreparedBy { get; set; }
         public int ControlNo { get; set; }
         public string PartNo { get; set; }
+        public string Category { get; set; } = string.Empty;
         public string location { get; set; }
         public int PPS { get; set; }
         public int GrandTotalBoxes { get; set; }
@@ -310,7 +311,8 @@ namespace FGScanner.Models
         public string LotNo { get; set; }
         public int Boxes { get; set; }
         public int Quantity { get; set; }
-        public int TotalQty => Boxes * Quantity;
+        public int? CalculatedTotalQuantity { get; set; }
+        public int TotalQty => CalculatedTotalQuantity ?? Boxes * Quantity;
     }
 
     public class PagedResult<T>
@@ -373,6 +375,7 @@ namespace FGScanner.Models
         public string PartNumber { get; set; }
         public string PartName { get; set; }
         public int EndingStock { get; set; }
+        public int EndingBoxes { get; set; }
         public string Customer { get; set; }
 
         // 2. The Header contains a list of Ledger transactions
@@ -389,6 +392,11 @@ namespace FGScanner.Models
         public int Out { get; set; }
         public int BeginningStock { get; set; }
         public int RunningStock { get; set; }
+        public int BoxIn { get; set; }
+        public int BoxOut { get; set; }
+        public int BeginningBoxes { get; set; }
+        public int RunningBoxes { get; set; }
+        public string PpsType { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
         public string ControlNumber { get; set; } = string.Empty;
         public string Incharge { get; set; } = string.Empty;

@@ -79,9 +79,13 @@ namespace FGScanner.Forms.Reports
                     dt.Columns.Add("Inventory Date", typeof(DateTime));
                     dt.Columns.Add("Category", typeof(string));
                     dt.Columns.Add("Control Number", typeof(string));
+                    dt.Columns.Add("PPS Type", typeof(string));
                     dt.Columns.Add("IN", typeof(string));
                     dt.Columns.Add("OUT", typeof(string));
                     dt.Columns.Add("Running Stock", typeof(string));
+                    dt.Columns.Add("Box IN", typeof(string));
+                    dt.Columns.Add("Box OUT", typeof(string));
+                    dt.Columns.Add("Running Boxes", typeof(string));
                     dt.Columns.Add("Remarks", typeof(string));
                     dt.Columns.Add("PIC", typeof(string));
 
@@ -98,9 +102,13 @@ namespace FGScanner.Forms.Reports
                            item.InventoryDate,
                            item.Category,
                            item.ControlNumber,
+                           item.PpsType,
                            item.In,
                            item.Out,
                            item.RunningStock,
+                           item.BoxIn,
+                           item.BoxOut,
+                           item.RunningBoxes,
                            item.Remarks ?? string.Empty,
                            item.Incharge.ToString() ?? string.Empty
                         );
@@ -114,9 +122,13 @@ namespace FGScanner.Forms.Reports
                     StockCardtable.Columns["Inventory Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     StockCardtable.Columns["Category"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     StockCardtable.Columns["Control Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    StockCardtable.Columns["PPS Type"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     StockCardtable.Columns["IN"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     StockCardtable.Columns["OUT"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     StockCardtable.Columns["Running Stock"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    StockCardtable.Columns["Box IN"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    StockCardtable.Columns["Box OUT"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    StockCardtable.Columns["Running Boxes"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     StockCardtable.Columns["Remarks"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     StockCardtable.Columns["PIC"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 }

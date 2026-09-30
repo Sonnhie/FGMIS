@@ -42,6 +42,11 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="FGScanner.Tests\**\*.cs" />
+    <EmbeddedResource Remove="FGScanner.Tests\**\*" />
+    <None Remove="FGScanner.Tests\**\*" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WinForms" Version="2.0.5" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Messaging" />

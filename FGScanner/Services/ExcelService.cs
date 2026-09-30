@@ -811,7 +811,9 @@ namespace FGScanner.Services
                     ws.Cells[startrow, 3].Value = item.Out;
                     ws.Cells[startrow, 4].Value = item.RunningStock;
                     ws.Cells[startrow, 5].Value = item.Incharge;
-                    ws.Cells[startrow, 6].Value = item.Category;
+                    ws.Cells[startrow, 6].Value = string.IsNullOrWhiteSpace(item.PpsType)
+                        ? item.Category
+                        : $"{item.Category} ({item.PpsType}) | Boxes IN: {item.BoxIn}, OUT: {item.BoxOut}, Balance: {item.RunningBoxes}";
 
                     startrow++;
 

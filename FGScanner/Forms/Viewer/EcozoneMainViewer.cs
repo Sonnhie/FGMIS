@@ -265,9 +265,10 @@ namespace FGScanner.Forms.Viewer
                 {
                     DataTable dt = new DataTable();
                     dt.Columns.Add("Part Number", typeof(string));
-                    dt.Columns.Add("Quantity", typeof(string));
-                    dt.Columns.Add("Total Box", typeof(string));
-                    dt.Columns.Add("Production Date", typeof(string));
+                    dt.Columns.Add("PPS Type", typeof(string));
+                    dt.Columns.Add("Quantity", typeof(int));
+                    dt.Columns.Add("Total Box", typeof(int));
+                    dt.Columns.Add("Production Date", typeof(DateTime));
                     dt.Columns.Add("Production Version", typeof(string));
                     dt.Columns.Add("Customer", typeof(string));
                     dt.Columns.Add("Warehouse", typeof(string));
@@ -280,9 +281,10 @@ namespace FGScanner.Forms.Viewer
                             dt.Rows.Add
                             (
                               Data.Partnumber,
+                              Data.Remarks,
                               Data.Quantity,
                               Data.TotalBox,
-                              Data.ProdDate.ToString("MM/dd/yyyy"),
+                              Data.ProdDate.ToDateTime(TimeOnly.MinValue),
                               Data.ProdVer,
                               Data.Customer,
                               Data.WhId
@@ -293,12 +295,36 @@ namespace FGScanner.Forms.Viewer
                     RackDataGridView.Columns.Clear();
                     RackDataGridView.ReadOnly = true;
                     RackDataGridView.DataSource = dt;
+                    ConfigureRackDetailsTable(RackDataGridView);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
             }
+        }
+
+        private static void ConfigureRackDetailsTable(DataGridView grid)
+        {
+            grid.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            grid.Columns["Part Number"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            grid.Columns["PPS Type"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            grid.Columns["Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            grid.Columns["Total Box"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            grid.Columns["Production Date"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            grid.Columns["Production Version"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            grid.Columns["Customer"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            grid.Columns["Warehouse"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+
+            grid.Columns["Quantity"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            grid.Columns["Quantity"].DefaultCellStyle.Format = "N0";
+            grid.Columns["Total Box"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            grid.Columns["Total Box"].DefaultCellStyle.Format = "N0";
+            grid.Columns["Production Date"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            grid.Columns["Production Date"].DefaultCellStyle.Format = "MM/dd/yyyy";
+            grid.Columns["PPS Type"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            grid.Columns["Production Version"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            grid.Columns["Warehouse"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
         }
 
         private async void Buttom_Click(object sender, EventArgs e)
