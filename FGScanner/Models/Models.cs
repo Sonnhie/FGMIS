@@ -323,6 +323,19 @@ namespace FGScanner.Models
         public int PageSize { get; set; }
     }
 
+    public class InventoryFilter
+    {
+        public string Partnumber { get; set; }
+        public string Customer { get; set; }
+        public string Location { get; set; }
+        public string ProductionVersion { get; set; }
+        public string WarehouseId { get; set; }
+        public string PpsType { get; set; }
+        public string MovementClassification { get; set; }
+        public DateOnly? ProductionDateFrom { get; set; }
+        public DateOnly? ProductionDateTo { get; set; }
+    }
+
     public class ReportGeneration<T>
     {
         public string Title { get; set; } = string.Empty;

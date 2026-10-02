@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Zen.Barcode;
+using FGScanner.UI;
 
 namespace FGScanner.Forms.Viewer
 {
@@ -45,18 +46,26 @@ namespace FGScanner.Forms.Viewer
         private List<FGScanner.Models.InventoryCardData> cardsToPrint = new();
         private int currentCardIndex = 0;
         private string _userid = string.Empty;
+        private bool _realtimeSubscribed;
+        private Label _searchStatusLabel;
+        private readonly HashSet<string> _searchMatches = new(StringComparer.OrdinalIgnoreCase);
+        private string _selectedLocation;
 
         public MainWarehouseViewer(string userid)
         {
             InitializeComponent();
 
-            timer1.Interval = 2000;
+            timer1.Interval = (int)TimeSpan.FromMinutes(2).TotalMilliseconds;
 
             // Setup UI and Services FIRST
-            typeof(FlowLayoutPanel)
-                .GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-                .SetValue(flowLayoutPanel1, true, null);
+            ViewerPresentation.EnableDoubleBuffering(this);
             TxtPartnumber.CharacterCasing = CharacterCasing.Upper;
+            _searchStatusLabel = ViewerPresentation.ConfigureCollapsibleDetails(
+                this, panel3, panel1, label13, label1, TxtPartnumber, () =>
+                {
+                    _selectedLocation = null;
+                    ApplyRackEmphasis();
+                });
 
             _userid = userid;
             _dbContext = new();
@@ -69,18 +78,23 @@ namespace FGScanner.Forms.Viewer
 
         private void InitializeRackViews(string[] Racks)
         {
-            foreach (var rack in Racks)
-            {
-                flowLayoutPanel1.SuspendLayout();
-                GenerateRackView(rack);
-                flowLayoutPanel1.ResumeLayout();
-            }
+            CinemaRackLayout.Build(flowLayoutPanel1, Racks, RackConfig, rackButtons, Buttom_Click);
         }
 
         private async Task LoadData(string partnumber)
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(partnumber))
+                {
+                    _searchMatches.Clear();
+                    _searchStatusLabel.Text = string.Empty;
+                    ListGrid.DataSource = null;
+                    ApplyRackEmphasis();
+                    return;
+                }
+
+                _searchMatches.Clear();
                 var Datas = await _queries.GetItemByPartnumber(partnumber, whId);
 
                 if (Datas != null)
@@ -96,6 +110,11 @@ namespace FGScanner.Forms.Viewer
                     {
                         if (Data.Quantity != 0)
                         {
+                            if (!string.IsNullOrWhiteSpace(Data.Location))
+                            {
+                                _searchMatches.Add(Data.Location);
+                            }
+
                             dt.Rows.Add
                             (
                               Data.Location,
@@ -111,6 +130,10 @@ namespace FGScanner.Forms.Viewer
                     ListGrid.Columns["Location"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     ListGrid.Columns["Quantity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     ListGrid.Columns["Total Box"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    _searchStatusLabel.Text = _searchMatches.Count == 1
+                        ? "1 location"
+                        : $"{_searchMatches.Count} locations";
+                    ApplyRackEmphasis();
                 }
             }
             catch (Exception ex)
@@ -327,7 +350,11 @@ namespace FGScanner.Forms.Viewer
         private async void Buttom_Click(object sender, EventArgs e)
         {
             Button clickedButton = sender as Button;
-            string location = clickedButton.Text;
+            string location = clickedButton.Tag as string ?? clickedButton.Text;
+            _selectedLocation = location;
+            LblRack.Text = location;
+            ApplyRackEmphasis();
+            ViewerPresentation.ShowDetails(this, panel1);
             timer1.Stop();
             await _dbLock.WaitAsync();
             try
@@ -343,8 +370,47 @@ namespace FGScanner.Forms.Viewer
                 _dbLock.Release();
                 timer1.Start();
             }
+        }
 
-            LblRack.Text = location;
+        private void ApplyRackEmphasis()
+        {
+            bool hasSearch = !string.IsNullOrWhiteSpace(TxtPartnumber.Text);
+
+            foreach (Control section in rackButtons.Values
+                         .Select(button => button.Parent?.Parent)
+                         .Where(section => section != null)
+                         .Distinct())
+            {
+                section.BackColor = Color.FromArgb(37, 55, 77);
+            }
+
+            foreach (var item in rackButtons)
+            {
+                Button button = item.Value;
+                bool isSelected = string.Equals(item.Key, _selectedLocation, StringComparison.OrdinalIgnoreCase);
+                bool isMatch = _searchMatches.Contains(item.Key);
+
+                button.FlatAppearance.BorderSize = isSelected ? 4 : isMatch ? 3 : 1;
+                button.FlatAppearance.BorderColor = isSelected
+                    ? Color.FromArgb(255, 111, 0)
+                    : isMatch
+                        ? Color.FromArgb(0, 120, 215)
+                        : hasSearch ? Color.Gainsboro : Color.FromArgb(122, 136, 153);
+                button.ForeColor = hasSearch && !isMatch && !isSelected ? Color.DarkGray : Color.Black;
+
+                if (button.Parent?.Parent is Control section)
+                {
+                    if (isMatch)
+                    {
+                        section.BackColor = Color.FromArgb(0, 90, 160);
+                    }
+
+                    if (isSelected)
+                    {
+                        section.BackColor = Color.FromArgb(185, 78, 0);
+                    }
+                }
+            }
         }
 
         private static Image GenerateQRCode(string QRData)
@@ -358,6 +424,7 @@ namespace FGScanner.Forms.Viewer
         {
             _isInitializing = true;
             timer1.Stop();
+            flowLayoutPanel1.Visible = false;
             await _dbLock.WaitAsync();
 
             try
@@ -372,23 +439,93 @@ namespace FGScanner.Forms.Viewer
             }
             finally
             {
+                ApplyRackEmphasis();
+                flowLayoutPanel1.Visible = true;
                 _dbLock.Release();
                 _isInitializing = false;
                 timer1.Start();
+                StartRealtimeUpdates();
             }
+        }
+
+        private void StartRealtimeUpdates()
+        {
+            if (_realtimeSubscribed)
+            {
+                return;
+            }
+
+            _realtimeSubscribed = true;
+            InventoryRealtimeClient.InventoryChanged += InventoryRealtimeClient_InventoryChanged;
+            Disposed += (_, _) =>
+            {
+                InventoryRealtimeClient.InventoryChanged -= InventoryRealtimeClient_InventoryChanged;
+                _realtimeSubscribed = false;
+            };
+            _ = InventoryRealtimeClient.StartAsync();
+        }
+
+        private void InventoryRealtimeClient_InventoryChanged(string warehouseId)
+        {
+            if (!string.IsNullOrWhiteSpace(warehouseId) &&
+                !string.Equals(warehouseId, whId, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            if (IsDisposed || !IsHandleCreated)
+            {
+                return;
+            }
+
+            BeginInvoke(new Action(async () => await RefreshViewerAsync()));
+        }
+
+        private async Task RefreshViewerAsync()
+        {
+            await _dbLock.WaitAsync();
+            try
+            {
+                await RefreshRackCountsAsync();
+                if (!string.IsNullOrWhiteSpace(LblRack.Text) && LblRack.Text != "---")
+                {
+                    await Loadtransactionlogs(LblRack.Text);
+                }
+            }
+            finally
+            {
+                _dbLock.Release();
+            }
+        }
+
+        private async Task RefreshRackCountsAsync()
+        {
+            var previousCounts = new Dictionary<string, int>(RackCountCache);
+            await LoadCache();
+
+            foreach (string rackLabel in rackButtons.Keys)
+            {
+                previousCounts.TryGetValue(rackLabel, out int previousCount);
+                RackCountCache.TryGetValue(rackLabel, out int currentCount);
+                if (previousCount != currentCount)
+                {
+                    await UpdateRackUI(rackLabel);
+                }
+            }
+
+            ApplyRackEmphasis();
         }
 
         private async void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Stop();
-            await _dbLock.WaitAsync();
             try
             {
-                await LoadChangeRacks();
+                _ = InventoryRealtimeClient.StartAsync();
+                await RefreshViewerAsync();
             }
             finally
             {
-                _dbLock.Release();
                 timer1.Start();
             }
         }

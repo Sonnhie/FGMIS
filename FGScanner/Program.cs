@@ -1,8 +1,11 @@
 using FGScanner.Util;
+using FGScanner.Services;
 using Microsoft.Data.SqlClient;
 using OfficeOpenXml;
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -45,25 +48,67 @@ namespace FGScanner
         {
             Stopwatch minimumDisplayTime = Stopwatch.StartNew();
 
-            splash.UpdateProgress(10, "Reading secure database configuration...");
+            splash.UpdateProgress(8, "Reading secure database configuration...");
             db_connection connection = new();
 
-            splash.UpdateProgress(35, "Connecting to the inventory database...");
+            splash.UpdateProgress(25, "Connecting to the inventory database...");
             DatabaseTest(connection);
 
-            splash.UpdateProgress(65, "Initializing spreadsheet and reporting services...");
+            splash.UpdateProgress(48, "Initializing spreadsheet and reporting services...");
             ExcelPackage.License.SetNonCommercialPersonal("NIDEC");
 
-            splash.UpdateProgress(85, "Checking application templates and resources...");
-            string templatePath = System.IO.Path.Combine(AppContext.BaseDirectory, "Templates");
-            if (!System.IO.Directory.Exists(templatePath))
-                throw new System.IO.DirectoryNotFoundException("The application Templates folder is missing.");
+            splash.UpdateProgress(65, "Checking required application files...");
+            CheckApplicationFiles();
 
-            splash.UpdateProgress(100, "Ready. Opening secure sign-in...");
+            splash.UpdateProgress(82, "Checking real-time inventory hub...");
+            bool hubConnected = InventoryRealtimeClient
+                .CheckConnectionAsync(TimeSpan.FromSeconds(3))
+                .GetAwaiter()
+                .GetResult();
+
+            string realtimeStatus = hubConnected
+                ? "Real-time updates connected."
+                : InventoryRealtimeClient.IsConfigured
+                    ? "Hub offline; periodic refresh is enabled."
+                    : "Hub not configured; periodic refresh is enabled.";
+
+            splash.UpdateProgress(100, $"Ready. {realtimeStatus} Opening secure sign-in...");
 
             int remainingMs = 900 - (int)minimumDisplayTime.ElapsedMilliseconds;
             if (remainingMs > 0)
                 Thread.Sleep(remainingMs);
+        }
+
+        static void CheckApplicationFiles()
+        {
+            string templatePath = Path.Combine(AppContext.BaseDirectory, "Templates");
+            string[] requiredFiles =
+            {
+                "packinglist.xlsx",
+                "TransferSlip.xlsx",
+                "SF-78-FG003_Rev.00_Stock Card.xlsx"
+            };
+
+            if (!Directory.Exists(templatePath))
+            {
+                throw new DirectoryNotFoundException(
+                    $"The application Templates folder is missing: {templatePath}");
+            }
+
+            string[] missingFiles = requiredFiles
+                .Where(fileName =>
+                {
+                    string filePath = Path.Combine(templatePath, fileName);
+                    return !File.Exists(filePath) || new FileInfo(filePath).Length == 0;
+                })
+                .ToArray();
+
+            if (missingFiles.Length > 0)
+            {
+                throw new FileNotFoundException(
+                    "Required application files are missing or empty: " +
+                    string.Join(", ", missingFiles));
+            }
         }
 
         static void DatabaseTest(db_connection connection)

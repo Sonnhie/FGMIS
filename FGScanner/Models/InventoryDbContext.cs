@@ -28,6 +28,10 @@ public partial class InventoryDbContext : DbContext
 
     public virtual DbSet<InventoryRebuildLog> InventoryRebuildLogs { get; set; }
 
+    public virtual DbSet<InventoryCountBatch> InventoryCountBatches { get; set; }
+
+    public virtual DbSet<InventoryCountTagSnapshot> InventoryCountTagSnapshots { get; set; }
+
     public virtual DbSet<Module> Modules { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
@@ -68,6 +72,52 @@ public partial class InventoryDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<InventoryCountBatch>(entity =>
+        {
+            entity.ToTable("inventory_count_batch");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.BatchCode).IsUnique();
+            entity.HasIndex(e => new { e.CutoffDate, e.WarehouseId, e.BatchSequence }).IsUnique();
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.BatchCode).HasMaxLength(50).HasColumnName("batch_code");
+            entity.Property(e => e.CutoffDate).HasColumnType("date").HasColumnName("cutoff_date");
+            entity.Property(e => e.WarehouseId).HasMaxLength(20).HasColumnName("warehouse_id");
+            entity.Property(e => e.GenerationMode).HasMaxLength(20).HasColumnName("generation_mode");
+            entity.Property(e => e.RackLocation).HasMaxLength(100).HasColumnName("rack_location");
+            entity.Property(e => e.Revision).HasColumnName("revision");
+            entity.Property(e => e.BatchSequence).HasColumnName("batch_sequence");
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime2").HasColumnName("created_at");
+            entity.Property(e => e.CreatedBy).HasMaxLength(255).HasColumnName("created_by");
+            entity.Property(e => e.PrefillSystemCount).HasColumnName("prefill_system_count");
+            entity.Property(e => e.TagCount).HasColumnName("tag_count");
+            entity.Property(e => e.Status).HasMaxLength(20).HasColumnName("status");
+        });
+
+        modelBuilder.Entity<InventoryCountTagSnapshot>(entity =>
+        {
+            entity.ToTable("inventory_count_tag_snapshot");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.TagNumber).IsUnique();
+            entity.HasIndex(e => new { e.BatchId, e.SequenceNumber }).IsUnique();
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.BatchId).HasColumnName("batch_id");
+            entity.Property(e => e.SequenceNumber).HasColumnName("sequence_number");
+            entity.Property(e => e.TagNumber).HasMaxLength(50).HasColumnName("tag_number");
+            entity.Property(e => e.ErpLocation).HasMaxLength(100).HasColumnName("erp_location");
+            entity.Property(e => e.RackLocation).HasMaxLength(100).HasColumnName("rack_location");
+            entity.Property(e => e.LocationDescription).HasMaxLength(100).HasColumnName("location_description");
+            entity.Property(e => e.PartNumber).HasMaxLength(255).HasColumnName("part_number");
+            entity.Property(e => e.ProductionVersion).HasMaxLength(100).HasColumnName("production_version");
+            entity.Property(e => e.MaterialName).HasMaxLength(255).HasColumnName("material_name");
+            entity.Property(e => e.Unit).HasMaxLength(20).HasColumnName("unit");
+            entity.Property(e => e.SystemBoxes).HasColumnName("system_boxes");
+            entity.Property(e => e.SystemQuantity).HasColumnName("system_quantity");
+            entity.HasOne(e => e.Batch)
+                .WithMany(e => e.Tags)
+                .HasForeignKey(e => e.BatchId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
         modelBuilder.Entity<ActualInventory>(entity =>
         {
             entity

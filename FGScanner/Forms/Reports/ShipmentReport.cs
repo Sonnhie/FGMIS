@@ -238,6 +238,7 @@ namespace FGScanner.Forms.Reports
 
                     if (isSuccess)
                     {
+                        _ = InventoryRealtimeClient.PublishInventoryChangedAsync(string.Empty);
                         MessageBox.Show(Message);
                         ShipmentTable.Refresh();
                         ShipmentItemTable.Refresh();

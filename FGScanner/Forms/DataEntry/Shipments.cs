@@ -511,6 +511,7 @@ namespace FGScanner.Forms.DataEntry
                     var (isSuccess, Message) = await _service.InsertFGOutgoing(validScan, warehouse, shipmentId, transactionType, _userid, marketcode, "FG");
                     if (isSuccess)
                     {
+                        _ = InventoryRealtimeClient.PublishInventoryChangedAsync(warehouse);
                         MessageBox.Show(Message);
                         GeneratePackingListBtn.Enabled = true;
                     }

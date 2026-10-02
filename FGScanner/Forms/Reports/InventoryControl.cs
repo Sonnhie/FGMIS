@@ -29,7 +29,6 @@ namespace FGScanner.Forms.Reports
         private int pageSize = 50;
         private int totalPage = 0;
         private string _userid = string.Empty;
-        private string _partnumber = string.Empty;
 
         public InventoryControl(string userid)
         {
@@ -38,18 +37,39 @@ namespace FGScanner.Forms.Reports
             toolStripProgressBar1.Visible = false;
             toolStripStatusLabel1.Visible = false;
             TxtPartnumber.CharacterCasing = CharacterCasing.Upper;
+            TxtCustomer.CharacterCasing = CharacterCasing.Upper;
+            TxtLocation.CharacterCasing = CharacterCasing.Upper;
+            TxtProductionVersion.CharacterCasing = CharacterCasing.Upper;
+            WarehouseFilter.SelectedIndex = 0;
+            PpsTypeFilter.SelectedIndex = 0;
+            MovementFilter.SelectedIndex = 0;
+            ProductionDateFrom.Checked = false;
+            ProductionDateTo.Checked = false;
             _dbContext = new();
             _queries = new(_dbContext);
             _excelService = new(_queries);
         }
 
-        public async Task FilterData(string partnumber = null)
+        public async Task FilterData()
         {
             try
             {
-                var data = await _queries.GetFilteredInventory(partnumber, page, pageSize);
+                if (ProductionDateFrom.Checked && ProductionDateTo.Checked &&
+                    ProductionDateFrom.Value.Date > ProductionDateTo.Value.Date)
+                {
+                    MessageBox.Show(
+                        "The production date From value cannot be later than the To value.",
+                        "Invalid Date Range",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
+
+                var data = await _queries.GetFilteredInventory(BuildInventoryFilter(), page, pageSize);
 
                 totalPage = data.TotalPages == 0 ? 1 : data.TotalPages;
+                BtnPrev.Enabled = page > 1;
+                BtnNext.Enabled = page < totalPage;
 
                 if (data != null)
                 {
@@ -174,8 +194,10 @@ namespace FGScanner.Forms.Reports
         {
             try
             {
-
-                await FilterData(TxtPartnumber.Text);
+                page = 1;
+                BtnPrev.Enabled = false;
+                BtnNext.Enabled = true;
+                await FilterData();
             }
             catch (Exception ex)
             {
@@ -185,7 +207,7 @@ namespace FGScanner.Forms.Reports
 
         private async void InventoryControl_Load(object sender, EventArgs e)
         {
-            await FilterData(TxtPartnumber.Text);
+            await FilterData();
         }
 
         private async void BtnNext_Click(object sender, EventArgs e)
@@ -194,7 +216,7 @@ namespace FGScanner.Forms.Reports
             {
                 page++;
                 BtnPrev.Enabled = true;
-                await FilterData(TxtPartnumber.Text);
+                await FilterData();
             }
             else
             {
@@ -207,7 +229,7 @@ namespace FGScanner.Forms.Reports
             if (page > 1)
             {
                 page--;
-                await FilterData(TxtPartnumber.Text);
+                await FilterData();
                 BtnNext.Enabled = true;
             }
             else
@@ -371,14 +393,57 @@ namespace FGScanner.Forms.Reports
                         "Stock Not Found",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
-                    await FilterData(TxtPartnumber.Text);
+                    await FilterData();
                     return;
                 }
 
                 StockEdit stockEdit = new(PPS, partnumber, location, productionVersion, productionDate, box, quantity, customer, whId, _userid);
                 stockEdit.ShowDialog();
-                await FilterData(TxtPartnumber.Text);
+                await FilterData();
             }
+        }
+
+        private InventoryFilter BuildInventoryFilter()
+        {
+            return new InventoryFilter
+            {
+                Partnumber = TxtPartnumber.Text,
+                Customer = TxtCustomer.Text,
+                Location = TxtLocation.Text,
+                ProductionVersion = TxtProductionVersion.Text,
+                WarehouseId = WarehouseFilter.SelectedIndex > 0 ? WarehouseFilter.Text : null,
+                PpsType = PpsTypeFilter.SelectedIndex > 0 ? PpsTypeFilter.Text : null,
+                MovementClassification = MovementFilter.SelectedIndex > 0 ? MovementFilter.Text : null,
+                ProductionDateFrom = ProductionDateFrom.Checked
+                    ? DateOnly.FromDateTime(ProductionDateFrom.Value)
+                    : null,
+                ProductionDateTo = ProductionDateTo.Checked
+                    ? DateOnly.FromDateTime(ProductionDateTo.Value)
+                    : null
+            };
+        }
+
+        private async void ClearFiltersButton_Click(object sender, EventArgs e)
+        {
+            TxtPartnumber.Clear();
+            TxtCustomer.Clear();
+            TxtLocation.Clear();
+            TxtProductionVersion.Clear();
+            WarehouseFilter.SelectedIndex = 0;
+            PpsTypeFilter.SelectedIndex = 0;
+            MovementFilter.SelectedIndex = 0;
+            ProductionDateFrom.Checked = false;
+            ProductionDateTo.Checked = false;
+            page = 1;
+            BtnPrev.Enabled = false;
+            BtnNext.Enabled = true;
+            await FilterData();
+        }
+
+        private void CheckTagsButton_Click(object sender, EventArgs e)
+        {
+            using var checkTagForm = new MonthEndCheckTagForm(_userid);
+            checkTagForm.ShowDialog(this);
         }
     }
 }

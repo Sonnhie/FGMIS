@@ -259,6 +259,7 @@ namespace FGScanner.Forms.DataEntry
 
                 if (isSuccess)
                 {
+                    _ = InventoryRealtimeClient.PublishInventoryChangedAsync(warehouse);
                     MessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                     // Post-success cleanup

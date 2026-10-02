@@ -1,6 +1,7 @@
 ﻿using FGScanner.Models;
 using FGScanner.Database;
 using FGScanner.Repositories;
+using FGScanner.Services;
 using FGScanner.Util;
 using Microsoft.Data.SqlClient;
 using System;
@@ -100,6 +101,7 @@ namespace FGScanner
                         CustomerId = _customer,
                         ProdVer = _productionVersion,
                         Location = _location,
+                        WhId = _whId,
                         Remarks = remarks,
                         StorageLocation = "9151",
                         Box = boxCount,
@@ -111,6 +113,7 @@ namespace FGScanner
 
                     if (isSuccess)
                     {
+                        _ = InventoryRealtimeClient.PublishInventoryChangedAsync(_whId);
                         MessageBox.Show(Message);
                         await LoadStockInformation();
                     }

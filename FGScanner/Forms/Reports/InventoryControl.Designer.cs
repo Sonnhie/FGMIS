@@ -40,6 +40,16 @@
             total_box_lbl = new System.Windows.Forms.Label();
             total_sum = new System.Windows.Forms.Label();
             LblPage = new System.Windows.Forms.Label();
+            TxtCustomer = new System.Windows.Forms.TextBox();
+            TxtLocation = new System.Windows.Forms.TextBox();
+            TxtProductionVersion = new System.Windows.Forms.TextBox();
+            WarehouseFilter = new System.Windows.Forms.ComboBox();
+            PpsTypeFilter = new System.Windows.Forms.ComboBox();
+            MovementFilter = new System.Windows.Forms.ComboBox();
+            ProductionDateFrom = new System.Windows.Forms.DateTimePicker();
+            ProductionDateTo = new System.Windows.Forms.DateTimePicker();
+            ClearFiltersButton = new System.Windows.Forms.Button();
+            CheckTagsButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)LogsTable).BeginInit();
             statusStrip1.SuspendLayout();
             SuspendLayout();
@@ -47,7 +57,7 @@
             // SearchButton
             // 
             SearchButton.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            SearchButton.Location = new System.Drawing.Point(403, 15);
+            SearchButton.Location = new System.Drawing.Point(678, 50);
             SearchButton.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             SearchButton.Name = "SearchButton";
             SearchButton.Size = new System.Drawing.Size(77, 33);
@@ -60,7 +70,7 @@
             // 
             BtnExport.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             BtnExport.Font = new System.Drawing.Font("Bahnschrift Condensed", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            BtnExport.Location = new System.Drawing.Point(301, 16);
+            BtnExport.Location = new System.Drawing.Point(855, 51);
             BtnExport.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             BtnExport.Name = "BtnExport";
             BtnExport.Size = new System.Drawing.Size(98, 32);
@@ -72,11 +82,11 @@
             // TxtPartnumber
             // 
             TxtPartnumber.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            TxtPartnumber.Location = new System.Drawing.Point(20, 19);
+            TxtPartnumber.Location = new System.Drawing.Point(20, 14);
             TxtPartnumber.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             TxtPartnumber.Name = "TxtPartnumber";
             TxtPartnumber.PlaceholderText = "Search partnumber";
-            TxtPartnumber.Size = new System.Drawing.Size(252, 26);
+            TxtPartnumber.Size = new System.Drawing.Size(150, 26);
             TxtPartnumber.TabIndex = 25;
             // 
             // LogsTable
@@ -87,11 +97,11 @@
             LogsTable.BackgroundColor = System.Drawing.SystemColors.Control;
             LogsTable.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             LogsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            LogsTable.Location = new System.Drawing.Point(23, 64);
+            LogsTable.Location = new System.Drawing.Point(23, 94);
             LogsTable.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             LogsTable.Name = "LogsTable";
             LogsTable.RowHeadersWidth = 51;
-            LogsTable.Size = new System.Drawing.Size(930, 443);
+            LogsTable.Size = new System.Drawing.Size(930, 413);
             LogsTable.TabIndex = 28;
             LogsTable.CellContentClick += LogsTable_CellContentClick;
             LogsTable.SelectionChanged += LogsTable_SelectionChanged;
@@ -178,9 +188,124 @@
             LblPage.TabIndex = 32;
             LblPage.Text = "Page 1 of 300";
             // 
+            // TxtCustomer
+            // 
+            TxtCustomer.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            TxtCustomer.Location = new System.Drawing.Point(180, 14);
+            TxtCustomer.Name = "TxtCustomer";
+            TxtCustomer.PlaceholderText = "Customer";
+            TxtCustomer.Size = new System.Drawing.Size(120, 26);
+            TxtCustomer.TabIndex = 35;
+            // 
+            // TxtLocation
+            // 
+            TxtLocation.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            TxtLocation.Location = new System.Drawing.Point(310, 14);
+            TxtLocation.Name = "TxtLocation";
+            TxtLocation.PlaceholderText = "Rack location";
+            TxtLocation.Size = new System.Drawing.Size(110, 26);
+            TxtLocation.TabIndex = 36;
+            // 
+            // TxtProductionVersion
+            // 
+            TxtProductionVersion.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            TxtProductionVersion.Location = new System.Drawing.Point(430, 14);
+            TxtProductionVersion.Name = "TxtProductionVersion";
+            TxtProductionVersion.PlaceholderText = "Prod. version";
+            TxtProductionVersion.Size = new System.Drawing.Size(90, 26);
+            TxtProductionVersion.TabIndex = 37;
+            // 
+            // WarehouseFilter
+            // 
+            WarehouseFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            WarehouseFilter.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            WarehouseFilter.FormattingEnabled = true;
+            WarehouseFilter.Items.AddRange(new object[] { "All Warehouses", "WH1", "WH2" });
+            WarehouseFilter.Location = new System.Drawing.Point(530, 14);
+            WarehouseFilter.Name = "WarehouseFilter";
+            WarehouseFilter.Size = new System.Drawing.Size(105, 26);
+            WarehouseFilter.TabIndex = 38;
+            // 
+            // PpsTypeFilter
+            // 
+            PpsTypeFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            PpsTypeFilter.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            PpsTypeFilter.FormattingEnabled = true;
+            PpsTypeFilter.Items.AddRange(new object[] { "All PPS Types", "BPPS", "Exact PPS" });
+            PpsTypeFilter.Location = new System.Drawing.Point(645, 14);
+            PpsTypeFilter.Name = "PpsTypeFilter";
+            PpsTypeFilter.Size = new System.Drawing.Size(110, 26);
+            PpsTypeFilter.TabIndex = 39;
+            // 
+            // MovementFilter
+            // 
+            MovementFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            MovementFilter.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            MovementFilter.FormattingEnabled = true;
+            MovementFilter.Items.AddRange(new object[] { "All Movement", "FAST", "SLOW", "NO MOVEMENT" });
+            MovementFilter.Location = new System.Drawing.Point(765, 14);
+            MovementFilter.Name = "MovementFilter";
+            MovementFilter.Size = new System.Drawing.Size(188, 26);
+            MovementFilter.TabIndex = 40;
+            // 
+            // ProductionDateFrom
+            // 
+            ProductionDateFrom.CustomFormat = "'From:' MM/dd/yyyy";
+            ProductionDateFrom.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            ProductionDateFrom.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            ProductionDateFrom.Location = new System.Drawing.Point(20, 52);
+            ProductionDateFrom.Name = "ProductionDateFrom";
+            ProductionDateFrom.ShowCheckBox = true;
+            ProductionDateFrom.Size = new System.Drawing.Size(190, 26);
+            ProductionDateFrom.TabIndex = 41;
+            // 
+            // ProductionDateTo
+            // 
+            ProductionDateTo.CustomFormat = "'To:' MM/dd/yyyy";
+            ProductionDateTo.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            ProductionDateTo.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            ProductionDateTo.Location = new System.Drawing.Point(220, 52);
+            ProductionDateTo.Name = "ProductionDateTo";
+            ProductionDateTo.ShowCheckBox = true;
+            ProductionDateTo.Size = new System.Drawing.Size(190, 26);
+            ProductionDateTo.TabIndex = 42;
+            // 
+            // ClearFiltersButton
+            // 
+            ClearFiltersButton.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            ClearFiltersButton.Location = new System.Drawing.Point(760, 50);
+            ClearFiltersButton.Name = "ClearFiltersButton";
+            ClearFiltersButton.Size = new System.Drawing.Size(73, 33);
+            ClearFiltersButton.TabIndex = 43;
+            ClearFiltersButton.Text = "Clear";
+            ClearFiltersButton.UseVisualStyleBackColor = true;
+            ClearFiltersButton.Click += ClearFiltersButton_Click;
+            // 
+            // CheckTagsButton
+            // 
+            CheckTagsButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            CheckTagsButton.Font = new System.Drawing.Font("Bahnschrift Condensed", 11.25F);
+            CheckTagsButton.Location = new System.Drawing.Point(335, 519);
+            CheckTagsButton.Name = "CheckTagsButton";
+            CheckTagsButton.Size = new System.Drawing.Size(140, 36);
+            CheckTagsButton.TabIndex = 44;
+            CheckTagsButton.Text = "Month-End Check Tags";
+            CheckTagsButton.UseVisualStyleBackColor = true;
+            CheckTagsButton.Click += CheckTagsButton_Click;
+            // 
             // InventoryControl
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            Controls.Add(CheckTagsButton);
+            Controls.Add(ClearFiltersButton);
+            Controls.Add(ProductionDateTo);
+            Controls.Add(ProductionDateFrom);
+            Controls.Add(MovementFilter);
+            Controls.Add(PpsTypeFilter);
+            Controls.Add(WarehouseFilter);
+            Controls.Add(TxtProductionVersion);
+            Controls.Add(TxtLocation);
+            Controls.Add(TxtCustomer);
             Controls.Add(total_box_lbl);
             Controls.Add(total_sum);
             Controls.Add(LblPage);
@@ -216,5 +341,15 @@
         private System.Windows.Forms.Label total_box_lbl;
         private System.Windows.Forms.Label total_sum;
         private System.Windows.Forms.Label LblPage;
+        private System.Windows.Forms.TextBox TxtCustomer;
+        private System.Windows.Forms.TextBox TxtLocation;
+        private System.Windows.Forms.TextBox TxtProductionVersion;
+        private System.Windows.Forms.ComboBox WarehouseFilter;
+        private System.Windows.Forms.ComboBox PpsTypeFilter;
+        private System.Windows.Forms.ComboBox MovementFilter;
+        private System.Windows.Forms.DateTimePicker ProductionDateFrom;
+        private System.Windows.Forms.DateTimePicker ProductionDateTo;
+        private System.Windows.Forms.Button ClearFiltersButton;
+        private System.Windows.Forms.Button CheckTagsButton;
     }
 }

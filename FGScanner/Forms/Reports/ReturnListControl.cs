@@ -269,6 +269,7 @@ namespace FGScanner.Forms.Reports
 
                     if (isSuccess)
                     {
+                        _ = InventoryRealtimeClient.PublishInventoryChangedAsync(string.Empty);
                         MessageBox.Show(Message);
                         ReturnTable.Refresh();
                         ReturnItemTable.Refresh();

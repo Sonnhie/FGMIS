@@ -373,7 +373,7 @@ namespace FGScanner.Services
             int rowH = 50;
             string cardTitle = string.IsNullOrWhiteSpace(data.Category)
                 ? "Inventory Card"
-                : $"Inventory Card - {data.Category}";
+                : $"Inventory Card";
             g.DrawString(cardTitle, bodyFont, textBrush, new Rectangle(startX, currentY, width, rowH), centerFmt);
             currentY += rowH; g.DrawLine(borderPen, startX, currentY, startX + width, currentY);
 

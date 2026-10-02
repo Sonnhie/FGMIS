@@ -263,6 +263,7 @@ namespace FGScanner.Forms.DataEntry
 
                     if (results.isSuccess)
                     {
+                        _ = InventoryRealtimeClient.PublishInventoryChangedAsync(warehouseId);
                         MessageBox.Show(results.Message);
                         await LoadInventoryTable();
                     }

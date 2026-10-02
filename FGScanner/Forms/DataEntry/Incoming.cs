@@ -208,6 +208,7 @@ namespace FGScanner.Forms.DataEntry
                     var (isSuccess, Message) = await _service.InsertFG(validScan, warehouse, transactionType, _userid);
                     if (isSuccess)
                     {
+                        _ = InventoryRealtimeClient.PublishInventoryChangedAsync(warehouse);
                         MessageBox.Show(Message);
                         validScan.Clear();
                         RackTable.DataSource = null;

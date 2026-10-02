@@ -1243,18 +1243,64 @@ namespace FGScanner.Repositories
             }
         }
 
-        public async Task<PagedResult<ActualInventory>> GetFilteredInventory(string partnumber = null, int pageNumber = 1, int pageSize = 50)
+        public Task<PagedResult<ActualInventory>> GetFilteredInventory(string partnumber = null, int pageNumber = 1, int pageSize = 50)
         {
+            return GetFilteredInventory(
+                new InventoryFilter { Partnumber = partnumber },
+                pageNumber,
+                pageSize);
+        }
+
+        public async Task<PagedResult<ActualInventory>> GetFilteredInventory(InventoryFilter filters, int pageNumber = 1, int pageSize = 50)
+        {
+            filters ??= new InventoryFilter();
+
             var transactionQuery = _context.TransactionHistories
                 .AsNoTracking()
                 .Where(transaction =>
                     transaction.Quantity > 0 &&
                     (transaction.TransactionType == "IN" || transaction.TransactionType == "OUT"));
 
-            if (!string.IsNullOrWhiteSpace(partnumber))
+            if (!string.IsNullOrWhiteSpace(filters.Partnumber))
             {
-                string filter = partnumber.Trim();
+                string filter = filters.Partnumber.Trim();
                 transactionQuery = transactionQuery.Where(transaction => transaction.Partnumber.Contains(filter));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.Customer))
+            {
+                string filter = filters.Customer.Trim();
+                transactionQuery = transactionQuery.Where(transaction => transaction.CustomerId.Contains(filter));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.Location))
+            {
+                string filter = filters.Location.Trim();
+                transactionQuery = transactionQuery.Where(transaction => transaction.Location.Contains(filter));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.ProductionVersion))
+            {
+                string filter = filters.ProductionVersion.Trim();
+                transactionQuery = transactionQuery.Where(transaction => transaction.ProdVer.Contains(filter));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.WarehouseId))
+            {
+                string filter = filters.WarehouseId.Trim();
+                transactionQuery = transactionQuery.Where(transaction => transaction.WhId == filter);
+            }
+
+            if (filters.ProductionDateFrom.HasValue)
+            {
+                DateOnly startDate = filters.ProductionDateFrom.Value;
+                transactionQuery = transactionQuery.Where(transaction => transaction.ProdDate >= startDate);
+            }
+
+            if (filters.ProductionDateTo.HasValue)
+            {
+                DateOnly endDate = filters.ProductionDateTo.Value;
+                transactionQuery = transactionQuery.Where(transaction => transaction.ProdDate <= endDate);
             }
 
             var movements =
@@ -1320,7 +1366,14 @@ namespace FGScanner.Repositories
                         inventory.ProdDate == item.ProdDate &&
                         inventory.ProdVer == item.ProdVer &&
                         inventory.Location == item.Location &&
-                        inventory.WhId == item.WhId));
+                        inventory.WhId == item.WhId &&
+                        (string.IsNullOrWhiteSpace(filters.MovementClassification) ||
+                         inventory.MovementClassification == filters.MovementClassification)));
+
+            if (!string.IsNullOrWhiteSpace(filters.PpsType))
+            {
+                balances = balances.Where(item => item.PpsType == filters.PpsType);
+            }
 
             int totalCount = await balances.CountAsync();
 
@@ -1455,6 +1508,7 @@ namespace FGScanner.Repositories
 
                 _context.TransactionHistories.Add(newItem);
                 await _context.SaveChangesAsync();
+                await dbTransaction.CommitAsync();
                 return (true, "Items successfully deducted.");
             }
             catch(Exception e)
